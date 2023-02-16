@@ -1,37 +1,13 @@
 # Tiros
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
 Tiros is an IPFS website measurement script. It uses [`clustertest`](https://github.com/gusegger/clustertest) to provision a configurable number of EC2 instances across the world and then uses those to request websites from there. 
 
-
-
-# Standard Readme
-
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-
-A standard style for README files
-
-Your README file is normally the first entry point to your code. It should tell people why they should use your module, how they can install it, and how they can use it. Standardizing how you write your README makes creating and maintaining your READMEs easier. Great documentation takes work!
-
-This repository contains:
-
-1. [The specification](spec.md) for how a standard README should look.
-2. A link to [a linter](https://github.com/RichardLitt/standard-readme-preset) you can use to keep your README maintained ([work in progress](https://github.com/RichardLitt/standard-readme/issues/5)).
-3. A link to [a generator](https://github.com/RichardLitt/generator-standard-readme) you can use to create standard READMEs.
-4. [A badge](#badge) to point to this spec.
-5. [Examples of standard READMEs](example-readmes/) - such as this file you are reading.
-
-Standard Readme is designed for open source libraries. Although it’s [historically](#background) made for Node and npm projects, it also applies to libraries in other languages and package managers.
-
-
 ## Table of Contents
 
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-    - [Generator](#generator)
-- [Badge](#badge)
-- [Example Readmes](#example-readmes)
-- [Related Efforts](#related-efforts)
+- [Table of Contents](#table-of-contents)
+- [Run](#run)
+- [Development](#development)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 - [License](#license)
@@ -87,16 +63,7 @@ migrate create -ext sql -dir migrations -seq create_measurements_table
 To create the database models
 
 ```shell
-
-```
-
-## Release
-
-This is only a documentation package. You can print out [spec.md](spec.md) to your console:
-
-```sh
-$ standard-readme-spec
-# Prints out the standard-readme spec
+make models
 ```
 
 ## Maintainers

@@ -130,7 +130,7 @@ func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region 
 		}
 	}
 
-	readyTimes := &sync.Map{}
+	readyTimes := &sync.Map{} // TODO: could embed this in kubo.Node
 
 	group, groupCtx := errgroup.WithContext(ctx)
 	for i, node := range nodes {
