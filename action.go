@@ -270,7 +270,7 @@ func runPhantomas(ctx context.Context, node *kubo.Node, url string) (*time.Durat
 	if err != nil {
 		fmt.Printf("stdout: %s\n", stdout)
 		fmt.Printf("stderr: %s\n", stderr)
-		return nil, err
+		return nil, fmt.Errorf("%s: stderr: %s", err, stderr)
 	}
 	out := &phantomasOutput{}
 	err = json.Unmarshal(stdout.Bytes(), out)
