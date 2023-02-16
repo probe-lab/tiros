@@ -191,10 +191,11 @@ func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *mod
 						logParams.Warnw("Error running phantomas", "err", err)
 						measurement.Error = null.StringFrom(err.Error())
 					} else {
+						logParams.Infow("Measured latency", "latency", loadTime.Seconds())
 						measurement.Latency = null.Float64From(loadTime.Seconds())
 					}
 
-					logParams.Infow("Inserting measurement...", "latency_s", loadTime.Seconds())
+					logParams.Infow("Inserting measurement...")
 					if err := measurement.Insert(ctx, dbClient.handle, boil.Infer()); err != nil {
 						log.Warnw("error inserting row", "err", err)
 					}
