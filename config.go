@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
@@ -36,7 +37,6 @@ func configFromContext(c *cli.Context) (*config, error) {
 		verbose:                  c.Bool("verbose"),
 		nodeagent:                c.String("nodeagent"),
 		regions:                  c.StringSlice("regions"),
-		urls:                     c.StringSlice("urls"),
 		versions:                 c.StringSlice("versions"),
 		nodesPerVersion:          c.Int("nodes-per-version"),
 		times:                    c.Int("times"),
@@ -74,6 +74,14 @@ func configFromContext(c *cli.Context) (*config, error) {
 		}
 		conf.s3BucketARNs = append(conf.s3BucketARNs, s3arn)
 	}
+
+	urls := c.StringSlice("urls")
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(urls), func(i, j int) {
+		urls[i], urls[j] = urls[j], urls[i]
+	})
+
+	conf.urls = urls
 
 	return &conf, nil
 }
