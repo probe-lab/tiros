@@ -102,6 +102,13 @@ func Action(ctx context.Context, conf *config) error {
 
 	}
 
+	defer func() {
+		run.FinishedAt = null.TimeFrom(time.Now())
+		if _, err = run.Update(ctx, db.handle, boil.Infer()); err != nil {
+			log.Warnw("Could not update measurement run", "err", err)
+		}
+	}()
+
 	return errg.Wait()
 }
 

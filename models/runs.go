@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -34,6 +35,7 @@ type Run struct {
 	Times           int16             `boil:"times" json:"times" toml:"times" yaml:"times"`
 	UpdatedAt       time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt       time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	FinishedAt      null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
 
 	R *runR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L runL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -50,6 +52,7 @@ var RunColumns = struct {
 	Times           string
 	UpdatedAt       string
 	CreatedAt       string
+	FinishedAt      string
 }{
 	ID:              "id",
 	Regions:         "regions",
@@ -61,6 +64,7 @@ var RunColumns = struct {
 	Times:           "times",
 	UpdatedAt:       "updated_at",
 	CreatedAt:       "created_at",
+	FinishedAt:      "finished_at",
 }
 
 var RunTableColumns = struct {
@@ -74,6 +78,7 @@ var RunTableColumns = struct {
 	Times           string
 	UpdatedAt       string
 	CreatedAt       string
+	FinishedAt      string
 }{
 	ID:              "runs.id",
 	Regions:         "runs.regions",
@@ -85,6 +90,7 @@ var RunTableColumns = struct {
 	Times:           "runs.times",
 	UpdatedAt:       "runs.updated_at",
 	CreatedAt:       "runs.created_at",
+	FinishedAt:      "runs.finished_at",
 }
 
 // Generated where
@@ -139,6 +145,30 @@ func (w whereHelperfloat64) NIN(slice []float64) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
+type whereHelpernull_Time struct{ field string }
+
+func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var RunWhere = struct {
 	ID              whereHelperint
 	Regions         whereHelpertypes_StringArray
@@ -150,6 +180,7 @@ var RunWhere = struct {
 	Times           whereHelperint16
 	UpdatedAt       whereHelpertime_Time
 	CreatedAt       whereHelpertime_Time
+	FinishedAt      whereHelpernull_Time
 }{
 	ID:              whereHelperint{field: "\"runs\".\"id\""},
 	Regions:         whereHelpertypes_StringArray{field: "\"runs\".\"regions\""},
@@ -161,6 +192,7 @@ var RunWhere = struct {
 	Times:           whereHelperint16{field: "\"runs\".\"times\""},
 	UpdatedAt:       whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
 	CreatedAt:       whereHelpertime_Time{field: "\"runs\".\"created_at\""},
+	FinishedAt:      whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
 }
 
 // RunRels is where relationship names are stored.
@@ -191,9 +223,9 @@ func (r *runR) GetMeasurements() MeasurementSlice {
 type runL struct{}
 
 var (
-	runAllColumns            = []string{"id", "regions", "urls", "settle_short", "settle_long", "nodes_per_version", "versions", "times", "updated_at", "created_at"}
+	runAllColumns            = []string{"id", "regions", "urls", "settle_short", "settle_long", "nodes_per_version", "versions", "times", "updated_at", "created_at", "finished_at"}
 	runColumnsWithoutDefault = []string{"regions", "urls", "settle_short", "settle_long", "nodes_per_version", "versions", "times", "updated_at", "created_at"}
-	runColumnsWithDefault    = []string{"id"}
+	runColumnsWithDefault    = []string{"id", "finished_at"}
 	runPrimaryKeyColumns     = []string{"id"}
 	runGeneratedColumns      = []string{"id"}
 )
