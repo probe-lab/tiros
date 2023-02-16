@@ -66,6 +66,12 @@ func main() {
 				EnvVars: []string{"TIROS_NODEAGENT_BIN"},
 			},
 			&cli.StringFlag{
+				Name:    "instance-type",
+				Usage:   "the EC2 instance type to run the experiment on",
+				Value:   "t2.micro",
+				EnvVars: []string{"TIROS_INSTANCE_TYPE"},
+			},
+			&cli.StringFlag{
 				Name:    "db-host",
 				Usage:   "On which host address can this clustertest reach the database",
 				EnvVars: []string{"TIROS_DATABASE_HOST"},

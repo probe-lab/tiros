@@ -62,7 +62,8 @@ func Action(ctx context.Context, conf *config) error {
 			WithPublicSubnetID(conf.subnetIDs[idx]).
 			WithInstanceProfileARN(conf.instanceProfileARNs[idx]).
 			WithInstanceSecurityGroupID(conf.instanceSecurityGroupIDs[idx]).
-			WithS3BucketARN(conf.s3BucketARNs[idx])
+			WithS3BucketARN(conf.s3BucketARNs[idx]).
+			WithInstanceType(conf.instanceType)
 
 		clusterImpls = append(clusterImpls, clusterImpl)
 	}

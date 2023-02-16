@@ -19,6 +19,7 @@ type config struct {
 	settleShort              time.Duration
 	settleLong               time.Duration
 	subnetIDs                []string
+	instanceType             string
 	instanceProfileARNs      []arn.ARN
 	s3BucketARNs             []arn.ARN
 	instanceSecurityGroupIDs []string
@@ -42,6 +43,7 @@ func configFromContext(c *cli.Context) (*config, error) {
 		settleShort:              c.Duration("settle-short"),
 		settleLong:               c.Duration("settle-long"),
 		subnetIDs:                c.StringSlice("public-subnet-ids"),
+		instanceType:             c.String("instance-type"),
 		instanceProfileARNs:      []arn.ARN{},
 		s3BucketARNs:             []arn.ARN{},
 		instanceSecurityGroupIDs: c.StringSlice("instance-security-group-ids"),
