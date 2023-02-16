@@ -2,7 +2,7 @@ REPO_SERVER=019120760881.dkr.ecr.us-east-1.amazonaws.com
 
 docker:
 	$(eval GIT_TAG := $(shell git rev-parse --short HEAD))
-	docker build -f Dockerfile_latency -t "${REPO_SERVER}/probelab:tiros-${GIT_TAG}" .
+	docker build -t "${REPO_SERVER}/probelab:tiros-${GIT_TAG}" .
 
 docker-push: docker
 	docker push "${REPO_SERVER}/probelab:tiros-${GIT_TAG}"

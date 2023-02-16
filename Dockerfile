@@ -18,7 +18,7 @@ RUN adduser -D -H tiros
 WORKDIR /home/tiros
 USER tiros
 
-COPY --from=builder /build/tiros /usr/local/bin/latency
+COPY --from=builder /build/tiros /usr/local/bin/tiros
 COPY --from=builder /go/bin/linux_amd64/agent /home/tiros/nodeagent
 
 CMD latency
