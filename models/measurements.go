@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,14 +24,16 @@ import (
 
 // Measurement is an object representing the database table.
 type Measurement struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RunID     string    `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
-	Region    string    `boil:"region" json:"region" toml:"region" yaml:"region"`
-	URL       string    `boil:"url" json:"url" toml:"url" yaml:"url"`
-	Version   string    `boil:"version" json:"version" toml:"version" yaml:"version"`
-	NodeNum   int16     `boil:"node_num" json:"node_num" toml:"node_num" yaml:"node_num"`
-	Latency   float64   `boil:"latency" json:"latency" toml:"latency" yaml:"latency"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID        int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	RunID     int          `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
+	Region    string       `boil:"region" json:"region" toml:"region" yaml:"region"`
+	URL       string       `boil:"url" json:"url" toml:"url" yaml:"url"`
+	Version   string       `boil:"version" json:"version" toml:"version" yaml:"version"`
+	NodeNum   int16        `boil:"node_num" json:"node_num" toml:"node_num" yaml:"node_num"`
+	Uptime    string       `boil:"uptime" json:"uptime" toml:"uptime" yaml:"uptime"`
+	Latency   null.Float64 `boil:"latency" json:"latency,omitempty" toml:"latency" yaml:"latency,omitempty"`
+	Error     null.String  `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
+	CreatedAt time.Time    `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *measurementR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L measurementL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -43,7 +46,9 @@ var MeasurementColumns = struct {
 	URL       string
 	Version   string
 	NodeNum   string
+	Uptime    string
 	Latency   string
+	Error     string
 	CreatedAt string
 }{
 	ID:        "id",
@@ -52,7 +57,9 @@ var MeasurementColumns = struct {
 	URL:       "url",
 	Version:   "version",
 	NodeNum:   "node_num",
+	Uptime:    "uptime",
 	Latency:   "latency",
+	Error:     "error",
 	CreatedAt: "created_at",
 }
 
@@ -63,7 +70,9 @@ var MeasurementTableColumns = struct {
 	URL       string
 	Version   string
 	NodeNum   string
+	Uptime    string
 	Latency   string
+	Error     string
 	CreatedAt string
 }{
 	ID:        "measurements.id",
@@ -72,7 +81,9 @@ var MeasurementTableColumns = struct {
 	URL:       "measurements.url",
 	Version:   "measurements.version",
 	NodeNum:   "measurements.node_num",
+	Uptime:    "measurements.uptime",
 	Latency:   "measurements.latency",
+	Error:     "measurements.error",
 	CreatedAt: "measurements.created_at",
 }
 
@@ -147,34 +158,81 @@ func (w whereHelperint16) NIN(slice []int16) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
-type whereHelperfloat64 struct{ field string }
+type whereHelpernull_Float64 struct{ field string }
 
-func (w whereHelperfloat64) EQ(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperfloat64) NEQ(x float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+func (w whereHelpernull_Float64) EQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
 }
-func (w whereHelperfloat64) LT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperfloat64) LTE(x float64) qm.QueryMod {
+func (w whereHelpernull_Float64) NEQ(x null.Float64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Float64) LT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Float64) LTE(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelperfloat64) GT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperfloat64) GTE(x float64) qm.QueryMod {
+func (w whereHelpernull_Float64) GT(x null.Float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
-func (w whereHelperfloat64) IN(slice []float64) qm.QueryMod {
+func (w whereHelpernull_Float64) IN(slice []float64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelperfloat64) NIN(slice []float64) qm.QueryMod {
+func (w whereHelpernull_Float64) NIN(slice []float64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
+
+func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
+type whereHelpernull_String struct{ field string }
+
+func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_String) IN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_String) NIN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 type whereHelpertime_Time struct{ field string }
 
@@ -199,30 +257,38 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 
 var MeasurementWhere = struct {
 	ID        whereHelperint
-	RunID     whereHelperstring
+	RunID     whereHelperint
 	Region    whereHelperstring
 	URL       whereHelperstring
 	Version   whereHelperstring
 	NodeNum   whereHelperint16
-	Latency   whereHelperfloat64
+	Uptime    whereHelperstring
+	Latency   whereHelpernull_Float64
+	Error     whereHelpernull_String
 	CreatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint{field: "\"measurements\".\"id\""},
-	RunID:     whereHelperstring{field: "\"measurements\".\"run_id\""},
+	RunID:     whereHelperint{field: "\"measurements\".\"run_id\""},
 	Region:    whereHelperstring{field: "\"measurements\".\"region\""},
 	URL:       whereHelperstring{field: "\"measurements\".\"url\""},
 	Version:   whereHelperstring{field: "\"measurements\".\"version\""},
 	NodeNum:   whereHelperint16{field: "\"measurements\".\"node_num\""},
-	Latency:   whereHelperfloat64{field: "\"measurements\".\"latency\""},
+	Uptime:    whereHelperstring{field: "\"measurements\".\"uptime\""},
+	Latency:   whereHelpernull_Float64{field: "\"measurements\".\"latency\""},
+	Error:     whereHelpernull_String{field: "\"measurements\".\"error\""},
 	CreatedAt: whereHelpertime_Time{field: "\"measurements\".\"created_at\""},
 }
 
 // MeasurementRels is where relationship names are stored.
 var MeasurementRels = struct {
-}{}
+	Run string
+}{
+	Run: "Run",
+}
 
 // measurementR is where relationships are stored.
 type measurementR struct {
+	Run *Run `boil:"Run" json:"Run" toml:"Run" yaml:"Run"`
 }
 
 // NewStruct creates a new relationship struct
@@ -230,13 +296,20 @@ func (*measurementR) NewStruct() *measurementR {
 	return &measurementR{}
 }
 
+func (r *measurementR) GetRun() *Run {
+	if r == nil {
+		return nil
+	}
+	return r.Run
+}
+
 // measurementL is where Load methods for each relationship are stored.
 type measurementL struct{}
 
 var (
-	measurementAllColumns            = []string{"id", "run_id", "region", "url", "version", "node_num", "latency", "created_at"}
-	measurementColumnsWithoutDefault = []string{"run_id", "region", "url", "version", "node_num", "latency", "created_at"}
-	measurementColumnsWithDefault    = []string{"id"}
+	measurementAllColumns            = []string{"id", "run_id", "region", "url", "version", "node_num", "uptime", "latency", "error", "created_at"}
+	measurementColumnsWithoutDefault = []string{"run_id", "region", "url", "version", "node_num", "uptime", "created_at"}
+	measurementColumnsWithDefault    = []string{"id", "latency", "error"}
 	measurementPrimaryKeyColumns     = []string{"id"}
 	measurementGeneratedColumns      = []string{"id"}
 )
@@ -517,6 +590,184 @@ func (q measurementQuery) Exists(ctx context.Context, exec boil.ContextExecutor)
 	}
 
 	return count > 0, nil
+}
+
+// Run pointed to by the foreign key.
+func (o *Measurement) Run(mods ...qm.QueryMod) runQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.RunID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Runs(queryMods...)
+}
+
+// LoadRun allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (measurementL) LoadRun(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMeasurement interface{}, mods queries.Applicator) error {
+	var slice []*Measurement
+	var object *Measurement
+
+	if singular {
+		var ok bool
+		object, ok = maybeMeasurement.(*Measurement)
+		if !ok {
+			object = new(Measurement)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeMeasurement)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeMeasurement))
+			}
+		}
+	} else {
+		s, ok := maybeMeasurement.(*[]*Measurement)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeMeasurement)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeMeasurement))
+			}
+		}
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &measurementR{}
+		}
+		args = append(args, object.RunID)
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &measurementR{}
+			}
+
+			for _, a := range args {
+				if a == obj.RunID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.RunID)
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`runs`),
+		qm.WhereIn(`runs.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Run")
+	}
+
+	var resultSlice []*Run
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Run")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for runs")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for runs")
+	}
+
+	if len(runAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Run = foreign
+		if foreign.R == nil {
+			foreign.R = &runR{}
+		}
+		foreign.R.Measurements = append(foreign.R.Measurements, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.RunID == foreign.ID {
+				local.R.Run = foreign
+				if foreign.R == nil {
+					foreign.R = &runR{}
+				}
+				foreign.R.Measurements = append(foreign.R.Measurements, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetRun of the measurement to the related item.
+// Sets o.R.Run to related.
+// Adds o to related.R.Measurements.
+func (o *Measurement) SetRun(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Run) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"measurements\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"run_id"}),
+		strmangle.WhereClause("\"", "\"", 2, measurementPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.RunID = related.ID
+	if o.R == nil {
+		o.R = &measurementR{
+			Run: related,
+		}
+	} else {
+		o.R.Run = related
+	}
+
+	if related.R == nil {
+		related.R = &runR{
+			Measurements: MeasurementSlice{o},
+		}
+	} else {
+		related.R.Measurements = append(related.R.Measurements, o)
+	}
+
+	return nil
 }
 
 // Measurements retrieves all the records using an executor.

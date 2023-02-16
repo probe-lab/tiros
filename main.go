@@ -36,10 +36,16 @@ func main() {
 				EnvVars: []string{"TIROS_REGIONS"},
 			},
 			&cli.DurationFlag{
-				Name:    "settle",
+				Name:    "settle-short",
 				Usage:   "the duration to wait after all daemons are online before starting the test",
 				Value:   10 * time.Second,
-				EnvVars: []string{"TIROS_SETTLE"},
+				EnvVars: []string{"TIROS_SETTLE_SHORT"},
+			},
+			&cli.DurationFlag{
+				Name:    "settle-long",
+				Usage:   "the duration to wait after all daemons are online before starting the test",
+				Value:   20 * time.Minute,
+				EnvVars: []string{"TIROS_SETTLE_LONG"},
 			},
 			&cli.StringSliceFlag{
 				Name:     "urls",
@@ -56,7 +62,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    "nodeagent",
 				Usage:   "path to the nodeagent binary",
-				Value:   "",
+				Value:   "/home/tiros/nodeagent", // correct if you use the default docker image
 				EnvVars: []string{"TIROS_NODEAGENT_BIN"},
 			},
 			&cli.StringFlag{
@@ -115,7 +121,13 @@ func main() {
 				EnvVars: []string{"TIROS_VERBOSE"},
 			},
 		},
-		Action: Action,
+		Action: func(c *cli.Context) error {
+			conf, err := configFromContext(c)
+			if err != nil {
+				return fmt.Errorf("parsing context to config: %w", err)
+			}
+			return Action(c.Context, conf)
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {

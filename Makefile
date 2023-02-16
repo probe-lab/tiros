@@ -28,4 +28,4 @@ migrate-up:
 migrate-down:
 	migrate -database 'postgres://tiros_test:password@localhost:5439/tiros_test?sslmode=disable' -path migrations down
 
-.PHONY: nodeagent tools docker-push
+.PHONY: nodeagent tools docker-push models database

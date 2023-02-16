@@ -5,71 +5,64 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
-	"github.com/dennis-tra/tiros/models"
-	kubo "github.com/guseggert/clustertest-kubo"
-	"github.com/guseggert/clustertest/cluster/basic"
-	"github.com/volatiletech/sqlboiler/v4/boil"
-
 	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/google/uuid"
+	kubo "github.com/guseggert/clustertest-kubo"
 	"github.com/guseggert/clustertest/cluster"
 	"github.com/guseggert/clustertest/cluster/aws"
-	"github.com/urfave/cli/v2"
+	"github.com/guseggert/clustertest/cluster/basic"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/dennis-tra/tiros/models"
 )
 
 var log *zap.SugaredLogger
 
-func Action(cliCtx *cli.Context) error {
-	runID := uuid.NewString()
-
-	nodeagent := cliCtx.String("nodeagent")
-	regions := cliCtx.StringSlice("regions")
-	subnetIDs := cliCtx.StringSlice("public-subnet-ids")
-	instanceProfileARNs := cliCtx.StringSlice("instance-profile-arns")
-	instanceSecurityGroupIDs := cliCtx.StringSlice("instance-security-group-ids")
-	s3BucketARNs := cliCtx.StringSlice("s3-bucket-arns")
-
-	l, err := newLogger(cliCtx.Bool("verbose"))
+func Action(ctx context.Context, conf *config) error {
+	l, err := newLogger(conf.verbose)
 	if err != nil {
 		return fmt.Errorf("initializing logger: %w", err)
 	}
 	log = l.Sugar()
 
-	db, err := InitDB(cliCtx.String("db-host"), cliCtx.Int("db-port"), cliCtx.String("db-name"), cliCtx.String("db-user"), cliCtx.String("db-password"), cliCtx.String("db-sslmode"))
+	db, err := InitDB(conf.dbHost, conf.dbPort, conf.dbName, conf.dbUser, conf.dbPassword, conf.dbSSL)
 	if err != nil {
 		return fmt.Errorf("initializing database connection: %w", err)
 	}
 	defer db.Close()
 
+	run := &models.Run{
+		Regions:         conf.regions,
+		Urls:            conf.urls,
+		SettleShort:     conf.settleShort.Seconds(),
+		SettleLong:      conf.settleLong.Seconds(),
+		NodesPerVersion: int16(conf.nodesPerVersion),
+		Versions:        conf.versions,
+		Times:           int16(conf.times),
+	}
+	if err = run.Insert(ctx, db.handle, boil.Infer()); err != nil {
+		return fmt.Errorf("initializing run: %w", err)
+	}
+
 	var clusterImpls []cluster.Cluster
-	for idx, region := range regions {
+	for idx, region := range conf.regions {
 		// capture loop variable
 		r := region
 
-		iparn, err := arn.Parse(instanceProfileARNs[idx])
-		if err != nil {
-			return fmt.Errorf("error parsing instnace profile arn: %w", err)
-		}
-
-		s3arn, err := arn.Parse(s3BucketARNs[idx])
-		if err != nil {
-			return fmt.Errorf("error parsing s3 bucket arn: %w", err)
-		}
-
 		clusterImpl := aws.NewCluster().
-			WithNodeAgentBin(nodeagent).
+			WithNodeAgentBin(conf.nodeagent).
 			WithSession(session.Must(session.NewSession(&awssdk.Config{Region: &r}))).
 			WithLogger(log).
-			WithPublicSubnetID(subnetIDs[idx]).
-			WithInstanceProfileARN(iparn).
-			WithInstanceSecurityGroupID(instanceSecurityGroupIDs[idx]).
-			WithS3BucketARN(s3arn)
+			WithPublicSubnetID(conf.subnetIDs[idx]).
+			WithInstanceProfileARN(conf.instanceProfileARNs[idx]).
+			WithInstanceSecurityGroupID(conf.instanceSecurityGroupIDs[idx]).
+			WithS3BucketARN(conf.s3BucketARNs[idx])
 
 		clusterImpls = append(clusterImpls, clusterImpl)
 	}
@@ -77,103 +70,130 @@ func Action(cliCtx *cli.Context) error {
 	// For each version, load the Kubo binary, initialize the repo, and run the daemon.
 	errg := errgroup.Group{}
 	for i, clusterImpl := range clusterImpls {
+		logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong)
 		ci := clusterImpl
-		region := regions[i]
+		region := conf.regions[i]
+
 		errg.Go(func() error {
-			return runRegion(cliCtx, db, runID, ci, region)
+			nodes, readyTimes, err := setupNodes(ctx, conf, ci, region)
+			if err != nil {
+				return fmt.Errorf("setting up nodes: %w", err)
+			}
+
+			logEntry.Infoln("Daemons running, waiting to settle...\n")
+			time.Sleep(conf.settleShort)
+
+			err = runRegion(ctx, conf, db, run, nodes, readyTimes, region)
+			if err != nil {
+				return fmt.Errorf("running region experiment: %w", err)
+			}
+
+			logEntry.Infof("Waiting %s to settle...\n", conf.settleLong)
+			time.Sleep(conf.settleLong)
+
+			err = runRegion(ctx, conf, db, run, nodes, readyTimes, region)
+			if err != nil {
+				return fmt.Errorf("running region experiment: %w", err)
+			}
+
+			return nil
 		})
+
 	}
 
 	return errg.Wait()
 }
 
-func runRegion(cliCtx *cli.Context, dbClient *DBClient, runID string, clus cluster.Cluster, region string) error {
-	ctx := cliCtx.Context
-
-	versions := cliCtx.StringSlice("versions")
-	nodesPerVersion := cliCtx.Int("nodes-per-version")
-	urls := cliCtx.StringSlice("urls")
-	times := cliCtx.Int("times")
-	settle := cliCtx.Duration("settle")
-
-	with := log.With("region", region)
-	with.Infow("Run region test", "versions", versions, "nodesPerVersion", nodesPerVersion, "urls", urls, "times", times, "settle", settle)
+func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region string) ([]*kubo.Node, *sync.Map, error) {
+	logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong)
+	logEntry.Infow("Setting up nodes...")
 
 	c := kubo.New(basic.New(clus).WithLogger(log))
 	defer c.Cleanup()
 
-	with.Infof("Launching %d nodes in %s\n", len(versions)*nodesPerVersion, region)
-
-	nodes := c.MustNewNodes(len(versions) * nodesPerVersion)
+	logEntry.Infof("Launching %d nodes in %s\n", len(conf.versions)*conf.nodesPerVersion, region)
+	nodes := c.MustNewNodes(len(conf.versions) * conf.nodesPerVersion)
 	var nodeVersions []string
-	for i, v := range versions {
-		for j := 0; j < nodesPerVersion; j++ {
-			node := nodes[i*nodesPerVersion+j]
+	for i, v := range conf.versions {
+		for j := 0; j < conf.nodesPerVersion; j++ {
+			node := nodes[i*conf.nodesPerVersion+j]
 			node.WithKuboVersion(v)
 			nodeVersions = append(nodeVersions, v)
 		}
 	}
 
-	group, groupCtx := errgroup.WithContext(ctx)
-	for _, node := range nodes {
-		node := node
-		group.Go(func() error {
-			node = node.Context(groupCtx)
+	readyTimes := &sync.Map{}
 
-			if err := node.LoadBinary(); err != nil {
+	group, groupCtx := errgroup.WithContext(ctx)
+	for i, node := range nodes {
+		n := node.Context(groupCtx)
+		nodeNum := i
+
+		group.Go(func() error {
+			if err := n.LoadBinary(); err != nil {
 				return fmt.Errorf("loading binary: %w", err)
 			}
 
-			if err := node.Init(); err != nil {
+			if err := n.Init(); err != nil {
 				return fmt.Errorf("initializing kubo: %w", err)
 			}
 
-			if err := node.ConfigureForRemote(); err != nil {
+			if err := n.ConfigureForRemote(); err != nil {
 				return fmt.Errorf("configuring kubo: %w", err)
 			}
 
-			if _, err := node.Context(ctx).StartDaemonAndWaitForAPI(); err != nil {
+			if _, err := n.Context(ctx).StartDaemonAndWaitForAPI(); err != nil {
 				return fmt.Errorf("waiting for kubo to startup: %w", err)
 			}
+
+			readyTimes.Store(nodeNum, time.Now())
 
 			return nil
 		})
 	}
 
-	with.Infoln("Setting up nodes...")
+	logEntry.Infoln("Setting up nodes...")
 	err := group.Wait()
 	if err != nil {
-		return fmt.Errorf("waiting on nodes to setup: %w", err)
+		return nil, &sync.Map{}, fmt.Errorf("waiting on nodes to setup: %w", err)
 	}
 
-	with.Infoln("Daemons running, waiting to settle...\n")
-	time.Sleep(settle)
+	return nodes, readyTimes, nil
+}
 
-	group, groupCtx = errgroup.WithContext(ctx)
+func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *models.Run, nodes []*kubo.Node, readyTimes *sync.Map, region string) error {
+	group, groupCtx := errgroup.WithContext(ctx)
 	for i, node := range nodes {
 		node := node.Context(groupCtx)
 		nodeNum := i
 		group.Go(func() error {
-			for _, url := range urls {
-				for i := 0; i < times; i++ {
+			for _, url := range conf.urls {
+				for i := 0; i < conf.times; i++ {
 					logParams := log.With("region", region, "version", node.MustVersion(), "url", url, "try_num", i, "node_num", nodeNum)
+
+					val, ok := readyTimes.Load(nodeNum)
+					if !ok {
+						return fmt.Errorf("node %d not found in map", nodeNum)
+					}
+					measurement := models.Measurement{
+						RunID:   dbRun.ID,
+						Region:  region,
+						URL:     url,
+						Version: node.MustVersion(),
+						NodeNum: int16(nodeNum),
+						Uptime:  fmt.Sprintf("%f seconds", time.Since(val.(time.Time)).Seconds()),
+					}
 
 					logParams.Infow("Requesting website...")
 					loadTime, err := runPhantomas(groupCtx, node, url)
 					if err != nil {
 						logParams.Warnw("Error running phantomas", "err", err)
-						continue
+						measurement.Error = null.StringFrom(err.Error())
+					} else {
+						measurement.Latency = null.Float64From(loadTime.Seconds())
 					}
 
 					logParams.Infow("Inserting measurement...", "latency_s", loadTime.Seconds())
-					measurement := models.Measurement{
-						RunID:   runID,
-						Region:  region,
-						URL:     url,
-						Version: node.MustVersion(),
-						NodeNum: int16(nodeNum),
-						Latency: loadTime.Seconds(),
-					}
 					if err := measurement.Insert(ctx, dbClient.handle, boil.Infer()); err != nil {
 						log.Warnw("error inserting row", "err", err)
 					}
@@ -193,11 +213,7 @@ func runRegion(cliCtx *cli.Context, dbClient *DBClient, runID string, clus clust
 		})
 	}
 
-	if err = group.Wait(); err != nil {
-		return fmt.Errorf("running %s test: %w", region, err)
-	}
-
-	return nil
+	return group.Wait()
 }
 
 type phantomasOutput struct {
