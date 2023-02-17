@@ -13,7 +13,7 @@ type config struct {
 	verbose                  bool
 	nodeagent                string
 	regions                  []string
-	urls                     []string
+	websites                 []string
 	versions                 []string
 	nodesPerVersion          int
 	times                    int
@@ -75,13 +75,13 @@ func configFromContext(c *cli.Context) (*config, error) {
 		conf.s3BucketARNs = append(conf.s3BucketARNs, s3arn)
 	}
 
-	urls := c.StringSlice("urls")
+	websites := c.StringSlice("websites")
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(urls), func(i, j int) {
-		urls[i], urls[j] = urls[j], urls[i]
+	rand.Shuffle(len(websites), func(i, j int) {
+		websites[i], websites[j] = websites[j], websites[i]
 	})
 
-	conf.urls = urls
+	conf.websites = websites
 
 	return &conf, nil
 }

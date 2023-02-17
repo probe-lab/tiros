@@ -37,7 +37,7 @@ func Action(ctx context.Context, conf *config) error {
 
 	run := &models.Run{
 		Regions:         conf.regions,
-		Urls:            conf.urls,
+		Urls:            conf.websites,
 		SettleShort:     conf.settleShort.Seconds(),
 		SettleLong:      conf.settleLong.Seconds(),
 		NodesPerVersion: int16(conf.nodesPerVersion),
@@ -69,7 +69,7 @@ func Action(ctx context.Context, conf *config) error {
 	// For each version, load the Kubo binary, initialize the repo, and run the daemon.
 	errg := errgroup.Group{}
 	for i, clusterImpl := range clusterImpls {
-		logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong)
+		logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "websites", conf.websites, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong)
 		ci := clusterImpl
 		region := conf.regions[i]
 
@@ -112,7 +112,7 @@ func Action(ctx context.Context, conf *config) error {
 }
 
 func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region string) (*kubo.Cluster, []*kubo.Node, error) {
-	logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong, "region", region)
+	logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "websites", conf.websites, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong, "region", region)
 	logEntry.Infow("Setting up nodes...")
 
 	c := kubo.New(basic.New(clus).WithLogger(log))
@@ -173,59 +173,87 @@ func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *mod
 		node := node.Context(groupCtx)
 		nodeNum := i
 		group.Go(func() error {
-			for _, url := range conf.urls {
+			if err := preparePhantomas(node); err != nil {
+				return fmt.Errorf("prepare phantomas: %w", err)
+			}
+
+			gatewayURL, err := node.GatewayURL()
+			if err != nil {
+				return fmt.Errorf("getting gateway url: %w", err)
+			}
+
+			for _, website := range conf.websites {
 				for i := 0; i < conf.times; i++ {
-					logParams := log.With("region", region, "version", node.MustVersion(), "url", url, "try_num", i, "node_num", nodeNum)
-
-					measurement := models.Measurement{
-						RunID:        dbRun.ID,
-						Region:       region,
-						URL:          url,
-						Version:      node.MustVersion(),
-						InstanceType: conf.instanceType,
-						NodeNum:      int16(nodeNum),
-						Uptime:       fmt.Sprintf("%f seconds", time.Since(node.APIAvailableSince).Seconds()),
-					}
-
-					logParams.Infow("Requesting website...")
-					metrics, err := runPhantomas(groupCtx, node, url)
+					err := requestURL(groupCtx, conf, dbClient, dbRun, node, region, i, nodeNum, website, models.MeasurementTypeKUBO, fmt.Sprintf("%s/ipns/%s", gatewayURL, website))
 					if err != nil {
-						logParams.Infow("Error running phantomas", "err", err)
-						measurement.Error = null.StringFrom(err.Error())
-					} else {
-						latencyS := (time.Duration(metrics.PerformanceTimingPageLoad) * time.Millisecond).Seconds()
-
-						logParams.Infow("Measured latency", "latencyS", latencyS)
-						measurement.PageLoad = null.Float64From(latencyS)
-
-						metricsDat, err := json.Marshal(metrics)
-						if err != nil {
-							return fmt.Errorf("marshalling metrics: %w", err)
-						}
-						measurement.Metrics = null.JSONFrom(metricsDat)
+						return err
 					}
-
-					logParams.Infow("Inserting measurement...")
-					if err := measurement.Insert(ctx, dbClient.handle, boil.Infer()); err != nil {
-						log.Warnw("error inserting row", "err", err)
-					}
-
-					gcCtx, cancelGC := context.WithTimeout(groupCtx, 10*time.Second)
-					err = kubo.ProcMust(node.Context(gcCtx).RunKubo(cluster.StartProcRequest{
-						Args: []string{"repo", "gc"},
-					}))
-					if err != nil {
-						cancelGC()
-						return fmt.Errorf("%s node %d running gc: %w", region, nodeNum, err)
-					}
-					cancelGC()
 				}
 			}
+
+			for _, website := range conf.websites {
+				for i := 0; i < conf.times; i++ {
+					err := requestURL(groupCtx, conf, dbClient, dbRun, node, region, i, nodeNum, website, models.MeasurementTypeHTTP, fmt.Sprintf("https://%s", website))
+					if err != nil {
+						return err
+					}
+				}
+			}
+
 			return nil
 		})
 	}
 
 	return group.Wait()
+}
+
+func requestURL(ctx context.Context, conf *config, dbClient *DBClient, dbRun *models.Run, node *kubo.Node, region string, try int, nodeNum int, website string, mType string, url string) error {
+	logParams := log.With("region", region, "version", node.MustVersion(), "url", url, "try_num", try, "node_num", nodeNum)
+
+	measurement := models.Measurement{
+		RunID:        dbRun.ID,
+		Region:       region,
+		Website:      website,
+		URL:          url,
+		Version:      node.MustVersion(),
+		Type:         mType,
+		Try:          int16(try),
+		Node:         int16(nodeNum),
+		InstanceType: conf.instanceType,
+		Uptime:       fmt.Sprintf("%f seconds", time.Since(node.APIAvailableSince).Seconds()),
+	}
+
+	logParams.Infow("Requesting website...", url, url)
+	metrics, err := runPhantomas(ctx, node, measurement.URL)
+	if err != nil {
+		logParams.Infow("Error running phantomas", "err", err)
+		measurement.Error = null.StringFrom(err.Error())
+	} else {
+		logParams.Infow("Measured Metrics")
+
+		metricsDat, err := json.Marshal(metrics)
+		if err != nil {
+			return fmt.Errorf("marshalling metrics: %w", err)
+		}
+		measurement.Metrics = null.JSONFrom(metricsDat)
+	}
+
+	logParams.Infow("Inserting measurement...")
+	if err := measurement.Insert(ctx, dbClient.handle, boil.Infer()); err != nil {
+		log.Warnw("error inserting row", "err", err)
+	}
+
+	gcCtx, cancelGC := context.WithTimeout(ctx, 10*time.Second)
+	err = kubo.ProcMust(node.Context(gcCtx).RunKubo(cluster.StartProcRequest{
+		Args: []string{"repo", "gc"},
+	}))
+	if err != nil {
+		cancelGC()
+		return fmt.Errorf("%s node %d running gc: %w", region, nodeNum, err)
+	}
+	cancelGC()
+
+	return nil
 }
 
 func newLogger(verbose bool) (*zap.Logger, error) {

@@ -24,18 +24,20 @@ import (
 
 // Measurement is an object representing the database table.
 type Measurement struct {
-	ID           int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RunID        int          `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
-	Region       string       `boil:"region" json:"region" toml:"region" yaml:"region"`
-	URL          string       `boil:"url" json:"url" toml:"url" yaml:"url"`
-	Version      string       `boil:"version" json:"version" toml:"version" yaml:"version"`
-	NodeNum      int16        `boil:"node_num" json:"node_num" toml:"node_num" yaml:"node_num"`
-	InstanceType string       `boil:"instance_type" json:"instance_type" toml:"instance_type" yaml:"instance_type"`
-	Uptime       string       `boil:"uptime" json:"uptime" toml:"uptime" yaml:"uptime"`
-	PageLoad     null.Float64 `boil:"page_load" json:"page_load,omitempty" toml:"page_load" yaml:"page_load,omitempty"`
-	Metrics      null.JSON    `boil:"metrics" json:"metrics,omitempty" toml:"metrics" yaml:"metrics,omitempty"`
-	Error        null.String  `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
-	CreatedAt    time.Time    `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	RunID        int         `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
+	Region       string      `boil:"region" json:"region" toml:"region" yaml:"region"`
+	Website      string      `boil:"website" json:"website" toml:"website" yaml:"website"`
+	URL          string      `boil:"url" json:"url" toml:"url" yaml:"url"`
+	Version      string      `boil:"version" json:"version" toml:"version" yaml:"version"`
+	Type         string      `boil:"type" json:"type" toml:"type" yaml:"type"`
+	Try          int16       `boil:"try" json:"try" toml:"try" yaml:"try"`
+	Node         int16       `boil:"node" json:"node" toml:"node" yaml:"node"`
+	InstanceType string      `boil:"instance_type" json:"instance_type" toml:"instance_type" yaml:"instance_type"`
+	Uptime       string      `boil:"uptime" json:"uptime" toml:"uptime" yaml:"uptime"`
+	Metrics      null.JSON   `boil:"metrics" json:"metrics,omitempty" toml:"metrics" yaml:"metrics,omitempty"`
+	Error        null.String `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
+	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *measurementR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L measurementL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -45,12 +47,14 @@ var MeasurementColumns = struct {
 	ID           string
 	RunID        string
 	Region       string
+	Website      string
 	URL          string
 	Version      string
-	NodeNum      string
+	Type         string
+	Try          string
+	Node         string
 	InstanceType string
 	Uptime       string
-	PageLoad     string
 	Metrics      string
 	Error        string
 	CreatedAt    string
@@ -58,12 +62,14 @@ var MeasurementColumns = struct {
 	ID:           "id",
 	RunID:        "run_id",
 	Region:       "region",
+	Website:      "website",
 	URL:          "url",
 	Version:      "version",
-	NodeNum:      "node_num",
+	Type:         "type",
+	Try:          "try",
+	Node:         "node",
 	InstanceType: "instance_type",
 	Uptime:       "uptime",
-	PageLoad:     "page_load",
 	Metrics:      "metrics",
 	Error:        "error",
 	CreatedAt:    "created_at",
@@ -73,12 +79,14 @@ var MeasurementTableColumns = struct {
 	ID           string
 	RunID        string
 	Region       string
+	Website      string
 	URL          string
 	Version      string
-	NodeNum      string
+	Type         string
+	Try          string
+	Node         string
 	InstanceType string
 	Uptime       string
-	PageLoad     string
 	Metrics      string
 	Error        string
 	CreatedAt    string
@@ -86,12 +94,14 @@ var MeasurementTableColumns = struct {
 	ID:           "measurements.id",
 	RunID:        "measurements.run_id",
 	Region:       "measurements.region",
+	Website:      "measurements.website",
 	URL:          "measurements.url",
 	Version:      "measurements.version",
-	NodeNum:      "measurements.node_num",
+	Type:         "measurements.type",
+	Try:          "measurements.try",
+	Node:         "measurements.node",
 	InstanceType: "measurements.instance_type",
 	Uptime:       "measurements.uptime",
-	PageLoad:     "measurements.page_load",
 	Metrics:      "measurements.metrics",
 	Error:        "measurements.error",
 	CreatedAt:    "measurements.created_at",
@@ -167,44 +177,6 @@ func (w whereHelperint16) NIN(slice []int16) qm.QueryMod {
 	}
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
-
-type whereHelpernull_Float64 struct{ field string }
-
-func (w whereHelpernull_Float64) EQ(x null.Float64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Float64) NEQ(x null.Float64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Float64) LT(x null.Float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Float64) LTE(x null.Float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Float64) GT(x null.Float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Float64) IN(slice []float64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_Float64) NIN(slice []float64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 type whereHelpernull_JSON struct{ field string }
 
@@ -293,12 +265,14 @@ var MeasurementWhere = struct {
 	ID           whereHelperint
 	RunID        whereHelperint
 	Region       whereHelperstring
+	Website      whereHelperstring
 	URL          whereHelperstring
 	Version      whereHelperstring
-	NodeNum      whereHelperint16
+	Type         whereHelperstring
+	Try          whereHelperint16
+	Node         whereHelperint16
 	InstanceType whereHelperstring
 	Uptime       whereHelperstring
-	PageLoad     whereHelpernull_Float64
 	Metrics      whereHelpernull_JSON
 	Error        whereHelpernull_String
 	CreatedAt    whereHelpertime_Time
@@ -306,12 +280,14 @@ var MeasurementWhere = struct {
 	ID:           whereHelperint{field: "\"measurements\".\"id\""},
 	RunID:        whereHelperint{field: "\"measurements\".\"run_id\""},
 	Region:       whereHelperstring{field: "\"measurements\".\"region\""},
+	Website:      whereHelperstring{field: "\"measurements\".\"website\""},
 	URL:          whereHelperstring{field: "\"measurements\".\"url\""},
 	Version:      whereHelperstring{field: "\"measurements\".\"version\""},
-	NodeNum:      whereHelperint16{field: "\"measurements\".\"node_num\""},
+	Type:         whereHelperstring{field: "\"measurements\".\"type\""},
+	Try:          whereHelperint16{field: "\"measurements\".\"try\""},
+	Node:         whereHelperint16{field: "\"measurements\".\"node\""},
 	InstanceType: whereHelperstring{field: "\"measurements\".\"instance_type\""},
 	Uptime:       whereHelperstring{field: "\"measurements\".\"uptime\""},
-	PageLoad:     whereHelpernull_Float64{field: "\"measurements\".\"page_load\""},
 	Metrics:      whereHelpernull_JSON{field: "\"measurements\".\"metrics\""},
 	Error:        whereHelpernull_String{field: "\"measurements\".\"error\""},
 	CreatedAt:    whereHelpertime_Time{field: "\"measurements\".\"created_at\""},
@@ -345,9 +321,9 @@ func (r *measurementR) GetRun() *Run {
 type measurementL struct{}
 
 var (
-	measurementAllColumns            = []string{"id", "run_id", "region", "url", "version", "node_num", "instance_type", "uptime", "page_load", "metrics", "error", "created_at"}
-	measurementColumnsWithoutDefault = []string{"run_id", "region", "url", "version", "node_num", "instance_type", "uptime", "created_at"}
-	measurementColumnsWithDefault    = []string{"id", "page_load", "metrics", "error"}
+	measurementAllColumns            = []string{"id", "run_id", "region", "website", "url", "version", "type", "try", "node", "instance_type", "uptime", "metrics", "error", "created_at"}
+	measurementColumnsWithoutDefault = []string{"run_id", "region", "website", "url", "version", "type", "try", "node", "instance_type", "uptime", "created_at"}
+	measurementColumnsWithDefault    = []string{"id", "metrics", "error"}
 	measurementPrimaryKeyColumns     = []string{"id"}
 	measurementGeneratedColumns      = []string{"id"}
 )

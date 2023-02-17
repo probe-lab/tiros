@@ -11,7 +11,7 @@ import (
 
 var app *cli.App
 
-// example invocation: ./tiros --region eu-north-1 --versions v0.17.0,v0.16.0,v0.15.0 --nodes-per-version 5 --settle 10s --urls /ipns/filecoin.io,/ipns/ipfs.io --times 5 --cluster aws
+// example invocation: ./tiros --region eu-north-1 --versions v0.17.0,v0.16.0,v0.15.0 --nodes-per-version 5 --settle 10s --websites filecoin.io,ipfs.io --times 5
 func main() {
 	app = &cli.App{
 		Name:    "tiros",
@@ -48,10 +48,10 @@ func main() {
 				EnvVars: []string{"TIROS_SETTLE_LONG"},
 			},
 			&cli.StringSliceFlag{
-				Name:     "urls",
-				Usage:    "URLs to test against, relative to the gateway URL. Example: '/ipns/ipfs.io'",
+				Name:     "websites",
+				Usage:    "Websites to test against. Example: 'ipfs.io' or 'filecoin.io",
 				Required: true,
-				EnvVars:  []string{"TIROS_URLS"},
+				EnvVars:  []string{"TIROS_WEBSITES"},
 			},
 			&cli.IntFlag{
 				Name:    "times",

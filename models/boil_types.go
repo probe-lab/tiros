@@ -50,3 +50,16 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	strmangle.PutBuffer(buf)
 	return str
 }
+
+// Enum values for MeasurementType
+const (
+	MeasurementTypeHTTP string = "HTTP"
+	MeasurementTypeKUBO string = "KUBO"
+)
+
+func AllMeasurementType() []string {
+	return []string{
+		MeasurementTypeHTTP,
+		MeasurementTypeKUBO,
+	}
+}

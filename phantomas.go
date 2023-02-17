@@ -19,7 +19,7 @@ type Metrics struct {
 	NotFound                       int64       `json:"notFound"`
 	BodySize                       int64       `json:"bodySize"`
 	ContentLength                  int64       `json:"contentLength"`
-	HTTPTrafficCompleted           interface{} `json:"httpTrafficCompleted"`
+	HTTPTrafficCompleted           *float64    `json:"httpTrafficCompleted"`
 	TimeToFirstByte                float64     `json:"timeToFirstByte"`
 	TimeToLastByte                 float64     `json:"timeToLastByte"`
 	AjaxRequests                   int64       `json:"ajaxRequests"`
@@ -117,7 +117,7 @@ type Metrics struct {
 	LocalStorageEntries            int64       `json:"localStorageEntries"`
 	MainDomainHTTPProtocol         string      `json:"mainDomainHttpProtocol"`
 	OldHTTPProtocol                int64       `json:"oldHttpProtocol"`
-	MainDomainTLSProtocol          int64       `json:"mainDomainTlsProtocol"`
+	MainDomainTLSProtocol          interface{} `json:"mainDomainTlsProtocol"`
 	OldTLSProtocol                 int64       `json:"oldTlsProtocol"`
 	Redirects                      int64       `json:"redirects"`
 	RedirectsTime                  int64       `json:"redirectsTime"`
@@ -134,9 +134,9 @@ type Metrics struct {
 	SmallCSSFiles                  int64       `json:"smallCssFiles"`
 	SmallJSFiles                   int64       `json:"smallJsFiles"`
 	MultipleRequests               int64       `json:"multipleRequests"`
-	TimeToFirstCSS                 interface{} `json:"timeToFirstCss"`
-	TimeToFirstJS                  interface{} `json:"timeToFirstJs"`
-	TimeToFirstImage               interface{} `json:"timeToFirstImage"`
+	TimeToFirstCSS                 *float64    `json:"timeToFirstCss"`
+	TimeToFirstJS                  *float64    `json:"timeToFirstJs"`
+	TimeToFirstImage               *float64    `json:"timeToFirstImage"`
 	DOMInteractive                 int64       `json:"domInteractive"`
 	DOMContentLoaded               int64       `json:"domContentLoaded"`
 	DOMContentLoadedEnd            int64       `json:"domContentLoadedEnd"`
@@ -168,17 +168,26 @@ type phantomasOutput struct {
 	Metrics Metrics
 }
 
+func preparePhantomas(node *kubo.Node) error {
+	_, err := node.Run(cluster.StartProcRequest{
+		Command: "docker",
+		Args: []string{
+			"pull",
+			"macbre/phantomas:latest",
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("pulling docker image: %w", err)
+	}
+	return err
+}
+
 func runPhantomas(ctx context.Context, node *kubo.Node, url string) (*Metrics, error) {
 	ctx, cancelCurl := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancelCurl()
 
-	gatewayURL, err := node.GatewayURL()
-	if err != nil {
-		return nil, err
-	}
-
 	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
-	_, err = node.Run(cluster.StartProcRequest{
+	_, err := node.Run(cluster.StartProcRequest{
 		Command: "docker",
 		Args: []string{
 			"run",
@@ -187,12 +196,11 @@ func runPhantomas(ctx context.Context, node *kubo.Node, url string) (*Metrics, e
 			"macbre/phantomas:latest",
 			"/opt/phantomas/bin/phantomas.js",
 			"--timeout=60",
-			fmt.Sprintf("--url=%s%s", gatewayURL, url),
+			fmt.Sprintf("--url=%s", url),
 		},
 		Stdout: stdout,
 		Stderr: stderr,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("%s: stdout: %s, stderr: %s", err, stdout, stderr)
 	}
