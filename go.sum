@@ -481,6 +481,8 @@ github.com/denis-tingajkin/go-header v0.4.2/go.mod h1:eLRHAVXzE5atsKAnNRDB90WHCF
 github.com/denisenkom/go-mssqldb v0.10.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/dennis-tra/clustertest v0.0.0-20230216074629-ad6bc680a355 h1:vxJNvawBAWqbJPdW82LcYPjBhKy5CkZwvwVUJSw/w08=
 github.com/dennis-tra/clustertest v0.0.0-20230216074629-ad6bc680a355/go.mod h1:+DUpurx8DkdEL0udWwdXc0pg3Df++D2du0JgpxjlBqY=
+github.com/dennis-tra/clustertest-kubo v0.0.0-20230217091823-743f20088637 h1:7ATktceptVwvq1Ezi/c3l4wcdKaqR7mpSpzyjrPWAhQ=
+github.com/dennis-tra/clustertest-kubo v0.0.0-20230217091823-743f20088637/go.mod h1:JLzSulG6t9CrdOEfPAWtUue3TgGZRnmKyBWGmRcgxOk=
 github.com/denverdino/aliyungo v0.0.0-20190125010748-a747050bb1ba/go.mod h1:dV8lFg6daOBZbT6/BDGIz6Y3WFGn8juu6G+CQ6LHtl0=
 github.com/dgraph-io/badger v1.5.5-0.20190226225317-8115aed38f8f/go.mod h1:VZxzAIRPHRVNRKRo6AXrX9BJegn6il06VMTZVJYCIjQ=
 github.com/dgraph-io/badger v1.6.0-rc1/go.mod h1:zwt7syl517jmP8s94KqSxTlM6IMsdhYy6psNgSztDR4=
@@ -901,8 +903,6 @@ github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t
 github.com/grpc-ecosystem/grpc-gateway v1.9.5/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/grpc-ecosystem/grpc-gateway v1.12.1/go.mod h1:8XEsbTttt/W+VvjtQhLACqCisSPWTxCZ7sBRjU6iH9c=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
-github.com/guseggert/clustertest-kubo v0.0.0-20230208164737-508b73711d48 h1:sn5eM6lbIt57qZqDl/BJH+U0aqzHcv8QqcDfGqHAfMQ=
-github.com/guseggert/clustertest-kubo v0.0.0-20230208164737-508b73711d48/go.mod h1:rzLdNDBwL6BeXX5b1B/YmRrOFvcEELiw+xdSider55s=
 github.com/gxed/hashland/keccakpg v0.0.1/go.mod h1:kRzw3HkwxFU1mpmPP8v1WyQzwdGfmKFJ6tItnhQ67kU=
 github.com/gxed/hashland/murmur3 v0.0.1/go.mod h1:KjXop02n4/ckmZSnY2+HKcLud/tcmvhST0bie/0lS48=
 github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed/go.mod h1:tMWxXQ9wFIaZeTI9F+hmhFiGpFmhOHzyShyFUhRm0H4=

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -76,15 +74,16 @@ func Action(ctx context.Context, conf *config) error {
 		region := conf.regions[i]
 
 		errg.Go(func() error {
-			nodes, readyTimes, err := setupNodes(ctx, conf, ci, region)
+			kc, nodes, err := setupNodes(ctx, conf, ci, region)
 			if err != nil {
 				return fmt.Errorf("setting up nodes: %w", err)
 			}
+			defer kc.Cleanup()
 
 			logEntry.Infoln("Daemons running, waiting to settle...\n")
 			time.Sleep(conf.settleShort)
 
-			err = runRegion(ctx, conf, db, run, nodes, readyTimes, region)
+			err = runRegion(ctx, conf, db, run, nodes, region)
 			if err != nil {
 				return fmt.Errorf("running region experiment: %w", err)
 			}
@@ -92,7 +91,7 @@ func Action(ctx context.Context, conf *config) error {
 			logEntry.Infof("Waiting %s to settle...\n", conf.settleLong)
 			time.Sleep(conf.settleLong)
 
-			err = runRegion(ctx, conf, db, run, nodes, readyTimes, region)
+			err = runRegion(ctx, conf, db, run, nodes, region)
 			if err != nil {
 				return fmt.Errorf("running region experiment: %w", err)
 			}
@@ -112,12 +111,11 @@ func Action(ctx context.Context, conf *config) error {
 	return errg.Wait()
 }
 
-func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region string) ([]*kubo.Node, *sync.Map, error) {
-	logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong)
+func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region string) (*kubo.Cluster, []*kubo.Node, error) {
+	logEntry := log.With("versions", conf.versions, "nodesPerVersion", conf.nodesPerVersion, "urls", conf.urls, "times", conf.times, "settleShort", conf.settleShort, "settleLong", conf.settleLong, "region", region)
 	logEntry.Infow("Setting up nodes...")
 
 	c := kubo.New(basic.New(clus).WithLogger(log))
-	defer c.Cleanup()
 
 	logEntry.Infof("Launching %d nodes in %s\n", len(conf.versions)*conf.nodesPerVersion, region)
 	nodes := c.MustNewNodes(len(conf.versions) * conf.nodesPerVersion)
@@ -126,16 +124,15 @@ func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region 
 		for j := 0; j < conf.nodesPerVersion; j++ {
 			node := nodes[i*conf.nodesPerVersion+j]
 			node.WithKuboVersion(v)
+			node.WithNodeLogger(log.With("region", region, "node_num", j))
 			nodeVersions = append(nodeVersions, v)
 		}
 	}
 
-	readyTimes := &sync.Map{} // TODO: could embed this in kubo.Node
-
 	group, groupCtx := errgroup.WithContext(ctx)
-	for i, node := range nodes {
+	for _, node := range nodes {
 		n := node.Context(groupCtx)
-		nodeNum := i
+		orgN := node
 
 		group.Go(func() error {
 			if err := n.LoadBinary(); err != nil {
@@ -154,7 +151,7 @@ func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region 
 				return fmt.Errorf("waiting for kubo to startup: %w", err)
 			}
 
-			readyTimes.Store(nodeNum, time.Now())
+			orgN.APIAvailableSince = time.Now()
 
 			return nil
 		})
@@ -163,13 +160,14 @@ func setupNodes(ctx context.Context, conf *config, clus cluster.Cluster, region 
 	logEntry.Infoln("Setting up nodes...")
 	err := group.Wait()
 	if err != nil {
-		return nil, &sync.Map{}, fmt.Errorf("waiting on nodes to setup: %w", err)
+		c.Cleanup()
+		return nil, nil, fmt.Errorf("waiting on nodes to setup: %w", err)
 	}
 
-	return nodes, readyTimes, nil
+	return c, nodes, nil
 }
 
-func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *models.Run, nodes []*kubo.Node, readyTimes *sync.Map, region string) error {
+func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *models.Run, nodes []*kubo.Node, region string) error {
 	group, groupCtx := errgroup.WithContext(ctx)
 	for i, node := range nodes {
 		node := node.Context(groupCtx)
@@ -179,27 +177,32 @@ func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *mod
 				for i := 0; i < conf.times; i++ {
 					logParams := log.With("region", region, "version", node.MustVersion(), "url", url, "try_num", i, "node_num", nodeNum)
 
-					val, ok := readyTimes.Load(nodeNum)
-					if !ok {
-						return fmt.Errorf("node %d not found in map", nodeNum)
-					}
 					measurement := models.Measurement{
-						RunID:   dbRun.ID,
-						Region:  region,
-						URL:     url,
-						Version: node.MustVersion(),
-						NodeNum: int16(nodeNum),
-						Uptime:  fmt.Sprintf("%f seconds", time.Since(val.(time.Time)).Seconds()),
+						RunID:        dbRun.ID,
+						Region:       region,
+						URL:          url,
+						Version:      node.MustVersion(),
+						InstanceType: conf.instanceType,
+						NodeNum:      int16(nodeNum),
+						Uptime:       fmt.Sprintf("%f seconds", time.Since(node.APIAvailableSince).Seconds()),
 					}
 
 					logParams.Infow("Requesting website...")
-					loadTime, err := runPhantomas(groupCtx, node, url)
+					metrics, err := runPhantomas(groupCtx, node, url)
 					if err != nil {
-						logParams.Warnw("Error running phantomas", "err", err)
+						logParams.Infow("Error running phantomas", "err", err)
 						measurement.Error = null.StringFrom(err.Error())
 					} else {
-						logParams.Infow("Measured latency", "latency", loadTime.Seconds())
-						measurement.Latency = null.Float64From(loadTime.Seconds())
+						latencyS := (time.Duration(metrics.PerformanceTimingPageLoad) * time.Millisecond).Seconds()
+
+						logParams.Infow("Measured latency", "latencyS", latencyS)
+						measurement.PageLoad = null.Float64From(latencyS)
+
+						metricsDat, err := json.Marshal(metrics)
+						if err != nil {
+							return fmt.Errorf("marshalling metrics: %w", err)
+						}
+						measurement.Metrics = null.JSONFrom(metricsDat)
 					}
 
 					logParams.Infow("Inserting measurement...")
@@ -223,60 +226,6 @@ func runRegion(ctx context.Context, conf *config, dbClient *DBClient, dbRun *mod
 	}
 
 	return group.Wait()
-}
-
-type phantomasOutput struct {
-	Metrics struct {
-		PerformanceTimingPageLoad int
-	}
-}
-
-func runPhantomas(ctx context.Context, node *kubo.Node, url string) (*time.Duration, error) {
-	ctx, cancelCurl := context.WithTimeout(ctx, 5*time.Minute)
-	defer cancelCurl()
-
-	gatewayURL, err := node.GatewayURL()
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = node.Run(cluster.StartProcRequest{
-		Command: "docker",
-		Args: []string{
-			"pull",
-			"macbre/phantomas:latest",
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
-	_, err = node.Run(cluster.StartProcRequest{
-		Command: "docker",
-		Args: []string{
-			"run",
-			"--network=host",
-			"--privileged",
-			"macbre/phantomas:latest",
-			"/opt/phantomas/bin/phantomas.js",
-			"--timeout=60",
-			fmt.Sprintf("--url=%s%s", gatewayURL, url),
-		},
-		Stdout: stdout,
-		Stderr: stderr,
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("%s: stdout: %s, stderr: %s", err, stdout, stderr)
-	}
-	out := &phantomasOutput{}
-	err = json.Unmarshal(stdout.Bytes(), out)
-	if err != nil {
-		return nil, err
-	}
-	loadTime := time.Duration(out.Metrics.PerformanceTimingPageLoad) * time.Millisecond
-	return &loadTime, nil
 }
 
 func newLogger(verbose bool) (*zap.Logger, error) {
