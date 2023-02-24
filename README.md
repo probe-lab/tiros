@@ -1,7 +1,7 @@
 # Tiros
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-Tiros is an IPFS website measurement script. It uses [`clustertest`](https://github.com/gusegger/clustertest) to provision a configurable number of EC2 instances across the world and then uses those to request websites from there. 
+Tiros is an IPFS website measurement script. It uses [`clustertest`](https://github.com/guseggert/clustertest) to provision a configurable number of EC2 instances across the world and then uses those to request websites from there. 
 
 ## Table of Contents
 
