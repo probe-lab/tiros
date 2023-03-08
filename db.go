@@ -1,21 +1,19 @@
-package tiros
+package main
 
 import (
 	"database/sql"
 	"embed"
 	"errors"
 	"fmt"
-	"io/fs"
-	"os"
-	"path/filepath"
-
-	"github.com/dennis-tra/tiros"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"io/fs"
+	"os"
+	"path/filepath"
 )
 
-//go:embed ../../migrations
+//go:embed migrations
 var migrations embed.FS
 
 type DBClient struct {
@@ -54,7 +52,7 @@ func (c *DBClient) Close() error {
 }
 
 func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
-	tmpDir, err := os.MkdirTemp("", "tiros-"+main.app.Version)
+	tmpDir, err := os.MkdirTemp("", "tiros-"+app.Version)
 	if err != nil {
 		return fmt.Errorf("create migrations tmp dir: %w", err)
 	}
@@ -68,7 +66,7 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 	err = fs.WalkDir(migrations, ".", func(path string, d fs.DirEntry, err error) error {
 		join := filepath.Join(tmpDir, path)
 		if d.IsDir() {
-			return os.MkdirAll(join, 0o755)
+			return os.MkdirAll(join, 0755)
 		}
 
 		data, err := migrations.ReadFile(path)
@@ -76,7 +74,7 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 			return fmt.Errorf("read file: %w", err)
 		}
 
-		return os.WriteFile(join, data, 0o644)
+		return os.WriteFile(join, data, 0644)
 	})
 	if err != nil {
 		return fmt.Errorf("create migrations files: %w", err)
