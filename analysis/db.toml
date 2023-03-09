@@ -1,0 +1,6 @@
+[psql]
+host = "localhost"
+port = 5432
+database = "tiros"
+user = "tiros_ro"
+password = "w.c*oh9cTk7iyVci"
