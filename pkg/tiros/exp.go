@@ -139,7 +139,7 @@ func (e *Experiment) probe(ctx context.Context, tnode *Node, mType string) error
 				"ttfb": p2f(result.TimeToFirstByte),
 				"lcp":  p2f(result.LargestContentfulPaint),
 				"fcp":  p2f(result.FirstContentFulPaint),
-			}).WithError(err).Infoln("Probed website", website)
+			}).WithError(result.Error).Infoln("Probed website", website)
 
 			metrics, err := result.NullJSON()
 			if err != nil {

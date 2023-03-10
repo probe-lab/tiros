@@ -24,7 +24,7 @@ import (
 	"github.com/dennis-tra/tiros/pkg/models"
 )
 
-const websiteRequestTimeout = 30 * time.Second
+const websiteRequestTimeout = 20 * time.Second
 
 type Node struct {
 	*kubo.Node
@@ -256,16 +256,26 @@ func (n *Node) probe(ctx context.Context, website string, mType string) (*ProbeR
 
 	var perfEntriesStr string
 	err = rod.Try(func() {
-		page := browser.MustPage().Context(ctx).Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitIdle().CancelTimeout()
+		page := browser.
+			MustIncognito(). // prevents cache usage
+			MustPage().
+			Context(ctx).                   // stop when outer ctx stops
+			Timeout(websiteRequestTimeout). // only wait 30s
+			MustNavigate(url).
+			MustWaitIdle(). // wait until network has come to a halt (1 Minute)
+			CancelTimeout() // continue using page object for things
+
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
 		browser.MustClose()
 	})
 	if errors.Is(err, context.DeadlineExceeded) {
-		return &ProbeResult{Error: fmt.Errorf("timedout after %s", websiteRequestTimeout)}, nil
+		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
+		return &pr, nil
 	} else if err != nil {
-		return &ProbeResult{Error: err}, nil
+		pr.Error = err
+		return &pr, nil
 	}
 
 	perfEntries, err := unmarshalPerformanceEntries([]byte(perfEntriesStr))
