@@ -86,6 +86,23 @@ func (e *Experiment) Run(ctx context.Context) error {
 	for _, tnode := range e.nodes {
 		tnode := tnode
 		errg.Go(func() error {
+			tnode.logEntry().Infoln("Start probing...")
+			defer tnode.logEntry().Infoln("Done probing!")
+
+			tnode.logEntry().Infoln("Sleeping for", e.conf.SettleShort)
+			time.Sleep(e.conf.SettleShort)
+
+			if err := e.probe(errCtx, tnode, models.MeasurementTypeKUBO); err != nil {
+				return fmt.Errorf("probe kubo websites: %w", err)
+			}
+
+			if err := e.probe(errCtx, tnode, models.MeasurementTypeHTTP); err != nil {
+				return fmt.Errorf("probe HTTP websites: %w", err)
+			}
+
+			tnode.logEntry().Infoln("Sleeping for", e.conf.SettleLong)
+			time.Sleep(e.conf.SettleLong)
+
 			if err := e.probe(errCtx, tnode, models.MeasurementTypeKUBO); err != nil {
 				return fmt.Errorf("probe kubo websites: %w", err)
 			}

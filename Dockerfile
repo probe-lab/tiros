@@ -9,7 +9,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . ./
-RUN GOARCH=amd64 GOOS=linux go build -o tiros github.com/dennis-tra/tiros
+RUN GOARCH=amd64 GOOS=linux go build -o tiros github.com/dennis-tra/tiros/cmd/tiros
 
 # Create lightweight container
 FROM alpine:latest
