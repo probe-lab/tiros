@@ -12,6 +12,10 @@ Tiros is an IPFS website measurement script. It uses [`clustertest`](https://git
 - [Contributing](#contributing)
 - [License](#license)
 
+## Background
+
+
+
 ## Run
 
 You need to provide many configuration parameters to `tiros`. See this help page:

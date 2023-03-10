@@ -66,9 +66,11 @@ func (n *Node) initialize() error {
 	return errg.Wait()
 }
 
-func (n *Node) Close() error {
+func (n *Node) StopChrome() error {
+	n.logEntry().Infoln("Sending SIGINT to Chrome")
+
 	if n.chromeProc != nil {
-		n.chromeProc.Signal(syscall.SIGINT)
+		return n.chromeProc.Signal(syscall.SIGINT)
 	}
 	return nil
 }

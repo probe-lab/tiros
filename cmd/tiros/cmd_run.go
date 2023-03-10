@@ -122,6 +122,9 @@ var RunCommand = &cli.Command{
 
 func RunAction(c *cli.Context, exp *tiros.Experiment) error {
 	log.Infoln("Starting Tiros run...")
+	defer log.Infoln("Stopped Tiros run.")
+
+	defer exp.Shutdown()
 
 	if err := exp.Init(c.Context); err != nil {
 		return fmt.Errorf("init experiment: %w", err)

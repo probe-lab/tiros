@@ -3,6 +3,7 @@ package tiros
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	kubo "github.com/guseggert/clustertest-kubo"
@@ -42,6 +43,8 @@ func (e *Experiment) Init(ctx context.Context) error {
 	errg := errgroup.Group{}
 	nodesChan := make(chan []*Node, len(e.Cluster))
 	for region, clus := range e.Cluster {
+		clus := clus
+		region := region
 
 		tc := NewCluster(clus, region, e.conf.Versions, e.conf.NodesPerVersion)
 
@@ -178,6 +181,36 @@ func (e *Experiment) probe(ctx context.Context, tnode *Node, mType string) error
 	}
 
 	return nil
+}
+
+func (e *Experiment) Shutdown() {
+	var wg sync.WaitGroup
+	log.Infoln("Stopping chrome instances...")
+	for _, tnode := range e.nodes {
+		tnode := tnode
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := tnode.StopChrome(); err != nil {
+				tnode.logEntry().WithError(err).Warnln("Error stopping chrome")
+			}
+		}()
+	}
+	wg.Wait()
+
+	log.Infoln("Cleaning up clusters...")
+	for region, cl := range e.Cluster {
+		region := region
+		cl := cl
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := cl.Cleanup(); err != nil {
+				log.WithField("region", region).WithError(err).Warnln("Error cleaning up cluster")
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func p2f(ptr *float64) float64 {

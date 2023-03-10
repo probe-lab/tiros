@@ -79,6 +79,8 @@ func RunAWSAction(c *cli.Context) error {
 	exp := tiros.NewExperiment(conf.RunConfig)
 
 	for i, region := range conf.Regions {
+		i := i
+		region := region
 		log.WithField("region", region).WithField("instanceType", conf.InstanceType).Infoln("Starting cluster...")
 		cl := aws.NewCluster().
 			WithNodeAgentBin(conf.NodeAgent).

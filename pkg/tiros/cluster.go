@@ -35,9 +35,9 @@ func (c *Cluster) NewNodes() ([]*Node, error) {
 	kc := kubo.New(c.Cluster).Context(c.Ctx)
 
 	log.WithFields(log.Fields{
-		"region":   c.Region,
-		"versions": c.Versions,
-		"npv":      c.NodesPerVersion,
+		"region":          c.Region,
+		"versions":        c.Versions,
+		"nodesPerVersion": c.NodesPerVersion,
 	}).Infoln("Starting new nodes..")
 
 	knodes, err := kc.NewNodes(len(c.Versions) * c.NodesPerVersion)
@@ -47,7 +47,7 @@ func (c *Cluster) NewNodes() ([]*Node, error) {
 
 	tnodes := make([]*Node, len(c.Versions)*c.NodesPerVersion)
 	for i, version := range c.Versions {
-		for j := 0; i < c.NodesPerVersion; i++ {
+		for j := 0; j < c.NodesPerVersion; j++ {
 			idx := i*c.NodesPerVersion + j
 			knode := knodes[idx].WithKuboVersion(version)
 			tnodes[idx] = NewNode(c, knode, j)
@@ -56,6 +56,7 @@ func (c *Cluster) NewNodes() ([]*Node, error) {
 
 	errg := errgroup.Group{}
 	for _, tnode := range tnodes {
+		tnode := tnode
 		errg.Go(func() error {
 			return tnode.initialize()
 		})
