@@ -46,19 +46,19 @@ var RunAWSCommand = &cli.Command{
 			Value:       cli.NewStringSlice(config.DefaultRunAWSConfig.InstanceSecurityGroupIDs...),
 			DefaultText: strings.Join(config.DefaultRunAWSConfig.InstanceSecurityGroupIDs, ","),
 		},
-		&cli.StringFlag{
-			Name:        "key-name",
+		&cli.StringSliceFlag{
+			Name:        "key-names",
 			Usage:       "The SSH key pair name to apply to the EC2 instances",
-			EnvVars:     []string{"TIROS_RUN_AWS_KEY_NAME"},
-			Value:       config.DefaultRunAWSConfig.KeyName,
-			DefaultText: config.DefaultRunAWSConfig.KeyName,
+			EnvVars:     []string{"TIROS_RUN_AWS_KEY_NAMES"},
+			Value:       cli.NewStringSlice(config.DefaultRunAWSConfig.KeyNames...),
+			DefaultText: strings.Join(config.DefaultRunAWSConfig.KeyNames, ","),
 		},
 		&cli.StringSliceFlag{
 			Name:        "regions",
 			Usage:       "the AWS regions to use, if using an AWS cluster",
 			EnvVars:     []string{"TIROS_RUN_AWS_REGIONS"},
-			Value:       cli.NewStringSlice(config.DefaultRunConfig.Regions...),
-			DefaultText: strings.Join(config.DefaultRunConfig.Regions, ","),
+			Value:       cli.NewStringSlice(config.DefaultRunAWSConfig.Regions...),
+			DefaultText: strings.Join(config.DefaultRunAWSConfig.Regions, ","),
 		},
 	},
 	Action: RunAWSAction,
@@ -90,7 +90,7 @@ func RunAWSAction(c *cli.Context) error {
 			WithInstanceSecurityGroupID(conf.InstanceSecurityGroupIDs[i]).
 			WithS3BucketARN(conf.S3BucketARNs[i]).
 			WithInstanceType(conf.InstanceType).
-			WithKeyName(conf.KeyName)
+			WithKeyName(conf.KeyNames[i])
 
 		exp.Cluster[region] = basic.New(cl.Context(c.Context))
 	}
