@@ -10,16 +10,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dennis-tra/tiros/pkg/models"
-
-	"github.com/dennis-tra/tiros/pkg/config"
-	"github.com/volatiletech/sqlboiler/v4/boil"
-
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+
+	"github.com/dennis-tra/tiros/pkg/config"
+	"github.com/dennis-tra/tiros/pkg/models"
 )
 
 //go:embed migrations
@@ -30,8 +30,8 @@ type DBClient struct {
 	handle *sql.DB
 }
 
-// InitDB establishes a database connection with the provided configuration
-// and applies any pending migrations
+// InitClient establishes a database connection with
+// the provided configuration and applies any pending migrations
 func InitClient(ctx context.Context, host string, port int, name string, user string, password string, ssl string) (*DBClient, error) {
 	log.WithFields(log.Fields{
 		"host": host,
@@ -72,7 +72,7 @@ func (c *DBClient) Close() error {
 }
 
 func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
-	tmpDir, err := os.MkdirTemp("", "parsec")
+	tmpDir, err := os.MkdirTemp("", "tiros")
 	if err != nil {
 		return fmt.Errorf("create migrations tmp dir: %w", err)
 	}
@@ -119,6 +119,8 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 }
 
 func (c *DBClient) InsertRun(ctx context.Context, conf config.RunConfig) (*models.Run, error) {
+	log.Infoln("Inserting Run...")
+
 	r := &models.Run{
 		Regions:         conf.Regions,
 		Urls:            conf.Websites,
@@ -130,4 +132,12 @@ func (c *DBClient) InsertRun(ctx context.Context, conf config.RunConfig) (*model
 	}
 
 	return r, r.Insert(ctx, c.handle, boil.Infer())
+}
+
+func (c *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement, metrics []byte, err error) (*models.Measurement, error) {
+	if err != nil {
+		m.Error = null.StringFrom(err.Error())
+	}
+
+	return m, m.Insert(ctx, c.handle, boil.Infer())
 }

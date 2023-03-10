@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -45,50 +46,63 @@ func (gc GlobalConfig) Apply(c *cli.Context) GlobalConfig {
 	return newConfig
 }
 
+func (gc GlobalConfig) String() string {
+	str, err := json.MarshalIndent(gc, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(str)
+}
+
 type RunConfig struct {
 	GlobalConfig
-	NodeAgent                string
-	Regions                  []string
-	Websites                 []string
-	Versions                 []string
-	NodesPerVersion          int
-	Times                    int
-	SettleShort              time.Duration
-	SettleLong               time.Duration
-	SubnetIDs                []string
-	InstanceType             string
-	InstanceProfileARNs      []arn.ARN
-	S3BucketARNs             []arn.ARN
-	InstanceSecurityGroupIDs []string
-	DatabaseHost             string
-	DatabasePort             int
-	DatabaseName             string
-	DatabaseUser             string
-	DatabasePassword         string
-	DatabaseSSLMode          string
+	NodeAgent        string
+	Regions          []string
+	Websites         []string
+	Versions         []string
+	NodesPerVersion  int
+	Times            int
+	SettleShort      time.Duration
+	SettleLong       time.Duration
+	DatabaseHost     string
+	DatabasePort     int
+	DatabaseName     string
+	DatabaseUser     string
+	DatabasePassword string
+	DatabaseSSLMode  string
+	InstanceType     string
+}
+
+func (rc RunConfig) String() string {
+	redacted := rc
+	redacted.DatabasePassword = "*****"
+
+	str, err := json.MarshalIndent(rc, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(str)
 }
 
 var DefaultRunConfig = RunConfig{
-	GlobalConfig:             DefaultGlobalConfig,
-	NodeAgent:                "/home/tiros/nodeagent", // correct if you use the default docker image
-	Regions:                  nil,
-	Websites:                 nil,
-	Versions:                 nil,
-	NodesPerVersion:          0,
-	Times:                    0,
-	SettleShort:              0,
-	SettleLong:               0,
-	SubnetIDs:                nil,
-	InstanceType:             "t2.micro",
-	InstanceProfileARNs:      nil,
-	S3BucketARNs:             nil,
-	InstanceSecurityGroupIDs: nil,
-	DatabaseHost:             "",
-	DatabasePort:             0,
-	DatabaseName:             "",
-	DatabaseUser:             "",
-	DatabasePassword:         "",
-	DatabaseSSLMode:          "",
+	GlobalConfig:     DefaultGlobalConfig,
+	NodeAgent:        "/home/tiros/nodeagent", // correct if you use the default docker image
+	Regions:          []string{},
+	Websites:         []string{"protocol.ai"},
+	Versions:         []string{"v0.18.0"},
+	NodesPerVersion:  1,
+	Times:            3,
+	SettleShort:      10 * time.Second,
+	SettleLong:       20 * time.Minute,
+	DatabaseHost:     "localhost",
+	DatabasePort:     5432,
+	DatabaseName:     "tiros",
+	DatabaseUser:     "tiros",
+	DatabasePassword: "password",
+	DatabaseSSLMode:  "disable",
+	InstanceType:     "local",
 }
 
 func (rc RunConfig) Apply(c *cli.Context) RunConfig {
@@ -142,6 +156,9 @@ func (rc RunConfig) Apply(c *cli.Context) RunConfig {
 	if c.IsSet("db-sslmode") {
 		newConfig.DatabaseSSLMode = c.String("db-sslmode")
 	}
+	if c.IsSet("instance-type") {
+		newConfig.InstanceType = c.String("instance-type")
+	}
 
 	return newConfig
 }
@@ -156,21 +173,36 @@ func ARNsToStrings(arns []arn.ARN) []string {
 
 type RunAWSConfig struct {
 	RunConfig
-	Nodes int
+
+	SubnetIDs                []string
+	InstanceProfileARNs      []arn.ARN
+	S3BucketARNs             []arn.ARN
+	InstanceSecurityGroupIDs []string
+	KeyName                  string
+}
+
+func (rawsc RunAWSConfig) String() string {
+	str, err := json.MarshalIndent(rawsc, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(str)
 }
 
 var DefaultRunAWSConfig = RunAWSConfig{
 	RunConfig: DefaultRunConfig,
+
+	InstanceProfileARNs:      nil,
+	S3BucketARNs:             nil,
+	InstanceSecurityGroupIDs: nil,
+	KeyName:                  "",
 }
 
 func (rdc RunAWSConfig) Apply(c *cli.Context) (RunAWSConfig, error) {
 	newConfig := rdc
 
 	newConfig.RunConfig = newConfig.RunConfig.Apply(c)
-
-	if c.IsSet("instance-type") {
-		newConfig.InstanceType = c.String("instance-type")
-	}
 
 	if c.IsSet("public-subnet-ids") {
 		newConfig.SubnetIDs = c.StringSlice("public-subnet-ids")
@@ -200,20 +232,33 @@ func (rdc RunAWSConfig) Apply(c *cli.Context) (RunAWSConfig, error) {
 		newConfig.InstanceSecurityGroupIDs = c.StringSlice("instance-security-group-ids")
 	}
 
+	if c.IsSet("key-name") {
+		newConfig.KeyName = c.String("key-name")
+	}
+
 	return newConfig, nil
 }
 
-type RunDockerConfig struct {
+type RunLocalConfig struct {
 	RunConfig
 	Nodes int
 }
 
-var DefaultRunDockerConfig = RunDockerConfig{
+var DefaultRunLocalConfig = RunLocalConfig{
 	RunConfig: DefaultRunConfig,
 	Nodes:     2,
 }
 
-func (rdc RunDockerConfig) Apply(c *cli.Context) (RunDockerConfig, error) {
+func (rdc RunLocalConfig) String() string {
+	str, err := json.MarshalIndent(rdc, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(str)
+}
+
+func (rdc RunLocalConfig) Apply(c *cli.Context) (RunLocalConfig, error) {
 	newConfig := rdc
 
 	newConfig.RunConfig = newConfig.RunConfig.Apply(c)

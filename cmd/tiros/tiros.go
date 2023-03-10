@@ -37,14 +37,14 @@ func main() {
 			&cli.BoolFlag{
 				Name:        "debug",
 				Usage:       "Set this flag to enable debug logging",
-				EnvVars:     []string{"PARSEC_DEBUG"},
+				EnvVars:     []string{"TIROS_DEBUG"},
 				Value:       config.DefaultGlobalConfig.Debug,
 				DefaultText: strconv.FormatBool(config.DefaultGlobalConfig.Debug),
 			},
 			&cli.IntFlag{
 				Name:        "log-level",
 				Usage:       "Set this flag to a value from 0 (least verbose) to 6 (most verbose). Overrides the --debug flag",
-				EnvVars:     []string{"PARSEC_LOG_LEVEL"},
+				EnvVars:     []string{"TIROS_LOG_LEVEL"},
 				Value:       config.DefaultGlobalConfig.LogLevel,
 				DefaultText: strconv.Itoa(config.DefaultGlobalConfig.LogLevel),
 			},

@@ -1,8 +1,11 @@
 package tiros
 
 import (
-	"context"
 	"fmt"
+
+	"go.uber.org/zap"
+
+	log "github.com/sirupsen/logrus"
 
 	kubo "github.com/guseggert/clustertest-kubo"
 	"github.com/guseggert/clustertest/cluster/basic"
@@ -11,75 +14,58 @@ import (
 
 type Cluster struct {
 	*basic.Cluster
-	Region string
+	Region          string
+	Versions        []string
+	NodesPerVersion int
 }
 
-func NewCluster(bc *basic.Cluster, region string) *Cluster {
+func NewCluster(bc *basic.Cluster, region string, versions []string, nodesPerVersion int) *Cluster {
+	log.WithFields(log.Fields{
+		"region":   region,
+		"versions": versions,
+		"npv":      nodesPerVersion,
+	}).Infoln("Init new cluster")
 	return &Cluster{
-		Cluster: bc,
-		Region:  region,
+		Cluster:         bc,
+		Region:          region,
+		Versions:        versions,
+		NodesPerVersion: nodesPerVersion,
 	}
 }
 
-//func (c *Cluster) NewNodes(n int) ([]*Node, error) {
-//	clusterNodes, err := c.Cluster.NewNodes(n)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	tirosNodes := make([]*Node, len(clusterNodes))
-//	for i, cn := range clusterNodes {
-//		n, err := NewNode(c, cn.Context(c.Ctx), fmt.Sprintf("node-%d", i))
-//		if err != nil {
-//			return nil, fmt.Errorf("new tiros node: %w", err)
-//		}
-//		tirosNodes[i] = n
-//	}
-//
-//	return tirosNodes, nil
-//}
+func (c *Cluster) NewNodes() ([]*Node, error) {
+	logger, _ := zap.NewDevelopment()
+	kc := kubo.New(c.Cluster.WithLogger(logger.Sugar())).Context(c.Ctx)
 
-func (c *Cluster) NewNode(ctx context.Context, version string) (*Node, error) {
-	cn, err := c.Cluster.NewNode()
+	log.WithFields(log.Fields{
+		"region":   c.Region,
+		"versions": c.Versions,
+		"npv":      c.NodesPerVersion,
+	}).Infoln("Starting new nodes..")
+
+	knodes, err := kc.NewNodes(len(c.Versions) * c.NodesPerVersion)
 	if err != nil {
-		return nil, fmt.Errorf("new cluster node: %w", err)
+		return nil, fmt.Errorf("new kubo nodes: %w", err)
 	}
 
-	errg, errCtx := errgroup.WithContext(ctx)
-	errg.Go(func() error {
-		kc := kubo.New(c.Cluster)
-
-		nodes, err := kc.NewNodes(1)
-		if err != nil {
-			return err
+	tnodes := make([]*Node, len(c.Versions)*c.NodesPerVersion)
+	for i, version := range c.Versions {
+		for j := 0; i < c.NodesPerVersion; i++ {
+			idx := i*c.NodesPerVersion + j
+			knode := knodes[idx].WithKuboVersion(version)
+			tnodes[idx] = NewNode(c, knode, j)
 		}
-		n := nodes[0]
+	}
 
-		n.WithKuboVersion(version)
+	errg := errgroup.Group{}
+	for _, tnode := range tnodes {
+		errg.Go(func() error {
+			return tnode.initialize()
+		})
+	}
+	if err = errg.Wait(); err != nil {
+		return nil, fmt.Errorf("init tiros node: %w", err)
+	}
 
-		if err := n.LoadBinary(); err != nil {
-			return fmt.Errorf("loading binary: %w", err)
-		}
-
-		if err := n.Init(); err != nil {
-			return fmt.Errorf("initializing kubo: %w", err)
-		}
-
-		if err := n.ConfigureForRemote(); err != nil {
-			return fmt.Errorf("configuring kubo: %w", err)
-		}
-
-		if _, err := n.Context(ctx).StartDaemonAndWaitForAPI(); err != nil {
-			return fmt.Errorf("waiting for kubo to startup: %w", err)
-		}
-		return nil
-	})
-
-	go func() {
-	}()
-
-	return n, err
+	return tnodes, nil
 }
-
-//func NewNode(clus *Cluster) (*Node, error) {
-//}
