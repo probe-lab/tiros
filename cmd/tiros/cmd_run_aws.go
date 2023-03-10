@@ -10,7 +10,6 @@ import (
 	"github.com/guseggert/clustertest/cluster/basic"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 
 	"github.com/dennis-tra/tiros/pkg/config"
 	"github.com/dennis-tra/tiros/pkg/tiros"
@@ -76,22 +75,6 @@ func RunAWSAction(c *cli.Context) error {
 	log.Infoln("Configuration:")
 	fmt.Println(conf.String())
 
-	// Initialize logger
-	var sugar *zap.SugaredLogger
-	if conf.GlobalConfig.Debug {
-		zl, err := zap.NewDevelopment()
-		if err != nil {
-			return fmt.Errorf("new zap dev logger: %w", err)
-		}
-		sugar = zl.Sugar()
-	} else {
-		zl, err := zap.NewProduction()
-		if err != nil {
-			return fmt.Errorf("new zap prod logger: %w", err)
-		}
-		sugar = zl.Sugar()
-	}
-
 	// starting cluster in all regions
 	exp := tiros.NewExperiment(conf.RunConfig)
 
@@ -105,8 +88,7 @@ func RunAWSAction(c *cli.Context) error {
 			WithInstanceSecurityGroupID(conf.InstanceSecurityGroupIDs[i]).
 			WithS3BucketARN(conf.S3BucketARNs[i]).
 			WithInstanceType(conf.InstanceType).
-			WithKeyName(conf.KeyName).
-			WithLogger(sugar)
+			WithKeyName(conf.KeyName)
 
 		exp.Cluster[region] = basic.New(cl.Context(c.Context))
 	}

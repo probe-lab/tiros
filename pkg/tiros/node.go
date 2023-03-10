@@ -2,25 +2,29 @@ package tiros
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"syscall"
 	"time"
 
-	"github.com/guseggert/clustertest/cluster/basic"
-
-	"github.com/dennis-tra/tiros/pkg/models"
-
+	"github.com/friendsofgo/errors"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/cdp"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	kubo "github.com/guseggert/clustertest-kubo"
 	"github.com/guseggert/clustertest/cluster"
+	"github.com/guseggert/clustertest/cluster/basic"
 	"github.com/ipfs/kubo/config"
 	log "github.com/sirupsen/logrus"
+	"github.com/volatiletech/null/v8"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/dennis-tra/tiros/pkg/models"
 )
+
+const websiteRequestTimeout = 30 * time.Second
 
 type Node struct {
 	*kubo.Node
@@ -71,7 +75,7 @@ func (n *Node) Close() error {
 
 func (n *Node) initKubo(ctx context.Context) error {
 	n.logEntry().Infoln("  ...init Kubo...")
-	defer n.logEntry().Infoln("  ... init Kubo done!")
+	defer n.logEntry().Infoln("  ...init Kubo done!")
 
 	kn := n.Node.Context(ctx)
 
@@ -88,7 +92,12 @@ func (n *Node) initKubo(ctx context.Context) error {
 	}
 
 	// Disable resource manager
-	if err := kn.UpdateConfig(func(cfg *config.Config) { cfg.Swarm.ResourceMgr.Enabled = config.False }); err != nil {
+	err := kn.UpdateConfig(func(cfg *config.Config) {
+		// comment in as soon as we only test kubo >= 0.19.0
+		// cfg.Routing.Type = "autoclient"
+		cfg.Swarm.ResourceMgr.Enabled = config.False
+	})
+	if err != nil {
 		return fmt.Errorf("disable resource manager: %w", err)
 	}
 
@@ -106,8 +115,8 @@ func (n *Node) initKubo(ctx context.Context) error {
 //   - init a tunnel through nodeagent to websocket endpoint of chrome instance
 //   - init rod to connect to chrome from local node
 func (n *Node) initChrome(ctx context.Context) error {
-	n.logEntry().Infoln("  ...init Chrome...")
-	defer n.logEntry().Infoln("  ... init Chrome done!")
+	n.logEntry().Infoln("  ...pulling Chrome...")
+	defer n.logEntry().Infoln("  ...init Chrome done!")
 
 	nodeLogger := log.New().WithFields(n.logEntry().Data)
 
@@ -121,6 +130,7 @@ func (n *Node) initChrome(ctx context.Context) error {
 		return fmt.Errorf("error starting headless chrome: %s", err)
 	}
 
+	n.logEntry().Infoln("  ...running Chrome...")
 	n.chromeProc, err = n.StartProc(cluster.StartProcRequest{
 		Command: "docker",
 		Args: []string{
@@ -138,7 +148,7 @@ func (n *Node) initChrome(ctx context.Context) error {
 	}
 
 	go func() {
-		n.logEntry().Infoln("Waiting for chrome browser...")
+		n.logEntry().Infoln("  ...waiting for chrome...")
 		defer n.logEntry().Infoln("Chrome stopped.")
 
 		if ex, err := n.chromeProc.Context(n.Ctx).Wait(); err != nil && n.Ctx.Err() != context.Canceled {
@@ -205,9 +215,27 @@ func (w *WebSocket) Read() ([]byte, error) {
 }
 
 type ProbeResult struct {
-	TimeToFirstByte        float64
-	LargestContentfulPaint float64
-	Error                  error
+	URL                    string
+	TimeToFirstByte        *float64
+	FirstContentFulPaint   *float64
+	LargestContentfulPaint *float64
+	NavigationPerformance  *PerformanceNavigationEntry
+	Error                  error `json:"-"`
+}
+
+func (pr *ProbeResult) NullJSON() (null.JSON, error) {
+	data, err := json.Marshal(pr)
+	if err != nil {
+		return null.NewJSON(nil, false), err
+	}
+	return null.JSONFrom(data), nil
+}
+
+func (pr *ProbeResult) NullError() null.String {
+	if pr.Error != nil {
+		return null.StringFrom(pr.Error.Error())
+	}
+	return null.NewString("", false)
 }
 
 func (n *Node) probe(ctx context.Context, website string, mType string) (*ProbeResult, error) {
@@ -218,16 +246,23 @@ func (n *Node) probe(ctx context.Context, website string, mType string) (*ProbeR
 
 	n.logEntry().WithField("type", mType).Infoln("Probing", url)
 
+	pr := ProbeResult{
+		URL: url,
+	}
+
 	var perfEntriesStr string
 	err = rod.Try(func() {
 		incognito := n.browser.MustIncognito()
-		page := incognito.MustPage()
-		page = page.Context(ctx).Timeout(30 * time.Second).MustNavigate(url).MustWaitIdle().CancelTimeout()
+
+		page := incognito.MustPage().Context(ctx).Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitIdle().CancelTimeout()
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
+
 		page.MustClose()
 		incognito.MustClose()
 	})
-	if err != nil {
+	if errors.Is(err, context.DeadlineExceeded) {
+		return &ProbeResult{Error: fmt.Errorf("timedout after %s", websiteRequestTimeout)}, nil
+	} else if err != nil {
 		return &ProbeResult{Error: err}, nil
 	}
 
@@ -237,24 +272,32 @@ func (n *Node) probe(ctx context.Context, website string, mType string) (*ProbeR
 		return nil, fmt.Errorf("parse performance entries: %w", err)
 	}
 
-	pr := ProbeResult{}
-
+	// https://developer.mozilla.org/en-US/docs/Learn/Performance/Perceived_performance#performance_metrics
 	for _, e := range perfEntries {
 		switch e.EntryType {
+		case "resource":
 		case "navigation":
 			pne, err := e.NavigationEntry()
 			if err != nil {
 				return nil, fmt.Errorf("parse navigation entry: %w", err)
 			}
-			pr.TimeToFirstByte = pne.ResponseStart - pne.StartTime
-		case "resource":
+
+			// https://developer.mozilla.org/en-US/docs/Web/Performance/Navigation_and_resource_timings#time_to_first_byte
+			ttfb := pne.ResponseStart - pne.StartTime
+			pr.TimeToFirstByte = &ttfb
+			pr.NavigationPerformance = pne
+
 		case "paint":
-		case "largest-contentful-paint":
-			lcpe, err := e.LargestContentfulPaintEntry()
-			if err != nil {
-				return nil, fmt.Errorf("parse lcp entry: %w", err)
+			// https://web.dev/fcp/
+			if pr.FirstContentFulPaint == nil || e.StartTime < *pr.FirstContentFulPaint {
+				pr.FirstContentFulPaint = &e.StartTime
 			}
-			pr.LargestContentfulPaint = lcpe.StartTime
+
+		case "largest-contentful-paint":
+			// https://web.dev/lcp/
+			if pr.LargestContentfulPaint == nil || e.StartTime > *pr.LargestContentfulPaint {
+				pr.LargestContentfulPaint = &e.StartTime
+			}
 		}
 	}
 
@@ -270,11 +313,14 @@ func (n *Node) websiteURL(website string, mType string) (string, error) {
 		}
 
 		return fmt.Sprintf("%s/ipns/%s", gatewayURL, website), nil
+
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website), nil
+
 	default:
 		errMsg := fmt.Sprintf("unknown measurement type: %s", mType)
 		n.logEntry().Errorln(errMsg)
+
 		return "", fmt.Errorf(errMsg)
 	}
 }

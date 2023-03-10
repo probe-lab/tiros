@@ -3,6 +3,10 @@ package tiros
 import (
 	"context"
 	"fmt"
+	"time"
+
+	kubo "github.com/guseggert/clustertest-kubo"
+	"github.com/guseggert/clustertest/cluster"
 
 	"github.com/guseggert/clustertest/cluster/basic"
 	log "github.com/sirupsen/logrus"
@@ -69,8 +73,8 @@ func (e *Experiment) Init(ctx context.Context) error {
 }
 
 func (e *Experiment) Run(ctx context.Context) error {
-	log.WithField("count", len(e.nodes)).Infoln("Starting website probing")
-	defer log.WithField("count", len(e.nodes)).Infoln("Stopped website probing")
+	log.WithField("nodeCount", len(e.nodes)).Infoln("Starting website probing")
+	defer log.WithField("nodeCount", len(e.nodes)).Infoln("Stopped website probing")
 
 	var err error
 	e.dbRun, err = e.db.InsertRun(ctx, e.conf)
@@ -111,33 +115,57 @@ func (e *Experiment) probe(ctx context.Context, tnode *Node, mType string) error
 				continue
 			}
 
-			logEntry.Infoln(result)
+			logEntry.WithFields(log.Fields{
+				"ttfb": p2f(result.TimeToFirstByte),
+				"lcp":  p2f(result.LargestContentfulPaint),
+				"fcp":  p2f(result.FirstContentFulPaint),
+			}).WithError(err).Infoln("Probed website", website)
 
-			//dbMeasurement := &models.Measurement{
-			//	RunID:        e.dbRun.ID,
-			//	Region:       tnode.Cluster.Region,
-			//	Website:      website,
-			//	Version:      tnode.MustVersion(),
-			//	Type:         mType,
-			//	Try:          int16(i),
-			//	Node:         int16(tnode.NodeNum),
-			//	InstanceType: e.conf.InstanceType,
-			//	Uptime:       fmt.Sprintf("%f seconds", time.Since(tnode.APIAvailableSince).Seconds()),
-			//}
-			//
-			//tnode.LogEntry().Infoln(perfEntriesStr)
+			metrics, err := result.NullJSON()
+			if err != nil {
+				logEntry.WithError(err).Warnln("Couldn't extract metrics from probe result")
+				continue
+			}
 
-			//gcCtx, cancelGC := context.WithTimeout(ctx, 10*time.Second)
-			//err = kubo.ProcMust(tnode.Context(gcCtx).RunKubo(cluster.StartProcRequest{
-			//	Args: []string{"repo", "gc"},
-			//}))
-			//if err != nil {
-			//	cancelGC()
-			//	return fmt.Errorf("%s node %d running gc: %w", region, nodeNum, err)
-			//}
-			//cancelGC()
-			// handle perf Entries
+			m := &models.Measurement{
+				RunID:        e.dbRun.ID,
+				Region:       tnode.Cluster.Region,
+				Website:      website,
+				Version:      tnode.MustVersion(),
+				Type:         mType,
+				URL:          result.URL,
+				Try:          int16(i),
+				Node:         int16(tnode.NodeNum),
+				InstanceType: e.conf.InstanceType,
+				Metrics:      metrics,
+				Error:        result.NullError(),
+				Uptime:       fmt.Sprintf("%f seconds", time.Since(tnode.APIAvailableSince).Seconds()),
+			}
+
+			if _, err := e.db.InsertMeasurement(ctx, m); err != nil {
+				return fmt.Errorf("insert measurement: %w", err)
+			}
+
+			if mType == models.MeasurementTypeHTTP {
+				continue
+			}
+
+			// Garbage collect kubo node
+			gcCtx, cancelGC := context.WithTimeout(ctx, 10*time.Second)
+			err = kubo.ProcMust(tnode.Context(gcCtx).RunKubo(cluster.StartProcRequest{Args: []string{"repo", "gc"}}))
+			cancelGC()
+			if err != nil {
+				return fmt.Errorf("%s node %d running gc: %w", tnode.Cluster.Region, tnode.NodeNum, err)
+			}
 		}
 	}
+
 	return nil
+}
+
+func p2f(ptr *float64) float64 {
+	if ptr == nil {
+		return -1
+	}
+	return *ptr
 }

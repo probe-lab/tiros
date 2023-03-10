@@ -3,8 +3,6 @@ package tiros
 import (
 	"fmt"
 
-	"go.uber.org/zap"
-
 	log "github.com/sirupsen/logrus"
 
 	kubo "github.com/guseggert/clustertest-kubo"
@@ -21,9 +19,9 @@ type Cluster struct {
 
 func NewCluster(bc *basic.Cluster, region string, versions []string, nodesPerVersion int) *Cluster {
 	log.WithFields(log.Fields{
-		"region":   region,
-		"versions": versions,
-		"npv":      nodesPerVersion,
+		"region":          region,
+		"versions":        versions,
+		"nodesPerVersion": nodesPerVersion,
 	}).Infoln("Init new cluster")
 	return &Cluster{
 		Cluster:         bc,
@@ -34,8 +32,7 @@ func NewCluster(bc *basic.Cluster, region string, versions []string, nodesPerVer
 }
 
 func (c *Cluster) NewNodes() ([]*Node, error) {
-	logger, _ := zap.NewDevelopment()
-	kc := kubo.New(c.Cluster.WithLogger(logger.Sugar())).Context(c.Ctx)
+	kc := kubo.New(c.Cluster).Context(c.Ctx)
 
 	log.WithFields(log.Fields{
 		"region":   c.Region,

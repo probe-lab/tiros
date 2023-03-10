@@ -9,13 +9,13 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/dennis-tra/tiros/pkg/config"
@@ -121,9 +121,21 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 func (c *DBClient) InsertRun(ctx context.Context, conf config.RunConfig) (*models.Run, error) {
 	log.Infoln("Inserting Run...")
 
+	websites := make([]string, len(conf.Websites))
+	for i, website := range conf.Websites {
+		websites[i] = website
+	}
+	sort.Strings(websites)
+
+	regions := make([]string, len(conf.Regions))
+	for i, region := range conf.Regions {
+		regions[i] = region
+	}
+	sort.Strings(regions)
+
 	r := &models.Run{
-		Regions:         conf.Regions,
-		Urls:            conf.Websites,
+		Regions:         regions,
+		Urls:            websites,
 		SettleShort:     conf.SettleShort.Seconds(),
 		SettleLong:      conf.SettleLong.Seconds(),
 		NodesPerVersion: int16(conf.NodesPerVersion),
@@ -134,10 +146,6 @@ func (c *DBClient) InsertRun(ctx context.Context, conf config.RunConfig) (*model
 	return r, r.Insert(ctx, c.handle, boil.Infer())
 }
 
-func (c *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement, metrics []byte, err error) (*models.Measurement, error) {
-	if err != nil {
-		m.Error = null.StringFrom(err.Error())
-	}
-
+func (c *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
 	return m, m.Insert(ctx, c.handle, boil.Infer())
 }

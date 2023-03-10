@@ -13,8 +13,7 @@ const jsPerformanceEntries = `
 			return new Promise(resolve => {
 				const observer = new PerformanceObserver((list) => {
 					const lcpEntries = list.getEntries();
-					const last = lcpEntries.splice(-1);
-					const allEntries = [...perfEntries, ...last]
+					const allEntries = [...perfEntries, ...lcpEntries]
 					resolve(JSON.stringify(allEntries));
 				});
 				observer.observe({ type: "largest-contentful-paint", buffered: true });

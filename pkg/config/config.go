@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
@@ -187,7 +188,7 @@ func (rawsc RunAWSConfig) String() string {
 		return err.Error()
 	}
 
-	return string(str)
+	return strings.ReplaceAll(string(str), rawsc.DatabasePassword, "****")
 }
 
 var DefaultRunAWSConfig = RunAWSConfig{

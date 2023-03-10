@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dennis-tra/tiros/pkg/config"
-	"github.com/dennis-tra/tiros/pkg/tiros"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+
+	"github.com/dennis-tra/tiros/pkg/config"
+	"github.com/dennis-tra/tiros/pkg/tiros"
 )
 
 var RunCommand = &cli.Command{
