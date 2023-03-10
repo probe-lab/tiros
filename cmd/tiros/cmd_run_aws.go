@@ -53,13 +53,6 @@ var RunAWSCommand = &cli.Command{
 			Value:       cli.NewStringSlice(config.DefaultRunAWSConfig.KeyNames...),
 			DefaultText: strings.Join(config.DefaultRunAWSConfig.KeyNames, ","),
 		},
-		&cli.StringSliceFlag{
-			Name:        "regions",
-			Usage:       "the AWS regions to use, if using an AWS cluster",
-			EnvVars:     []string{"TIROS_RUN_AWS_REGIONS"},
-			Value:       cli.NewStringSlice(config.DefaultRunAWSConfig.Regions...),
-			DefaultText: strings.Join(config.DefaultRunAWSConfig.Regions, ","),
-		},
 	},
 	Action: RunAWSAction,
 }

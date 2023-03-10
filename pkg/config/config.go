@@ -61,6 +61,7 @@ type RunConfig struct {
 	NodeAgent        string
 	Websites         []string
 	Versions         []string
+	Regions          []string
 	NodesPerVersion  int
 	Times            int
 	SettleShort      time.Duration
@@ -89,6 +90,7 @@ func (rc RunConfig) String() string {
 var DefaultRunConfig = RunConfig{
 	GlobalConfig:     DefaultGlobalConfig,
 	NodeAgent:        "/home/tiros/nodeagent", // correct if you use the default docker image
+	Regions:          []string{},
 	Websites:         []string{"protocol.ai"},
 	Versions:         []string{"v0.18.0"},
 	NodesPerVersion:  1,
@@ -114,6 +116,9 @@ func (rc RunConfig) Apply(c *cli.Context) RunConfig {
 	}
 	if c.IsSet("nodes-per-version") {
 		newConfig.NodesPerVersion = c.Int("nodes-per-version")
+	}
+	if c.IsSet("regions") {
+		newConfig.Regions = c.StringSlice("regions")
 	}
 	if c.IsSet("settle-short") {
 		newConfig.SettleShort = c.Duration("settle-short")
@@ -170,7 +175,6 @@ func ARNsToStrings(arns []arn.ARN) []string {
 type RunAWSConfig struct {
 	RunConfig
 
-	Regions                  []string
 	SubnetIDs                []string
 	InstanceProfileARNs      []arn.ARN
 	S3BucketARNs             []arn.ARN
@@ -190,7 +194,6 @@ func (rawsc RunAWSConfig) String() string {
 var DefaultRunAWSConfig = RunAWSConfig{
 	RunConfig: DefaultRunConfig,
 
-	Regions:                  []string{},
 	InstanceProfileARNs:      nil,
 	S3BucketARNs:             nil,
 	InstanceSecurityGroupIDs: nil,
@@ -232,10 +235,6 @@ func (rdc RunAWSConfig) Apply(c *cli.Context) (RunAWSConfig, error) {
 
 	if c.IsSet("key-names") {
 		newConfig.KeyNames = c.StringSlice("key-names")
-	}
-
-	if c.IsSet("regions") {
-		newConfig.Regions = c.StringSlice("regions")
 	}
 
 	return newConfig, nil

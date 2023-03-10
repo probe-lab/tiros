@@ -113,6 +113,13 @@ var RunCommand = &cli.Command{
 			Value:       config.DefaultRunConfig.InstanceType,
 			DefaultText: config.DefaultRunConfig.InstanceType,
 		},
+		&cli.StringSliceFlag{
+			Name:        "regions",
+			Usage:       "the AWS regions to use, if using an AWS cluster",
+			EnvVars:     []string{"TIROS_RUN_REGIONS"},
+			Value:       cli.NewStringSlice(config.DefaultRunConfig.Regions...),
+			DefaultText: strings.Join(config.DefaultRunConfig.Regions, ","),
+		},
 	},
 	Subcommands: []*cli.Command{
 		RunLocalCommand,
