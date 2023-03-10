@@ -32,7 +32,6 @@ type Node struct {
 	NodeNum int
 
 	chromeOnlineSince time.Time
-	browser           *rod.Browser
 	chromeProc        *basic.Process
 }
 
@@ -196,9 +195,7 @@ func (n *Node) initBrowser() (*rod.Browser, error) {
 		return nil, fmt.Errorf("connect to chrome: %w", err)
 	}
 
-	n.browser = browser
-
-	return n.browser, nil
+	return browser, nil
 }
 
 // WebSocket is a custom websocket that uses gobwas/ws as the transport layer.
@@ -252,15 +249,18 @@ func (n *Node) probe(ctx context.Context, website string, mType string) (*ProbeR
 		URL: url,
 	}
 
+	browser, err := n.initBrowser()
+	if err != nil {
+		return nil, fmt.Errorf("init browser: %w", err)
+	}
+
 	var perfEntriesStr string
 	err = rod.Try(func() {
-		incognito := n.browser.MustIncognito()
-
-		page := incognito.MustPage().Context(ctx).Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitIdle().CancelTimeout()
+		page := browser.MustPage().Context(ctx).Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitIdle().CancelTimeout()
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
-		incognito.MustClose()
+		browser.MustClose()
 	})
 	if errors.Is(err, context.DeadlineExceeded) {
 		return &ProbeResult{Error: fmt.Errorf("timedout after %s", websiteRequestTimeout)}, nil
