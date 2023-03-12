@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/dennis-tra/tiros/models"
-	"github.com/go-rod/rod"
 	shell "github.com/ipfs/go-ipfs-api"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -115,15 +114,9 @@ func RunAction(c *cli.Context) error {
 
 	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
 
-	browser := rod.New().ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
-	if err = browser.Connect(); err != nil {
-		return fmt.Errorf("chrome cdp api offline: %w", err)
-	}
-
 	t := Tiros{
 		DBClient: dbClient,
 		Kubo:     kubo,
-		Browser:  browser,
 	}
 
 	if _, err := t.InitRun(c); err != nil {

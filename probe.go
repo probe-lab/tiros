@@ -23,7 +23,6 @@ const websiteRequestTimeout = 30 * time.Second
 type Tiros struct {
 	DBClient *DBClient
 	Kubo     *shell.Shell
-	Browser  *rod.Browser
 	DBRun    *models.Run
 }
 
@@ -51,12 +50,23 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		URL: url,
 	}
 
+	browser := rod.New().ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
+	if err := browser.Connect(); err != nil {
+		return nil, fmt.Errorf("chrome cdp api offline: %w", err)
+	}
+
+	defer func() {
+		if err := browser.Close(); err != nil {
+			log.WithError(err).Warnln("Couldn't close browser.")
+		}
+	}()
+
 	var perfEntriesStr string
 	err := rod.Try(func() {
 		// clear cookies
-		t.Browser.MustSetCookies()
+		browser.MustSetCookies()
 
-		page := t.Browser.MustPage()
+		page := browser.MustPage()
 
 		// clear local storage
 		page.MustEvalOnNewDocument(`localStorage.clear();`)
