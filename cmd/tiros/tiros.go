@@ -51,7 +51,6 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			RunCommand,
-			StandaloneCommand,
 		},
 	}
 

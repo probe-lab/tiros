@@ -5,30 +5,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-rod/rod"
+	shell "github.com/ipfs/go-ipfs-api"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
 	"github.com/dennis-tra/tiros/pkg/config"
-	"github.com/dennis-tra/tiros/pkg/tiros"
+	"github.com/dennis-tra/tiros/pkg/db"
 )
 
 var RunCommand = &cli.Command{
 	Name: "run",
 	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:        "versions",
-			Usage:       "the kubo versions to test (comma-separated), e.g. 'v0.16.0,v0.17.0'.",
-			EnvVars:     []string{"TIROS_RUN_VERSIONS"},
-			Value:       cli.NewStringSlice(config.DefaultRunConfig.Versions...),
-			DefaultText: strings.Join(config.DefaultRunConfig.Versions, ","),
-		},
-		&cli.IntFlag{
-			Name:        "nodes-per-version",
-			Usage:       "the number of nodes per version to run",
-			EnvVars:     []string{"TIROS_RUN_NODES_PER_VERSION"},
-			Value:       config.DefaultRunConfig.NodesPerVersion,
-			DefaultText: strconv.Itoa(config.DefaultRunConfig.NodesPerVersion),
-		},
 		&cli.DurationFlag{
 			Name:        "settle-short",
 			Usage:       "the duration to wait after all daemons are online before starting the test",
@@ -56,13 +44,6 @@ var RunCommand = &cli.Command{
 			EnvVars:     []string{"TIROS_RUN_TIMES"},
 			Value:       config.DefaultRunConfig.Times,
 			DefaultText: strconv.Itoa(config.DefaultRunConfig.Times),
-		},
-		&cli.StringFlag{
-			Name:        "nodeagent",
-			Usage:       "path to the nodeagent binary",
-			EnvVars:     []string{"TIROS_RUN_NODEAGENT_BIN"},
-			Value:       config.DefaultRunConfig.NodeAgent,
-			DefaultText: config.DefaultRunConfig.NodeAgent,
 		},
 		&cli.StringFlag{
 			Name:        "db-host",
@@ -106,39 +87,50 @@ var RunCommand = &cli.Command{
 			Value:       config.DefaultRunConfig.DatabaseSSLMode,
 			DefaultText: config.DefaultRunConfig.DatabaseSSLMode,
 		},
-		&cli.StringFlag{
-			Name:        "instance-type",
-			Usage:       "the EC2 instance type to run the experiment on",
-			EnvVars:     []string{"TIROS_RUN_INSTANCE_TYPE"},
-			Value:       config.DefaultRunConfig.InstanceType,
-			DefaultText: config.DefaultRunConfig.InstanceType,
+		&cli.IntFlag{
+			Name:        "kubo-api-port",
+			Usage:       "port to reach the Kubo API",
+			EnvVars:     []string{"TIROS_RUN_KUBO_API_PORT"},
+			Value:       config.DefaultRunConfig.KuboApiPort,
+			DefaultText: strconv.Itoa(config.DefaultRunConfig.KuboApiPort),
 		},
-		&cli.StringSliceFlag{
-			Name:        "regions",
-			Usage:       "the AWS regions to use, if using an AWS cluster",
-			EnvVars:     []string{"TIROS_RUN_REGIONS"},
-			Value:       cli.NewStringSlice(config.DefaultRunConfig.Regions...),
-			DefaultText: strings.Join(config.DefaultRunConfig.Regions, ","),
+		&cli.IntFlag{
+			Name:        "kubo-gateway-port",
+			Usage:       "port to reach the Kubo Gateway",
+			EnvVars:     []string{"TIROS_RUN_KUBO_GATEWAY_PORT"},
+			Value:       config.DefaultRunConfig.KuboGatewayPort,
+			DefaultText: strconv.Itoa(config.DefaultRunConfig.KuboGatewayPort),
+		},
+		&cli.IntFlag{
+			Name:        "chrome-cdp-port",
+			Usage:       "port to reach the Chrome DevTools Protocol port",
+			EnvVars:     []string{"TIROS_RUN_CHROME_CDP_PORT"},
+			Value:       config.DefaultRunConfig.ChromeCDPPort,
+			DefaultText: strconv.Itoa(config.DefaultRunConfig.ChromeCDPPort),
 		},
 	},
-	Subcommands: []*cli.Command{
-		RunLocalCommand,
-		RunAWSCommand,
-	},
+	Action: RunAction,
 }
 
-func RunAction(c *cli.Context, exp *tiros.Experiment) error {
-	log.Infoln("Starting Tiros run...")
-	defer log.Infoln("Stopped Tiros run.")
+func RunAction(c *cli.Context) error {
+	log.Infoln("Starting Tiros standalone...")
+	defer log.Infoln("Stopped Tiros standalone.")
 
-	defer exp.Shutdown()
-
-	if err := exp.Init(c.Context); err != nil {
-		return fmt.Errorf("init experiment: %w", err)
+	dbClient, err := db.InitClient(c.Context, c.String("db-host"), c.Int("db-port"), c.String("db-name"), c.String("db-user"), c.String("db-password"), c.String("db-sslmode"))
+	if err != nil {
+		return fmt.Errorf("init db connection: %w", err)
 	}
 
-	if err := exp.Run(c.Context); err != nil {
-		return fmt.Errorf("run experiment: %w", err)
+	// verify Kubo API connection
+	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
+	version, _, err := kubo.Version()
+	if err != nil {
+		return fmt.Errorf("kubo api offline: %w", err)
+	}
+
+	browser := rod.New().ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
+	if err = browser.Connect(); err != nil {
+		return fmt.Errorf("chrome cdp api offline: %w", err)
 	}
 
 	return nil

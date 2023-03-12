@@ -73,6 +73,9 @@ type RunConfig struct {
 	DatabasePassword string
 	DatabaseSSLMode  string
 	InstanceType     string
+	KuboApiPort      int
+	KuboGatewayPort  int
+	ChromeCDPPort    int
 }
 
 func (rc RunConfig) String() string {
@@ -104,6 +107,9 @@ var DefaultRunConfig = RunConfig{
 	DatabasePassword: "password",
 	DatabaseSSLMode:  "disable",
 	InstanceType:     "local",
+	KuboApiPort:      5001,
+	KuboGatewayPort:  8080,
+	ChromeCDPPort:    3000,
 }
 
 func (rc RunConfig) Apply(c *cli.Context) RunConfig {
