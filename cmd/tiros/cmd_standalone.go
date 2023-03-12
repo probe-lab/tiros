@@ -5,6 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-rod/rod"
+
+	shell "github.com/ipfs/go-ipfs-api"
+
 	"github.com/dennis-tra/tiros/pkg/db"
 
 	log "github.com/sirupsen/logrus"
@@ -100,6 +104,22 @@ func StandaloneAction(c *cli.Context) error {
 	}
 
 	log.WithField("sdf", dbClient).Infoln("successful connection")
+
+	s := shell.NewShell("/ip4/127.0.0.1/tcp/5001")
+
+	iv, sha, err := s.Version()
+	if err != nil {
+		log.WithError(err).Warnln("couldn't get version")
+	} else {
+		log.Infoln(iv, sha)
+	}
+
+	browser := rod.New().ControlURL("ws://localhost:3000")
+	if err = browser.Connect(); err != nil {
+		log.WithError(err).Warnln("couldn't connect browser")
+	} else {
+		log.Infoln("connected to browser.")
+	}
 
 	return nil
 }
