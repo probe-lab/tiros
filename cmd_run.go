@@ -162,7 +162,7 @@ func RunAction(c *cli.Context) error {
 						"fcp":  p2f(pr.FirstContentfulPaint),
 					}).WithError(pr.Error).Infoln("Probed website", website)
 
-					if _, err := t.Save(c, pr, website, models.MeasurementTypeKUBO, i); err != nil {
+					if _, err := t.Save(c, pr, website, mType, i); err != nil {
 						return fmt.Errorf("save measurement: %w", err)
 					}
 
