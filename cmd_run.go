@@ -28,17 +28,11 @@ var RunCommand = &cli.Command{
 			EnvVars:  []string{"TIROS_RUN_REGION"},
 			Required: true,
 		},
-		&cli.DurationFlag{
-			Name:    "settle-short",
-			Usage:   "the duration to wait after all daemons are online before starting the test",
-			EnvVars: []string{"TIROS_RUN_SETTLE_SHORT"},
-			Value:   10 * time.Second,
-		},
-		&cli.DurationFlag{
-			Name:    "settle-long",
-			Usage:   "the duration to wait after all daemons are online before starting the test",
-			EnvVars: []string{"TIROS_RUN_SETTLE_LONG"},
-			Value:   20 * time.Minute,
+		&cli.IntSliceFlag{
+			Name:    "settle-times",
+			Usage:   "a list of times to settle in seconds",
+			EnvVars: []string{"TIROS_RUN_SETTLE_TIMES"},
+			Value:   cli.NewIntSlice(10, 1200),
 		},
 		&cli.IntFlag{
 			Name:    "times",
@@ -148,26 +142,42 @@ func RunAction(c *cli.Context) error {
 		websites[i], websites[j] = websites[j], websites[i]
 	})
 
-	for i := 0; i < c.Int("times"); i++ {
-		for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
-			for _, website := range websites {
-				pr, err := t.Probe(c, websiteURL(c, website, mType))
-				if err != nil {
-					return fmt.Errorf("probing %s: %w", website, err)
-				}
+	log.WithFields(log.Fields{
+		"websites":    websites,
+		"settleTimes": c.IntSlice("settle-times"),
+		"times":       c.Int("times"),
+	}).Infoln("Starting run!")
 
-				log.WithFields(log.Fields{
-					"ttfb": p2f(pr.TimeToFirstByte),
-					"lcp":  p2f(pr.LargestContentfulPaint),
-					"fcp":  p2f(pr.FirstContentfulPaint),
-				}).WithError(pr.Error).Infoln("Probed website", website)
+	for _, settle := range c.IntSlice("settle-times") {
 
-				if _, err := t.Save(c, pr, website, models.MeasurementTypeKUBO, i); err != nil {
-					return fmt.Errorf("save measurement: %w", err)
-				}
+		sleepDur := time.Duration(settle) * time.Second
 
-				if err = t.KuboGC(c.Context); err != nil {
-					return fmt.Errorf("kubo gc: %w", err)
+		log.Infof("Letting Kubo settle for %s\n", sleepDur)
+		time.Sleep(sleepDur)
+
+		for i := 0; i < c.Int("times"); i++ {
+			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+				for _, website := range websites {
+					pr, err := t.Probe(c, websiteURL(c, website, mType))
+					if err != nil {
+						return fmt.Errorf("probing %s: %w", website, err)
+					}
+
+					log.WithFields(log.Fields{
+						"ttfb": p2f(pr.TimeToFirstByte),
+						"lcp":  p2f(pr.LargestContentfulPaint),
+						"fcp":  p2f(pr.FirstContentfulPaint),
+					}).WithError(pr.Error).Infoln("Probed website", website)
+
+					if _, err := t.Save(c, pr, website, models.MeasurementTypeKUBO, i); err != nil {
+						return fmt.Errorf("save measurement: %w", err)
+					}
+
+					if mType == models.MeasurementTypeKUBO {
+						if err = t.KuboGC(c.Context); err != nil {
+							return fmt.Errorf("kubo gc: %w", err)
+						}
+					}
 				}
 			}
 		}
