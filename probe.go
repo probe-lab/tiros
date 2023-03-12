@@ -7,15 +7,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/volatiletech/sqlboiler/v4/boil"
-
-	shell "github.com/ipfs/go-ipfs-api"
-
-	"github.com/urfave/cli/v2"
-
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
+	shell "github.com/ipfs/go-ipfs-api"
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/dennis-tra/tiros/models"
 )
@@ -55,9 +53,21 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 
 	var perfEntriesStr string
 	err := rod.Try(func() {
-		incognito := t.Browser.MustIncognito() // prevents cache usage
-		page := incognito.
-			MustPage().
+		// clear cookies
+		t.Browser.MustSetCookies()
+
+		page := t.Browser.MustPage()
+
+		// clear local storage
+		page.MustEvalOnNewDocument(`localStorage.clear();`)
+
+		// disable cache
+		err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page)
+		if err != nil {
+			panic(err)
+		}
+
+		page.
 			Context(c.Context).             // stop when outer ctx stops
 			Timeout(websiteRequestTimeout). // only wait 30s
 			MustNavigate(url).
@@ -67,7 +77,6 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
-		incognito.MustClose()
 	})
 	if errors.Is(err, context.DeadlineExceeded) {
 		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
