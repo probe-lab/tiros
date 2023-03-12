@@ -1,4 +1,4 @@
-package tiros
+package main
 
 import (
 	"testing"

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 
 	_ "github.com/lib/pq"
@@ -15,8 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-
-	"github.com/dennis-tra/tiros/pkg/config"
 )
 
 var app *cli.App
@@ -35,18 +32,28 @@ func main() {
 		Before: Before,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:        "debug",
-				Usage:       "Set this flag to enable debug logging",
-				EnvVars:     []string{"TIROS_DEBUG"},
-				Value:       config.DefaultGlobalConfig.Debug,
-				DefaultText: strconv.FormatBool(config.DefaultGlobalConfig.Debug),
+				Name:    "debug",
+				Usage:   "Set this flag to enable debug logging",
+				EnvVars: []string{"TIROS_DEBUG"},
+				Value:   false,
 			},
 			&cli.IntFlag{
-				Name:        "log-level",
-				Usage:       "Set this flag to a value from 0 (least verbose) to 6 (most verbose). Overrides the --debug flag",
-				EnvVars:     []string{"TIROS_LOG_LEVEL"},
-				Value:       config.DefaultGlobalConfig.LogLevel,
-				DefaultText: strconv.Itoa(config.DefaultGlobalConfig.LogLevel),
+				Name:    "log-level",
+				Usage:   "Set this flag to a value from 0 (least verbose) to 6 (most verbose). Overrides the --debug flag",
+				EnvVars: []string{"TIROS_LOG_LEVEL"},
+				Value:   4,
+			},
+			&cli.StringFlag{
+				Name:    "telemetry-host",
+				Usage:   "To which network address should the telemetry (prometheus, pprof) server bind",
+				EnvVars: []string{"TIROS_TELEMETRY_HOST"},
+				Value:   "localhost",
+			},
+			&cli.IntFlag{
+				Name:    "telemetry-port",
+				Usage:   "On which port should the telemetry (prometheus, pprof) server listen",
+				EnvVars: []string{"TIROS_TELEMETRY_PORT"},
+				Value:   6666,
 			},
 		},
 		Commands: []*cli.Command{
@@ -74,9 +81,7 @@ func main() {
 }
 
 func Before(c *cli.Context) error {
-	cfg := config.DefaultGlobalConfig.Apply(c)
-
-	if cfg.Debug {
+	if c.Bool("debug") {
 		log.SetLevel(log.DebugLevel)
 	}
 
@@ -89,7 +94,7 @@ func Before(c *cli.Context) error {
 	}
 
 	// Start prometheus metrics endpoint
-	go metricsListenAndServe(cfg.TelemetryHost, cfg.TelemetryPort)
+	go metricsListenAndServe(c.String("telemetry-host"), c.Int("telemetry-port"))
 
 	return nil
 }

@@ -1,4 +1,4 @@
-package db
+package main
 
 import (
 	"context"
@@ -11,15 +11,16 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/dennis-tra/tiros/models"
+
+	"github.com/urfave/cli/v2"
+
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-
-	"github.com/dennis-tra/tiros/pkg/config"
-	"github.com/dennis-tra/tiros/pkg/models"
 )
 
 //go:embed migrations
@@ -118,32 +119,25 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 	return nil
 }
 
-func (c *DBClient) InsertRun(ctx context.Context, conf config.RunConfig) (*models.Run, error) {
+func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
 	log.Infoln("Inserting Run...")
 
-	websites := make([]string, len(conf.Websites))
-	for i, website := range conf.Websites {
+	websites := make([]string, len(c.StringSlice("websites")))
+	for i, website := range c.StringSlice("websites") {
 		websites[i] = website
 	}
 	sort.Strings(websites)
 
-	regions := make([]string, len(conf.Regions))
-	for i, region := range conf.Regions {
-		regions[i] = region
-	}
-	sort.Strings(regions)
-
 	r := &models.Run{
-		Regions:         regions,
-		Urls:            websites,
-		SettleShort:     conf.SettleShort.Seconds(),
-		SettleLong:      conf.SettleLong.Seconds(),
-		NodesPerVersion: int16(conf.NodesPerVersion),
-		Versions:        conf.Versions,
-		Times:           int16(conf.Times),
+		Region:      c.String("region"),
+		Websites:    websites,
+		SettleShort: c.Duration("settle-short").Seconds(),
+		SettleLong:  c.Duration("settle-long").Seconds(),
+		Version:     version,
+		Times:       int16(c.Int("times")),
 	}
 
-	return r, r.Insert(ctx, c.handle, boil.Infer())
+	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
 func (c *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {

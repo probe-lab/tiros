@@ -25,72 +25,77 @@ import (
 
 // Run is an object representing the database table.
 type Run struct {
-	ID              int               `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Regions         types.StringArray `boil:"regions" json:"regions" toml:"regions" yaml:"regions"`
-	Urls            types.StringArray `boil:"urls" json:"urls" toml:"urls" yaml:"urls"`
-	SettleShort     float64           `boil:"settle_short" json:"settle_short" toml:"settle_short" yaml:"settle_short"`
-	SettleLong      float64           `boil:"settle_long" json:"settle_long" toml:"settle_long" yaml:"settle_long"`
-	NodesPerVersion int16             `boil:"nodes_per_version" json:"nodes_per_version" toml:"nodes_per_version" yaml:"nodes_per_version"`
-	Versions        types.StringArray `boil:"versions" json:"versions" toml:"versions" yaml:"versions"`
-	Times           int16             `boil:"times" json:"times" toml:"times" yaml:"times"`
-	UpdatedAt       time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt       time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	FinishedAt      null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
+	ID          int               `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Region      string            `boil:"region" json:"region" toml:"region" yaml:"region"`
+	Websites    types.StringArray `boil:"websites" json:"websites" toml:"websites" yaml:"websites"`
+	SettleShort float64           `boil:"settle_short" json:"settle_short" toml:"settle_short" yaml:"settle_short"`
+	SettleLong  float64           `boil:"settle_long" json:"settle_long" toml:"settle_long" yaml:"settle_long"`
+	Version     string            `boil:"version" json:"version" toml:"version" yaml:"version"`
+	Times       int16             `boil:"times" json:"times" toml:"times" yaml:"times"`
+	CPU         int               `boil:"cpu" json:"cpu" toml:"cpu" yaml:"cpu"`
+	Memory      int               `boil:"memory" json:"memory" toml:"memory" yaml:"memory"`
+	UpdatedAt   time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt   time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	FinishedAt  null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
 
 	R *runR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L runL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RunColumns = struct {
-	ID              string
-	Regions         string
-	Urls            string
-	SettleShort     string
-	SettleLong      string
-	NodesPerVersion string
-	Versions        string
-	Times           string
-	UpdatedAt       string
-	CreatedAt       string
-	FinishedAt      string
+	ID          string
+	Region      string
+	Websites    string
+	SettleShort string
+	SettleLong  string
+	Version     string
+	Times       string
+	CPU         string
+	Memory      string
+	UpdatedAt   string
+	CreatedAt   string
+	FinishedAt  string
 }{
-	ID:              "id",
-	Regions:         "regions",
-	Urls:            "urls",
-	SettleShort:     "settle_short",
-	SettleLong:      "settle_long",
-	NodesPerVersion: "nodes_per_version",
-	Versions:        "versions",
-	Times:           "times",
-	UpdatedAt:       "updated_at",
-	CreatedAt:       "created_at",
-	FinishedAt:      "finished_at",
+	ID:          "id",
+	Region:      "region",
+	Websites:    "websites",
+	SettleShort: "settle_short",
+	SettleLong:  "settle_long",
+	Version:     "version",
+	Times:       "times",
+	CPU:         "cpu",
+	Memory:      "memory",
+	UpdatedAt:   "updated_at",
+	CreatedAt:   "created_at",
+	FinishedAt:  "finished_at",
 }
 
 var RunTableColumns = struct {
-	ID              string
-	Regions         string
-	Urls            string
-	SettleShort     string
-	SettleLong      string
-	NodesPerVersion string
-	Versions        string
-	Times           string
-	UpdatedAt       string
-	CreatedAt       string
-	FinishedAt      string
+	ID          string
+	Region      string
+	Websites    string
+	SettleShort string
+	SettleLong  string
+	Version     string
+	Times       string
+	CPU         string
+	Memory      string
+	UpdatedAt   string
+	CreatedAt   string
+	FinishedAt  string
 }{
-	ID:              "runs.id",
-	Regions:         "runs.regions",
-	Urls:            "runs.urls",
-	SettleShort:     "runs.settle_short",
-	SettleLong:      "runs.settle_long",
-	NodesPerVersion: "runs.nodes_per_version",
-	Versions:        "runs.versions",
-	Times:           "runs.times",
-	UpdatedAt:       "runs.updated_at",
-	CreatedAt:       "runs.created_at",
-	FinishedAt:      "runs.finished_at",
+	ID:          "runs.id",
+	Region:      "runs.region",
+	Websites:    "runs.websites",
+	SettleShort: "runs.settle_short",
+	SettleLong:  "runs.settle_long",
+	Version:     "runs.version",
+	Times:       "runs.times",
+	CPU:         "runs.cpu",
+	Memory:      "runs.memory",
+	UpdatedAt:   "runs.updated_at",
+	CreatedAt:   "runs.created_at",
+	FinishedAt:  "runs.finished_at",
 }
 
 // Generated where
@@ -170,29 +175,31 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var RunWhere = struct {
-	ID              whereHelperint
-	Regions         whereHelpertypes_StringArray
-	Urls            whereHelpertypes_StringArray
-	SettleShort     whereHelperfloat64
-	SettleLong      whereHelperfloat64
-	NodesPerVersion whereHelperint16
-	Versions        whereHelpertypes_StringArray
-	Times           whereHelperint16
-	UpdatedAt       whereHelpertime_Time
-	CreatedAt       whereHelpertime_Time
-	FinishedAt      whereHelpernull_Time
+	ID          whereHelperint
+	Region      whereHelperstring
+	Websites    whereHelpertypes_StringArray
+	SettleShort whereHelperfloat64
+	SettleLong  whereHelperfloat64
+	Version     whereHelperstring
+	Times       whereHelperint16
+	CPU         whereHelperint
+	Memory      whereHelperint
+	UpdatedAt   whereHelpertime_Time
+	CreatedAt   whereHelpertime_Time
+	FinishedAt  whereHelpernull_Time
 }{
-	ID:              whereHelperint{field: "\"runs\".\"id\""},
-	Regions:         whereHelpertypes_StringArray{field: "\"runs\".\"regions\""},
-	Urls:            whereHelpertypes_StringArray{field: "\"runs\".\"urls\""},
-	SettleShort:     whereHelperfloat64{field: "\"runs\".\"settle_short\""},
-	SettleLong:      whereHelperfloat64{field: "\"runs\".\"settle_long\""},
-	NodesPerVersion: whereHelperint16{field: "\"runs\".\"nodes_per_version\""},
-	Versions:        whereHelpertypes_StringArray{field: "\"runs\".\"versions\""},
-	Times:           whereHelperint16{field: "\"runs\".\"times\""},
-	UpdatedAt:       whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
-	CreatedAt:       whereHelpertime_Time{field: "\"runs\".\"created_at\""},
-	FinishedAt:      whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
+	ID:          whereHelperint{field: "\"runs\".\"id\""},
+	Region:      whereHelperstring{field: "\"runs\".\"region\""},
+	Websites:    whereHelpertypes_StringArray{field: "\"runs\".\"websites\""},
+	SettleShort: whereHelperfloat64{field: "\"runs\".\"settle_short\""},
+	SettleLong:  whereHelperfloat64{field: "\"runs\".\"settle_long\""},
+	Version:     whereHelperstring{field: "\"runs\".\"version\""},
+	Times:       whereHelperint16{field: "\"runs\".\"times\""},
+	CPU:         whereHelperint{field: "\"runs\".\"cpu\""},
+	Memory:      whereHelperint{field: "\"runs\".\"memory\""},
+	UpdatedAt:   whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
+	CreatedAt:   whereHelpertime_Time{field: "\"runs\".\"created_at\""},
+	FinishedAt:  whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
 }
 
 // RunRels is where relationship names are stored.
@@ -223,8 +230,8 @@ func (r *runR) GetMeasurements() MeasurementSlice {
 type runL struct{}
 
 var (
-	runAllColumns            = []string{"id", "regions", "urls", "settle_short", "settle_long", "nodes_per_version", "versions", "times", "updated_at", "created_at", "finished_at"}
-	runColumnsWithoutDefault = []string{"regions", "urls", "settle_short", "settle_long", "nodes_per_version", "versions", "times", "updated_at", "created_at"}
+	runAllColumns            = []string{"id", "region", "websites", "settle_short", "settle_long", "version", "times", "cpu", "memory", "updated_at", "created_at", "finished_at"}
+	runColumnsWithoutDefault = []string{"region", "websites", "settle_short", "settle_long", "version", "times", "cpu", "memory", "updated_at", "created_at"}
 	runColumnsWithDefault    = []string{"id", "finished_at"}
 	runPrimaryKeyColumns     = []string{"id"}
 	runGeneratedColumns      = []string{"id"}
