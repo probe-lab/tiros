@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -52,23 +51,23 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 
 	var perfEntriesStr string
 	err := rod.Try(func() {
-		// create new browser
+		// create new browser each time
 		browser := rod.New().
 			Context(c.Context). // stop when outer ctx stops
 			ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port"))).
 			MustConnect().
-			MustIncognito()
+			MustIncognito() // first defense to prevent hitting the cache
 
 		// clear cookies
-		browser.MustSetCookies()
+		browser.MustSetCookies() // second defense to prevent hitting the cache
 
 		page := browser.MustPage()
 
 		// clear local storage
-		page.MustEvalOnNewDocument(`localStorage.clear();`)
+		page.MustEvalOnNewDocument(`localStorage.clear();`) // third defense to prevent hitting the cache
 
 		// disable cache
-		err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page)
+		err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page) // fourth defense to prevent hitting the cache
 		if err != nil {
 			panic(err)
 		}
@@ -88,6 +87,8 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	if errors.Is(err, context.DeadlineExceeded) {
 		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
 		return &pr, nil
+	} else if errors.Is(err, context.Canceled) {
+		return nil, err
 	} else if err != nil {
 		pr.Error = err
 		return &pr, nil
@@ -139,40 +140,6 @@ func (t *Tiros) SealRun(ctx context.Context) (*models.Run, error) {
 	t.DBRun.FinishedAt = null.TimeFrom(time.Now())
 	_, err := t.DBRun.Update(ctx, t.DBClient.handle, boil.Infer())
 	return t.DBRun, err
-}
-
-type ProbeResult struct {
-	URL                    string
-	TimeToFirstByte        *float64
-	FirstContentfulPaint   *float64
-	LargestContentfulPaint *float64
-	NavigationPerformance  *PerformanceNavigationEntry
-	Error                  error `json:"-"`
-}
-
-type Metrics struct {
-	NavigationPerformance *PerformanceNavigationEntry
-	// can grow
-}
-
-func (pr *ProbeResult) NullJSON() (null.JSON, error) {
-	m := Metrics{
-		NavigationPerformance: pr.NavigationPerformance,
-	}
-
-	data, err := json.Marshal(m)
-	if err != nil {
-		return null.NewJSON(nil, false), err
-	}
-
-	return null.JSONFrom(data), nil
-}
-
-func (pr *ProbeResult) NullError() null.String {
-	if pr.Error != nil {
-		return null.StringFrom(pr.Error.Error())
-	}
-	return null.NewString("", false)
 }
 
 func (t *Tiros) Save(c *cli.Context, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
