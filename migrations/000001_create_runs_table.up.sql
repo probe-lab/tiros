@@ -5,8 +5,6 @@ CREATE TABLE runs
     id           INT GENERATED ALWAYS AS IDENTITY,
     region       TEXT        NOT NULL,
     websites     TEXT[]      NOT NULL,
-    settle_short FLOAT       NOT NULL,
-    settle_long  FLOAT       NOT NULL,
     version      TEXT        NOT NULL,
     times        SMALLINT    NOT NULL,
     cpu          INT         NOT NULL,

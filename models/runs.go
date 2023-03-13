@@ -25,77 +25,67 @@ import (
 
 // Run is an object representing the database table.
 type Run struct {
-	ID          int               `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Region      string            `boil:"region" json:"region" toml:"region" yaml:"region"`
-	Websites    types.StringArray `boil:"websites" json:"websites" toml:"websites" yaml:"websites"`
-	SettleShort float64           `boil:"settle_short" json:"settle_short" toml:"settle_short" yaml:"settle_short"`
-	SettleLong  float64           `boil:"settle_long" json:"settle_long" toml:"settle_long" yaml:"settle_long"`
-	Version     string            `boil:"version" json:"version" toml:"version" yaml:"version"`
-	Times       int16             `boil:"times" json:"times" toml:"times" yaml:"times"`
-	CPU         int               `boil:"cpu" json:"cpu" toml:"cpu" yaml:"cpu"`
-	Memory      int               `boil:"memory" json:"memory" toml:"memory" yaml:"memory"`
-	UpdatedAt   time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt   time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	FinishedAt  null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
+	ID         int               `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Region     string            `boil:"region" json:"region" toml:"region" yaml:"region"`
+	Websites   types.StringArray `boil:"websites" json:"websites" toml:"websites" yaml:"websites"`
+	Version    string            `boil:"version" json:"version" toml:"version" yaml:"version"`
+	Times      int16             `boil:"times" json:"times" toml:"times" yaml:"times"`
+	CPU        int               `boil:"cpu" json:"cpu" toml:"cpu" yaml:"cpu"`
+	Memory     int               `boil:"memory" json:"memory" toml:"memory" yaml:"memory"`
+	UpdatedAt  time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt  time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	FinishedAt null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
 
 	R *runR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L runL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RunColumns = struct {
-	ID          string
-	Region      string
-	Websites    string
-	SettleShort string
-	SettleLong  string
-	Version     string
-	Times       string
-	CPU         string
-	Memory      string
-	UpdatedAt   string
-	CreatedAt   string
-	FinishedAt  string
+	ID         string
+	Region     string
+	Websites   string
+	Version    string
+	Times      string
+	CPU        string
+	Memory     string
+	UpdatedAt  string
+	CreatedAt  string
+	FinishedAt string
 }{
-	ID:          "id",
-	Region:      "region",
-	Websites:    "websites",
-	SettleShort: "settle_short",
-	SettleLong:  "settle_long",
-	Version:     "version",
-	Times:       "times",
-	CPU:         "cpu",
-	Memory:      "memory",
-	UpdatedAt:   "updated_at",
-	CreatedAt:   "created_at",
-	FinishedAt:  "finished_at",
+	ID:         "id",
+	Region:     "region",
+	Websites:   "websites",
+	Version:    "version",
+	Times:      "times",
+	CPU:        "cpu",
+	Memory:     "memory",
+	UpdatedAt:  "updated_at",
+	CreatedAt:  "created_at",
+	FinishedAt: "finished_at",
 }
 
 var RunTableColumns = struct {
-	ID          string
-	Region      string
-	Websites    string
-	SettleShort string
-	SettleLong  string
-	Version     string
-	Times       string
-	CPU         string
-	Memory      string
-	UpdatedAt   string
-	CreatedAt   string
-	FinishedAt  string
+	ID         string
+	Region     string
+	Websites   string
+	Version    string
+	Times      string
+	CPU        string
+	Memory     string
+	UpdatedAt  string
+	CreatedAt  string
+	FinishedAt string
 }{
-	ID:          "runs.id",
-	Region:      "runs.region",
-	Websites:    "runs.websites",
-	SettleShort: "runs.settle_short",
-	SettleLong:  "runs.settle_long",
-	Version:     "runs.version",
-	Times:       "runs.times",
-	CPU:         "runs.cpu",
-	Memory:      "runs.memory",
-	UpdatedAt:   "runs.updated_at",
-	CreatedAt:   "runs.created_at",
-	FinishedAt:  "runs.finished_at",
+	ID:         "runs.id",
+	Region:     "runs.region",
+	Websites:   "runs.websites",
+	Version:    "runs.version",
+	Times:      "runs.times",
+	CPU:        "runs.cpu",
+	Memory:     "runs.memory",
+	UpdatedAt:  "runs.updated_at",
+	CreatedAt:  "runs.created_at",
+	FinishedAt: "runs.finished_at",
 }
 
 // Generated where
@@ -119,35 +109,6 @@ func (w whereHelpertypes_StringArray) GT(x types.StringArray) qm.QueryMod {
 }
 func (w whereHelpertypes_StringArray) GTE(x types.StringArray) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-type whereHelperfloat64 struct{ field string }
-
-func (w whereHelperfloat64) EQ(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperfloat64) NEQ(x float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelperfloat64) LT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperfloat64) LTE(x float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelperfloat64) GT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperfloat64) GTE(x float64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelperfloat64) IN(slice []float64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperfloat64) NIN(slice []float64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
 type whereHelpernull_Time struct{ field string }
@@ -175,31 +136,27 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var RunWhere = struct {
-	ID          whereHelperint
-	Region      whereHelperstring
-	Websites    whereHelpertypes_StringArray
-	SettleShort whereHelperfloat64
-	SettleLong  whereHelperfloat64
-	Version     whereHelperstring
-	Times       whereHelperint16
-	CPU         whereHelperint
-	Memory      whereHelperint
-	UpdatedAt   whereHelpertime_Time
-	CreatedAt   whereHelpertime_Time
-	FinishedAt  whereHelpernull_Time
+	ID         whereHelperint
+	Region     whereHelperstring
+	Websites   whereHelpertypes_StringArray
+	Version    whereHelperstring
+	Times      whereHelperint16
+	CPU        whereHelperint
+	Memory     whereHelperint
+	UpdatedAt  whereHelpertime_Time
+	CreatedAt  whereHelpertime_Time
+	FinishedAt whereHelpernull_Time
 }{
-	ID:          whereHelperint{field: "\"runs\".\"id\""},
-	Region:      whereHelperstring{field: "\"runs\".\"region\""},
-	Websites:    whereHelpertypes_StringArray{field: "\"runs\".\"websites\""},
-	SettleShort: whereHelperfloat64{field: "\"runs\".\"settle_short\""},
-	SettleLong:  whereHelperfloat64{field: "\"runs\".\"settle_long\""},
-	Version:     whereHelperstring{field: "\"runs\".\"version\""},
-	Times:       whereHelperint16{field: "\"runs\".\"times\""},
-	CPU:         whereHelperint{field: "\"runs\".\"cpu\""},
-	Memory:      whereHelperint{field: "\"runs\".\"memory\""},
-	UpdatedAt:   whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
-	CreatedAt:   whereHelpertime_Time{field: "\"runs\".\"created_at\""},
-	FinishedAt:  whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
+	ID:         whereHelperint{field: "\"runs\".\"id\""},
+	Region:     whereHelperstring{field: "\"runs\".\"region\""},
+	Websites:   whereHelpertypes_StringArray{field: "\"runs\".\"websites\""},
+	Version:    whereHelperstring{field: "\"runs\".\"version\""},
+	Times:      whereHelperint16{field: "\"runs\".\"times\""},
+	CPU:        whereHelperint{field: "\"runs\".\"cpu\""},
+	Memory:     whereHelperint{field: "\"runs\".\"memory\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"runs\".\"created_at\""},
+	FinishedAt: whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
 }
 
 // RunRels is where relationship names are stored.
@@ -230,8 +187,8 @@ func (r *runR) GetMeasurements() MeasurementSlice {
 type runL struct{}
 
 var (
-	runAllColumns            = []string{"id", "region", "websites", "settle_short", "settle_long", "version", "times", "cpu", "memory", "updated_at", "created_at", "finished_at"}
-	runColumnsWithoutDefault = []string{"region", "websites", "settle_short", "settle_long", "version", "times", "cpu", "memory", "updated_at", "created_at"}
+	runAllColumns            = []string{"id", "region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at", "finished_at"}
+	runColumnsWithoutDefault = []string{"region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at"}
 	runColumnsWithDefault    = []string{"id", "finished_at"}
 	runPrimaryKeyColumns     = []string{"id"}
 	runGeneratedColumns      = []string{"id"}

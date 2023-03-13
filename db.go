@@ -129,12 +129,12 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 	sort.Strings(websites)
 
 	r := &models.Run{
-		Region:      c.String("region"),
-		Websites:    websites,
-		SettleShort: c.Duration("settle-short").Seconds(),
-		SettleLong:  c.Duration("settle-long").Seconds(),
-		Version:     version,
-		Times:       int16(c.Int("times")),
+		Region:   c.String("region"),
+		Websites: websites,
+		Version:  version,
+		Times:    int16(c.Int("times")),
+		CPU:      c.Int("cpu"),
+		Memory:   c.Int("memory"),
 	}
 
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
