@@ -50,19 +50,15 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		URL: url,
 	}
 
-	browser := rod.New().ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
-	if err := browser.Connect(); err != nil {
-		return nil, fmt.Errorf("chrome cdp api offline: %w", err)
-	}
-
-	defer func() {
-		if err := browser.Close(); err != nil {
-			log.WithError(err).Warnln("Couldn't close browser.")
-		}
-	}()
-
 	var perfEntriesStr string
 	err := rod.Try(func() {
+		// create new browser
+		browser := rod.New().
+			Context(c.Context). // stop when outer ctx stops
+			ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port"))).
+			MustConnect().
+			MustIncognito()
+
 		// clear cookies
 		browser.MustSetCookies()
 
@@ -78,15 +74,16 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		}
 
 		page.
-			Context(c.Context).             // stop when outer ctx stops
 			Timeout(websiteRequestTimeout). // only wait 30s
-			MustNavigate(url).
-			MustWaitIdle(). // wait until network has come to a halt (1 Minute)
-			CancelTimeout() // continue using page object for things
+			MustNavigate(url).              // actually open the page
+			MustWaitLoad().                 // fired when the whole page has loaded (ncluding all dependent resources such as stylesheets, scripts, iframes, and images)
+			MustWaitIdle().                 // wait until network has come to a halt (1 Minute)
+			CancelTimeout()                 // continue using page object for things
 
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
+		browser.MustClose()
 	})
 	if errors.Is(err, context.DeadlineExceeded) {
 		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
