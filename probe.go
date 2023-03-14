@@ -53,7 +53,7 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 
 	browser := rod.New().
 		Context(c.Context). // stop when outer ctx stops
-		ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
+		ControlURL(fmt.Sprintf("ws://localhost:%d", c.Int("chrome-cdp-port")))
 
 	logEntry.Debugln("Connecting to browser...")
 	if err := browser.Connect(); err != nil {

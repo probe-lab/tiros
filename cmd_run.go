@@ -182,7 +182,7 @@ func RunAction(c *cli.Context) error {
 func websiteURL(c *cli.Context, website string, mType string) string {
 	switch mType {
 	case models.MeasurementTypeKUBO:
-		return fmt.Sprintf("http://127.0.0.1:%d/ipns/%s", c.Int("kubo-gateway-port"), website)
+		return fmt.Sprintf("http://localhost:%d/ipns/%s", c.Int("kubo-gateway-port"), website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:
