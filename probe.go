@@ -77,7 +77,8 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		logEntry.Debugln("Opening new page")
 		page := browser.MustPage()
 
-		// clear local storage
+		// clear local storage and attaching onerror listeners
+		logEntry.Debugln("Attaching javascript")
 		page.MustEvalOnNewDocument(jsOnNewDocument) // third defense to prevent hitting the cache
 
 		// disable cache
@@ -86,17 +87,25 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 			panic(err)
 		}
 
-		page.
-			Timeout(websiteRequestTimeout). // only wait 30s
-			MustNavigate(url).              // actually open the page
-			MustWaitLoad().                 // fired when the whole page has loaded (ncluding all dependent resources such as stylesheets, scripts, iframes, and images)
-			MustWaitIdle().                 // wait until network has come to a halt (1 Minute)
-			CancelTimeout()                 // continue using page object for things
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url)
+		page.Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitNavigation()
 
+		logEntry.Debugln("Waiting for page to settle...", url)
+		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
+		// idle: fired when network has come to a halt (1 Minute)
+		page.MustWaitLoad().MustWaitIdle()
+
+		logEntry.WithFields(log.Fields{
+			"href":       page.MustEval("() => window.location.href").Str(),
+			"errorCount": page.MustEval("() => `${window.errorCount}`").Str(),
+		}).Debugln("Getting performance entries...")
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
 	})
+	if err != nil {
+		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
+	}
 	if errors.Is(err, context.DeadlineExceeded) {
 		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
 		return &pr, nil
