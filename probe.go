@@ -87,13 +87,10 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 			panic(err)
 		}
 
-		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url)
-		page.Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitNavigation()
-
-		logEntry.Debugln("Waiting for page to settle...", url)
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "and waiting for page to settle...")
 		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
 		// idle: fired when network has come to a halt (1 Minute)
-		page.MustWaitLoad().MustWaitIdle()
+		page.Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitLoad().MustWaitIdle()
 
 		logEntry.WithFields(log.Fields{
 			"href":       page.MustEval("() => window.location.href").Str(),
