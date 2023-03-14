@@ -17,6 +17,20 @@ import (
 	"github.com/dennis-tra/tiros/models"
 )
 
+var (
+	ErrNavigateTimeout    = errors.New("navigation timed out")
+	ErrOnLoadTimeout      = errors.New("window.onload event timed out")
+	ErrNetworkIdleTimeout = errors.New("window.requestIdleCallback timed out")
+)
+
+func handleTimeoutErr(err error, deadlineErr error) {
+	if errors.Is(err, context.DeadlineExceeded) {
+		panic(deadlineErr)
+	} else if err != nil {
+		panic(err)
+	}
+}
+
 const websiteRequestTimeout = 30 * time.Second
 
 type Tiros struct {
@@ -90,7 +104,17 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "and waiting for page to settle...")
 		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
 		// idle: fired when network has come to a halt (1 Minute)
-		page.Timeout(websiteRequestTimeout).MustNavigate(url).MustWaitLoad().MustWaitIdle()
+		err = page.Timeout(websiteRequestTimeout).Navigate(url)
+		handleTimeoutErr(err, ErrNavigateTimeout)
+
+		err = page.Timeout(websiteRequestTimeout).WaitLoad()
+		handleTimeoutErr(err, ErrOnLoadTimeout)
+
+		err = page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
+		// don't error out but just keep track of it
+		if err != nil {
+			pr.Error = ErrNetworkIdleTimeout
+		}
 
 		logEntry.WithFields(log.Fields{
 			"href":       page.MustEval("() => window.location.href").Str(),
@@ -103,9 +127,15 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	if err != nil {
 		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
 	}
-	if errors.Is(err, context.DeadlineExceeded) {
-		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
+	if errors.Is(err, ErrNavigateTimeout) {
+		pr.Error = ErrNavigateTimeout
 		return &pr, nil
+	} else if errors.Is(err, ErrOnLoadTimeout) {
+		pr.Error = ErrOnLoadTimeout
+		return &pr, nil
+		//} else if errors.Is(err, ErrNetworkIdleTimeout) {
+		//	pr.Error = ErrNetworkIdleTimeout
+		//	return &pr, nil
 	} else if errors.Is(err, context.Canceled) {
 		return nil, err
 	} else if err != nil {
