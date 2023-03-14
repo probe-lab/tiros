@@ -5,6 +5,31 @@ import (
 	"fmt"
 )
 
+// jsOnNewDocument attaches `onerror` handlers
+// to all <link>, <img> and <script> tags and counts
+// the errors. It also clears the localStorage cache.
+const jsOnNewDocument = `
+window.errorCount = 0
+
+document.addEventListener('readystatechange', () => {
+	if (document.readyState != "interactive") {
+		return;
+	}
+
+	const tags = [
+		...document.querySelectorAll('link'),
+		...document.querySelectorAll('img'),
+		...document.querySelectorAll('script'),
+	]
+
+	tags.map(tag => {
+		tag.onerror = () => window.errorCount += 1;
+	});
+});
+
+localStorage.clear();
+`
+
 const jsPerformanceEntries = `
 	async () => {
 		const perfEntries = window.performance.getEntries();

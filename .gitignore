@@ -459,3 +459,4 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/jupyternotebooks,python,go,goland,node
 
 nodeagent
+rod

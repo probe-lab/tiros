@@ -42,29 +42,43 @@ func (t *Tiros) InitRun(c *cli.Context) (*models.Run, error) {
 }
 
 func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
-	log.Infoln("Probing", url)
-	defer log.Infoln("Done probing", url)
+	logEntry := log.WithField("url", url)
+
+	logEntry.Infoln("Probing", url)
+	defer logEntry.Infoln("Done probing", url)
 
 	pr := ProbeResult{
 		URL: url,
 	}
 
+	browser := rod.New().
+		Context(c.Context). // stop when outer ctx stops
+		ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port")))
+
+	logEntry.Debugln("Connecting to browser...")
+	if err := browser.Connect(); err != nil {
+		return nil, fmt.Errorf("connecting to browser: %w", err)
+	}
+	defer func() {
+		logEntry.Debugln("Closing connection to browser...")
+		if err := browser.Close(); err != nil {
+			logEntry.WithError(err).Warnln("Error closing browser")
+		}
+	}()
+
 	var perfEntriesStr string
 	err := rod.Try(func() {
-		// create new browser each time
-		browser := rod.New().
-			Context(c.Context). // stop when outer ctx stops
-			ControlURL(fmt.Sprintf("ws://127.0.0.1:%d", c.Int("chrome-cdp-port"))).
-			MustConnect().
-			MustIncognito() // first defense to prevent hitting the cache
+		logEntry.Debugln("Initialize incognito browser")
+		browser = browser.MustIncognito() // first defense to prevent hitting the cache
 
-		// clear cookies
-		browser.MustSetCookies() // second defense to prevent hitting the cache
+		logEntry.Debugln("Clearing browser cookies") // empty arguments clear cookies
+		browser.MustSetCookies()                     // second defense to prevent hitting the cache
 
+		logEntry.Debugln("Opening new page")
 		page := browser.MustPage()
 
 		// clear local storage
-		page.MustEvalOnNewDocument(`localStorage.clear();`) // third defense to prevent hitting the cache
+		page.MustEvalOnNewDocument(jsOnNewDocument) // third defense to prevent hitting the cache
 
 		// disable cache
 		err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page) // fourth defense to prevent hitting the cache
@@ -82,7 +96,6 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
 		page.MustClose()
-		browser.MustClose()
 	})
 	if errors.Is(err, context.DeadlineExceeded) {
 		pr.Error = fmt.Errorf("timed out after %s", websiteRequestTimeout)
