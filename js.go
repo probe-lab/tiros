@@ -30,19 +30,26 @@ document.addEventListener('readystatechange', () => {
 localStorage.clear();
 `
 
+// jsPerformanceEntries gets all performance entries and registers an observer for `largest-contentful-paint` events.
+// If no such event was emitted within 5s only the performance entries are returned.
 const jsPerformanceEntries = `
 	async () => {
 		const perfEntries = window.performance.getEntries();
 		
 		function aggregatePerformanceEntries() {
-			return new Promise(resolve => {
-				const observer = new PerformanceObserver((list) => {
-					const lcpEntries = list.getEntries();
-					const allEntries = [...perfEntries, ...lcpEntries]
-					resolve(JSON.stringify(allEntries));
-				});
-				observer.observe({ type: "largest-contentful-paint", buffered: true });
-			});
+			return Promise.race([
+				new Promise(resolve => {
+					const observer = new PerformanceObserver((list) => {
+						const lcpEntries = list.getEntries();
+						const allEntries = [...perfEntries, ...lcpEntries]
+						resolve(JSON.stringify(allEntries));
+					});
+					observer.observe({ type: "largest-contentful-paint", buffered: true });
+				}),
+				new Promise((resolve, reject) => {
+					setTimeout(() => resolve(JSON.stringify(perfEntries)), 5000);
+				})
+			]);
 		}
 		
 		return await aggregatePerformanceEntries();
