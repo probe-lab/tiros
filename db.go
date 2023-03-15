@@ -65,14 +65,14 @@ func InitClient(ctx context.Context, host string, port int, name string, user st
 
 	client := &DBClient{handle: db}
 
-	return client, client.applyMigrations(db, name)
+	return client, client.applyMigrations(name)
 }
 
-func (c *DBClient) Close() error {
-	return c.handle.Close()
+func (db *DBClient) Close() error {
+	return db.handle.Close()
 }
 
-func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
+func (db *DBClient) applyMigrations(name string) error {
 	tmpDir, err := os.MkdirTemp("", "tiros")
 	if err != nil {
 		return fmt.Errorf("create migrations tmp dir: %w", err)
@@ -102,7 +102,7 @@ func (c *DBClient) applyMigrations(db *sql.DB, name string) error {
 	}
 
 	// Apply migrations
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.handle, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("create driver instance: %w", err)
 	}
@@ -140,6 +140,6 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
-func (c *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
-	return m, m.Insert(ctx, c.handle, boil.Infer())
+func (db *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
+	return m, m.Insert(ctx, db.handle, boil.Infer())
 }
