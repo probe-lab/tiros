@@ -207,3 +207,7 @@ func p2f(ptr *float64) float64 {
 	}
 	return *ptr
 }
+
+func (t *Tiros) KuboGC(ctx context.Context) error {
+	return t.Kubo.Request("repo/gc").Exec(ctx, nil)
+}

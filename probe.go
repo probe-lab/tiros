@@ -81,6 +81,7 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	}()
 
 	var metricsStr string
+	var navPerfEntryStr string
 	err := rod.Try(func() {
 		logEntry.Debugln("Initialize incognito browser")
 		browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
@@ -133,6 +134,13 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		logEntry.Debugln("Running measurement ...")
 		metricsStr = page.MustEval(jsMeasurement).Str() // finally actually measure the stuff
 
+		logEntry.Debugln("Getting Performance Entry measurement ...")
+		rro, err := page.Eval(jsNavPerfEntry)
+		if err != nil {
+			logEntry.WithError(err).Warnln("Couldn't get navigation performance entry")
+		}
+		navPerfEntryStr = rro.Value.Str()
+
 		page.MustClose()
 	})
 	if errors.Is(err, ErrNavigateTimeout) {
@@ -150,6 +158,14 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	vitals := WebVitals{}
 	if err := json.Unmarshal([]byte(metricsStr), &vitals); err != nil {
 		return nil, fmt.Errorf("unmarshal web-vitals: %w", err)
+	}
+
+	if navPerfEntryStr != "" {
+		navPerfEntry := PerformanceNavigationEntry{}
+		if err := json.Unmarshal([]byte(navPerfEntryStr), &navPerfEntry); err != nil {
+			return nil, fmt.Errorf("unmarshal navigation performance entry: %w", err)
+		}
+		pr.NavigationPerformance = &navPerfEntry
 	}
 
 	for _, v := range vitals {
@@ -195,6 +211,8 @@ type ProbeResult struct {
 	CumulativeLayoutShift       *float64
 	CumulativeLayoutShiftRating *string
 
+	NavigationPerformance *PerformanceNavigationEntry
+
 	Error error `json:"-"`
 }
 
@@ -205,6 +223,57 @@ func (pr *ProbeResult) NullError() null.String {
 	return null.NewString("", false)
 }
 
-func (t *Tiros) KuboGC(ctx context.Context) error {
-	return t.Kubo.Request("repo/gc").Exec(ctx, nil)
+type Metrics struct {
+	NavigationPerformance *PerformanceNavigationEntry
+	// can grow
+}
+
+func (pr *ProbeResult) NullJSON() (null.JSON, error) {
+	m := Metrics{
+		NavigationPerformance: pr.NavigationPerformance,
+	}
+
+	data, err := json.Marshal(m)
+	if err != nil {
+		return null.NewJSON(nil, false), err
+	}
+
+	return null.JSONFrom(data), nil
+}
+
+type PerformanceNavigationEntry struct {
+	Name                       string  `json:"name"`
+	EntryType                  string  `json:"entryType"`
+	StartTime                  float64 `json:"startTime"`
+	Duration                   float64 `json:"duration"`
+	InitiatorType              string  `json:"initiatorType"`
+	NextHopProtocol            string  `json:"nextHopProtocol"`
+	RenderBlockingStatus       string  `json:"renderBlockingStatus"`
+	WorkerStart                float64 `json:"workerStart"`
+	RedirectStart              float64 `json:"redirectStart"`
+	RedirectEnd                float64 `json:"redirectEnd"`
+	FetchStart                 float64 `json:"fetchStart"`
+	DomainLookupStart          float64 `json:"domainLookupStart"`
+	DomainLookupEnd            float64 `json:"domainLookupEnd"`
+	ConnectStart               float64 `json:"connectStart"`
+	SecureConnectionStart      float64 `json:"secureConnectionStart"`
+	ConnectEnd                 float64 `json:"connectEnd"`
+	RequestStart               float64 `json:"requestStart"`
+	ResponseStart              float64 `json:"responseStart"`
+	ResponseEnd                float64 `json:"responseEnd"`
+	TransferSize               int64   `json:"transferSize"`
+	EncodedBodySize            int64   `json:"encodedBodySize"`
+	DecodedBodySize            int64   `json:"decodedBodySize"`
+	ResponseStatus             int64   `json:"responseStatus"`
+	UnloadEventStart           float64 `json:"unloadEventStart"`
+	UnloadEventEnd             float64 `json:"unloadEventEnd"`
+	DOMInteractive             float64 `json:"domInteractive"`
+	DOMContentLoadedEventStart float64 `json:"domContentLoadedEventStart"`
+	DOMContentLoadedEventEnd   float64 `json:"domContentLoadedEventEnd"`
+	DOMComplete                float64 `json:"domComplete"`
+	LoadEventStart             float64 `json:"loadEventStart"`
+	LoadEventEnd               float64 `json:"loadEventEnd"`
+	Type                       string  `json:"type"`
+	RedirectCount              int64   `json:"redirectCount"`
+	ActivationStart            float64 `json:"activationStart"`
 }

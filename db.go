@@ -156,6 +156,11 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 }
 
 func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
+	metrics, err := pr.NullJSON()
+	if err != nil {
+		return nil, fmt.Errorf("getting metrics json")
+	}
+
 	m := &models.Measurement{
 		RunID:      dbRun.ID,
 		Website:    website,
@@ -171,6 +176,7 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *Probe
 		TTFBRating: mapRating(pr.TimeToFirstByteRating),
 		FCPRating:  mapRating(pr.FirstContentfulPaintRating),
 		LCPRating:  mapRating(pr.LargestContentfulPaintRating),
+		Metrics:    metrics,
 	}
 
 	if err := m.Insert(c.Context, db.handle, boil.Infer()); err != nil {

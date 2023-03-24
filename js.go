@@ -17,6 +17,9 @@ var jsOnNewDocument string
 //go:embed js/measurement.js
 var jsMeasurement string
 
+//go:embed js/navPerfEntry.js
+var jsNavPerfEntry string
+
 func wrapInFn(js string) string {
 	return fmt.Sprintf("() => { %s };", js)
 }
