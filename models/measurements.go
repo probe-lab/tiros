@@ -37,7 +37,9 @@ type Measurement struct {
 	Error      null.String `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
 	CreatedAt  time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	Tti        null.String `boil:"tti" json:"tti,omitempty" toml:"tti" yaml:"tti,omitempty"`
+	CLS        null.String `boil:"cls" json:"cls,omitempty" toml:"cls" yaml:"cls,omitempty"`
 	TtiRating  null.String `boil:"tti_rating" json:"tti_rating,omitempty" toml:"tti_rating" yaml:"tti_rating,omitempty"`
+	CLSRating  null.String `boil:"cls_rating" json:"cls_rating,omitempty" toml:"cls_rating" yaml:"cls_rating,omitempty"`
 	TTFBRating null.String `boil:"ttfb_rating" json:"ttfb_rating,omitempty" toml:"ttfb_rating" yaml:"ttfb_rating,omitempty"`
 	FCPRating  null.String `boil:"fcp_rating" json:"fcp_rating,omitempty" toml:"fcp_rating" yaml:"fcp_rating,omitempty"`
 	LCPRating  null.String `boil:"lcp_rating" json:"lcp_rating,omitempty" toml:"lcp_rating" yaml:"lcp_rating,omitempty"`
@@ -60,7 +62,9 @@ var MeasurementColumns = struct {
 	Error      string
 	CreatedAt  string
 	Tti        string
+	CLS        string
 	TtiRating  string
+	CLSRating  string
 	TTFBRating string
 	FCPRating  string
 	LCPRating  string
@@ -78,7 +82,9 @@ var MeasurementColumns = struct {
 	Error:      "error",
 	CreatedAt:  "created_at",
 	Tti:        "tti",
+	CLS:        "cls",
 	TtiRating:  "tti_rating",
+	CLSRating:  "cls_rating",
 	TTFBRating: "ttfb_rating",
 	FCPRating:  "fcp_rating",
 	LCPRating:  "lcp_rating",
@@ -98,7 +104,9 @@ var MeasurementTableColumns = struct {
 	Error      string
 	CreatedAt  string
 	Tti        string
+	CLS        string
 	TtiRating  string
+	CLSRating  string
 	TTFBRating string
 	FCPRating  string
 	LCPRating  string
@@ -116,7 +124,9 @@ var MeasurementTableColumns = struct {
 	Error:      "measurements.error",
 	CreatedAt:  "measurements.created_at",
 	Tti:        "measurements.tti",
+	CLS:        "measurements.cls",
 	TtiRating:  "measurements.tti_rating",
+	CLSRating:  "measurements.cls_rating",
 	TTFBRating: "measurements.ttfb_rating",
 	FCPRating:  "measurements.fcp_rating",
 	LCPRating:  "measurements.lcp_rating",
@@ -290,7 +300,9 @@ var MeasurementWhere = struct {
 	Error      whereHelpernull_String
 	CreatedAt  whereHelpertime_Time
 	Tti        whereHelpernull_String
+	CLS        whereHelpernull_String
 	TtiRating  whereHelpernull_String
+	CLSRating  whereHelpernull_String
 	TTFBRating whereHelpernull_String
 	FCPRating  whereHelpernull_String
 	LCPRating  whereHelpernull_String
@@ -308,7 +320,9 @@ var MeasurementWhere = struct {
 	Error:      whereHelpernull_String{field: "\"measurements\".\"error\""},
 	CreatedAt:  whereHelpertime_Time{field: "\"measurements\".\"created_at\""},
 	Tti:        whereHelpernull_String{field: "\"measurements\".\"tti\""},
+	CLS:        whereHelpernull_String{field: "\"measurements\".\"cls\""},
 	TtiRating:  whereHelpernull_String{field: "\"measurements\".\"tti_rating\""},
+	CLSRating:  whereHelpernull_String{field: "\"measurements\".\"cls_rating\""},
 	TTFBRating: whereHelpernull_String{field: "\"measurements\".\"ttfb_rating\""},
 	FCPRating:  whereHelpernull_String{field: "\"measurements\".\"fcp_rating\""},
 	LCPRating:  whereHelpernull_String{field: "\"measurements\".\"lcp_rating\""},
@@ -342,9 +356,9 @@ func (r *measurementR) GetRun() *Run {
 type measurementL struct{}
 
 var (
-	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at", "tti", "tti_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
+	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
 	measurementColumnsWithoutDefault = []string{"run_id", "website", "url", "type", "try", "created_at"}
-	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error", "tti", "tti_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
+	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
 	measurementPrimaryKeyColumns     = []string{"id"}
 	measurementGeneratedColumns      = []string{"id"}
 )

@@ -170,13 +170,15 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *Probe
 		TTFB:       intervalMs(pr.TimeToFirstByte),
 		FCP:        intervalMs(pr.FirstContentfulPaint),
 		LCP:        intervalMs(pr.LargestContentfulPaint),
-		Error:      pr.NullError(),
+		CLS:        intervalMs(pr.CumulativeLayoutShift),
 		Tti:        intervalMs(pr.TimeToInteract),
 		TtiRating:  mapRating(pr.TimeToInteractRating),
 		TTFBRating: mapRating(pr.TimeToFirstByteRating),
 		FCPRating:  mapRating(pr.FirstContentfulPaintRating),
 		LCPRating:  mapRating(pr.LargestContentfulPaintRating),
+		CLSRating:  mapRating(pr.CumulativeLayoutShiftRating),
 		Metrics:    metrics,
+		Error:      pr.NullError(),
 	}
 
 	if err := m.Insert(c.Context, db.handle, boil.Infer()); err != nil {
