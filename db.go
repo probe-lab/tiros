@@ -10,30 +10,39 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-
-	"github.com/dennis-tra/tiros/models"
-
-	"github.com/urfave/cli/v2"
+	"time"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+
+	"github.com/dennis-tra/tiros/models"
 )
 
 //go:embed migrations
 var migrations embed.FS
+
+type IDBClient interface {
+	InsertRun(c *cli.Context, version string) (*models.Run, error)
+	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error)
+	SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error)
+}
 
 type DBClient struct {
 	// Database handle
 	handle *sql.DB
 }
 
+var _ IDBClient = (*DBClient)(nil)
+
 // InitClient establishes a database connection with
 // the provided configuration and applies any pending migrations
-func InitClient(ctx context.Context, host string, port int, name string, user string, password string, ssl string) (*DBClient, error) {
+func InitClient(ctx context.Context, host string, port int, name string, user string, password string, ssl string) (IDBClient, error) {
 	log.WithFields(log.Fields{
 		"host": host,
 		"port": port,
@@ -119,6 +128,12 @@ func (db *DBClient) applyMigrations(name string) error {
 	return nil
 }
 
+func (db *DBClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error) {
+	dbRun.FinishedAt = null.TimeFrom(time.Now())
+	_, err := dbRun.Update(ctx, db.handle, boil.Infer())
+	return dbRun, err
+}
+
 func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
 	log.Infoln("Inserting Run...")
 
@@ -140,6 +155,73 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
-func (db *DBClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
-	return m, m.Insert(ctx, db.handle, boil.Infer())
+func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
+	m := &models.Measurement{
+		RunID:      dbRun.ID,
+		Website:    website,
+		URL:        pr.URL,
+		Type:       mType,
+		Try:        int16(try),
+		TTFB:       intervalMs(pr.TimeToFirstByte),
+		FCP:        intervalMs(pr.FirstContentfulPaint),
+		LCP:        intervalMs(pr.LargestContentfulPaint),
+		Error:      pr.NullError(),
+		Tti:        intervalMs(pr.TimeToInteract),
+		TtiRating:  mapRating(pr.TimeToInteractRating),
+		TTFBRating: mapRating(pr.TimeToFirstByteRating),
+		FCPRating:  mapRating(pr.FirstContentfulPaintRating),
+		LCPRating:  mapRating(pr.LargestContentfulPaintRating),
+	}
+
+	if err := m.Insert(c.Context, db.handle, boil.Infer()); err != nil {
+		return nil, fmt.Errorf("insert measurement: %w", err)
+	}
+
+	return m, nil
+}
+
+func intervalMs(val *float64) null.String {
+	if val == nil {
+		return null.NewString("", false)
+	}
+	return null.StringFrom(fmt.Sprintf("%f Milliseconds", *val))
+}
+
+func mapRating(rating *string) null.String {
+	if rating == nil {
+		return null.StringFromPtr(nil)
+	}
+	switch *rating {
+	case "good":
+		return null.StringFrom(models.RatingGOOD)
+	case "needs-improvement":
+		return null.StringFrom(models.RatingNEEDS_IMPROVEMENT)
+	case "poor":
+		return null.StringFrom(models.RatingPOOR)
+	default:
+		panic("unknown rating " + *rating)
+	}
+}
+
+type DBDummyClient struct{}
+
+var _ IDBClient = (*DBDummyClient)(nil)
+
+func (D DBDummyClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
+	return nil, nil
+}
+
+func (D DBDummyClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error) {
+	return nil, nil
+}
+
+func (D DBDummyClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
+	return &models.Run{
+		ID:     2,
+		Region: "dummy",
+	}, nil
+}
+
+func (D DBDummyClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
+	return nil, nil
 }

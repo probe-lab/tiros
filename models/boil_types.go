@@ -63,3 +63,18 @@ func AllMeasurementType() []string {
 		MeasurementTypeKUBO,
 	}
 }
+
+// Enum values for Rating
+const (
+	RatingGOOD              string = "GOOD"
+	RatingNEEDS_IMPROVEMENT string = "NEEDS_IMPROVEMENT"
+	RatingPOOR              string = "POOR"
+)
+
+func AllRating() []string {
+	return []string{
+		RatingGOOD,
+		RatingNEEDS_IMPROVEMENT,
+		RatingPOOR,
+	}
+}

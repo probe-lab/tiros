@@ -24,77 +24,102 @@ import (
 
 // Measurement is an object representing the database table.
 type Measurement struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RunID     int         `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
-	Website   string      `boil:"website" json:"website" toml:"website" yaml:"website"`
-	URL       string      `boil:"url" json:"url" toml:"url" yaml:"url"`
-	Type      string      `boil:"type" json:"type" toml:"type" yaml:"type"`
-	Try       int16       `boil:"try" json:"try" toml:"try" yaml:"try"`
-	TTFB      null.String `boil:"ttfb" json:"ttfb,omitempty" toml:"ttfb" yaml:"ttfb,omitempty"`
-	FCP       null.String `boil:"fcp" json:"fcp,omitempty" toml:"fcp" yaml:"fcp,omitempty"`
-	LCP       null.String `boil:"lcp" json:"lcp,omitempty" toml:"lcp" yaml:"lcp,omitempty"`
-	Metrics   null.JSON   `boil:"metrics" json:"metrics,omitempty" toml:"metrics" yaml:"metrics,omitempty"`
-	Error     null.String `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
-	CreatedAt time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	RunID      int         `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
+	Website    string      `boil:"website" json:"website" toml:"website" yaml:"website"`
+	URL        string      `boil:"url" json:"url" toml:"url" yaml:"url"`
+	Type       string      `boil:"type" json:"type" toml:"type" yaml:"type"`
+	Try        int16       `boil:"try" json:"try" toml:"try" yaml:"try"`
+	TTFB       null.String `boil:"ttfb" json:"ttfb,omitempty" toml:"ttfb" yaml:"ttfb,omitempty"`
+	FCP        null.String `boil:"fcp" json:"fcp,omitempty" toml:"fcp" yaml:"fcp,omitempty"`
+	LCP        null.String `boil:"lcp" json:"lcp,omitempty" toml:"lcp" yaml:"lcp,omitempty"`
+	Metrics    null.JSON   `boil:"metrics" json:"metrics,omitempty" toml:"metrics" yaml:"metrics,omitempty"`
+	Error      null.String `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
+	CreatedAt  time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	Tti        null.String `boil:"tti" json:"tti,omitempty" toml:"tti" yaml:"tti,omitempty"`
+	TtiRating  null.String `boil:"tti_rating" json:"tti_rating,omitempty" toml:"tti_rating" yaml:"tti_rating,omitempty"`
+	TTFBRating null.String `boil:"ttfb_rating" json:"ttfb_rating,omitempty" toml:"ttfb_rating" yaml:"ttfb_rating,omitempty"`
+	FCPRating  null.String `boil:"fcp_rating" json:"fcp_rating,omitempty" toml:"fcp_rating" yaml:"fcp_rating,omitempty"`
+	LCPRating  null.String `boil:"lcp_rating" json:"lcp_rating,omitempty" toml:"lcp_rating" yaml:"lcp_rating,omitempty"`
 
 	R *measurementR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L measurementL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var MeasurementColumns = struct {
-	ID        string
-	RunID     string
-	Website   string
-	URL       string
-	Type      string
-	Try       string
-	TTFB      string
-	FCP       string
-	LCP       string
-	Metrics   string
-	Error     string
-	CreatedAt string
+	ID         string
+	RunID      string
+	Website    string
+	URL        string
+	Type       string
+	Try        string
+	TTFB       string
+	FCP        string
+	LCP        string
+	Metrics    string
+	Error      string
+	CreatedAt  string
+	Tti        string
+	TtiRating  string
+	TTFBRating string
+	FCPRating  string
+	LCPRating  string
 }{
-	ID:        "id",
-	RunID:     "run_id",
-	Website:   "website",
-	URL:       "url",
-	Type:      "type",
-	Try:       "try",
-	TTFB:      "ttfb",
-	FCP:       "fcp",
-	LCP:       "lcp",
-	Metrics:   "metrics",
-	Error:     "error",
-	CreatedAt: "created_at",
+	ID:         "id",
+	RunID:      "run_id",
+	Website:    "website",
+	URL:        "url",
+	Type:       "type",
+	Try:        "try",
+	TTFB:       "ttfb",
+	FCP:        "fcp",
+	LCP:        "lcp",
+	Metrics:    "metrics",
+	Error:      "error",
+	CreatedAt:  "created_at",
+	Tti:        "tti",
+	TtiRating:  "tti_rating",
+	TTFBRating: "ttfb_rating",
+	FCPRating:  "fcp_rating",
+	LCPRating:  "lcp_rating",
 }
 
 var MeasurementTableColumns = struct {
-	ID        string
-	RunID     string
-	Website   string
-	URL       string
-	Type      string
-	Try       string
-	TTFB      string
-	FCP       string
-	LCP       string
-	Metrics   string
-	Error     string
-	CreatedAt string
+	ID         string
+	RunID      string
+	Website    string
+	URL        string
+	Type       string
+	Try        string
+	TTFB       string
+	FCP        string
+	LCP        string
+	Metrics    string
+	Error      string
+	CreatedAt  string
+	Tti        string
+	TtiRating  string
+	TTFBRating string
+	FCPRating  string
+	LCPRating  string
 }{
-	ID:        "measurements.id",
-	RunID:     "measurements.run_id",
-	Website:   "measurements.website",
-	URL:       "measurements.url",
-	Type:      "measurements.type",
-	Try:       "measurements.try",
-	TTFB:      "measurements.ttfb",
-	FCP:       "measurements.fcp",
-	LCP:       "measurements.lcp",
-	Metrics:   "measurements.metrics",
-	Error:     "measurements.error",
-	CreatedAt: "measurements.created_at",
+	ID:         "measurements.id",
+	RunID:      "measurements.run_id",
+	Website:    "measurements.website",
+	URL:        "measurements.url",
+	Type:       "measurements.type",
+	Try:        "measurements.try",
+	TTFB:       "measurements.ttfb",
+	FCP:        "measurements.fcp",
+	LCP:        "measurements.lcp",
+	Metrics:    "measurements.metrics",
+	Error:      "measurements.error",
+	CreatedAt:  "measurements.created_at",
+	Tti:        "measurements.tti",
+	TtiRating:  "measurements.tti_rating",
+	TTFBRating: "measurements.ttfb_rating",
+	FCPRating:  "measurements.fcp_rating",
+	LCPRating:  "measurements.lcp_rating",
 }
 
 // Generated where
@@ -252,31 +277,41 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 }
 
 var MeasurementWhere = struct {
-	ID        whereHelperint
-	RunID     whereHelperint
-	Website   whereHelperstring
-	URL       whereHelperstring
-	Type      whereHelperstring
-	Try       whereHelperint16
-	TTFB      whereHelpernull_String
-	FCP       whereHelpernull_String
-	LCP       whereHelpernull_String
-	Metrics   whereHelpernull_JSON
-	Error     whereHelpernull_String
-	CreatedAt whereHelpertime_Time
+	ID         whereHelperint
+	RunID      whereHelperint
+	Website    whereHelperstring
+	URL        whereHelperstring
+	Type       whereHelperstring
+	Try        whereHelperint16
+	TTFB       whereHelpernull_String
+	FCP        whereHelpernull_String
+	LCP        whereHelpernull_String
+	Metrics    whereHelpernull_JSON
+	Error      whereHelpernull_String
+	CreatedAt  whereHelpertime_Time
+	Tti        whereHelpernull_String
+	TtiRating  whereHelpernull_String
+	TTFBRating whereHelpernull_String
+	FCPRating  whereHelpernull_String
+	LCPRating  whereHelpernull_String
 }{
-	ID:        whereHelperint{field: "\"measurements\".\"id\""},
-	RunID:     whereHelperint{field: "\"measurements\".\"run_id\""},
-	Website:   whereHelperstring{field: "\"measurements\".\"website\""},
-	URL:       whereHelperstring{field: "\"measurements\".\"url\""},
-	Type:      whereHelperstring{field: "\"measurements\".\"type\""},
-	Try:       whereHelperint16{field: "\"measurements\".\"try\""},
-	TTFB:      whereHelpernull_String{field: "\"measurements\".\"ttfb\""},
-	FCP:       whereHelpernull_String{field: "\"measurements\".\"fcp\""},
-	LCP:       whereHelpernull_String{field: "\"measurements\".\"lcp\""},
-	Metrics:   whereHelpernull_JSON{field: "\"measurements\".\"metrics\""},
-	Error:     whereHelpernull_String{field: "\"measurements\".\"error\""},
-	CreatedAt: whereHelpertime_Time{field: "\"measurements\".\"created_at\""},
+	ID:         whereHelperint{field: "\"measurements\".\"id\""},
+	RunID:      whereHelperint{field: "\"measurements\".\"run_id\""},
+	Website:    whereHelperstring{field: "\"measurements\".\"website\""},
+	URL:        whereHelperstring{field: "\"measurements\".\"url\""},
+	Type:       whereHelperstring{field: "\"measurements\".\"type\""},
+	Try:        whereHelperint16{field: "\"measurements\".\"try\""},
+	TTFB:       whereHelpernull_String{field: "\"measurements\".\"ttfb\""},
+	FCP:        whereHelpernull_String{field: "\"measurements\".\"fcp\""},
+	LCP:        whereHelpernull_String{field: "\"measurements\".\"lcp\""},
+	Metrics:    whereHelpernull_JSON{field: "\"measurements\".\"metrics\""},
+	Error:      whereHelpernull_String{field: "\"measurements\".\"error\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"measurements\".\"created_at\""},
+	Tti:        whereHelpernull_String{field: "\"measurements\".\"tti\""},
+	TtiRating:  whereHelpernull_String{field: "\"measurements\".\"tti_rating\""},
+	TTFBRating: whereHelpernull_String{field: "\"measurements\".\"ttfb_rating\""},
+	FCPRating:  whereHelpernull_String{field: "\"measurements\".\"fcp_rating\""},
+	LCPRating:  whereHelpernull_String{field: "\"measurements\".\"lcp_rating\""},
 }
 
 // MeasurementRels is where relationship names are stored.
@@ -307,9 +342,9 @@ func (r *measurementR) GetRun() *Run {
 type measurementL struct{}
 
 var (
-	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at"}
+	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at", "tti", "tti_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
 	measurementColumnsWithoutDefault = []string{"run_id", "website", "url", "type", "try", "created_at"}
-	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error"}
+	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error", "tti", "tti_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
 	measurementPrimaryKeyColumns     = []string{"id"}
 	measurementGeneratedColumns      = []string{"id"}
 )

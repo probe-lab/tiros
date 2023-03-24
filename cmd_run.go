@@ -39,6 +39,11 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_TIMES"},
 			Value:   3,
 		},
+		&cli.BoolFlag{
+			Name:    "dry-run",
+			Usage:   "Whether to skip DB interactions",
+			EnvVars: []string{"TIROS_RUN_DRY_RUN"},
+		},
 		&cli.StringFlag{
 			Name:    "db-host",
 			Usage:   "On which host address can this clustertest reach the database",
@@ -107,9 +112,13 @@ func RunAction(c *cli.Context) error {
 	log.Infoln("Starting Tiros run...")
 	defer log.Infoln("Stopped Tiros run.")
 
-	dbClient, err := InitClient(c.Context, c.String("db-host"), c.Int("db-port"), c.String("db-name"), c.String("db-user"), c.String("db-password"), c.String("db-sslmode"))
-	if err != nil {
-		return fmt.Errorf("init db connection: %w", err)
+	var err error
+	var dbClient IDBClient = DBDummyClient{}
+	if !c.Bool("dry-run") {
+		dbClient, err = InitClient(c.Context, c.String("db-host"), c.Int("db-port"), c.String("db-name"), c.String("db-user"), c.String("db-password"), c.String("db-sslmode"))
+		if err != nil {
+			return fmt.Errorf("init db connection: %w", err)
+		}
 	}
 
 	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
@@ -123,7 +132,7 @@ func RunAction(c *cli.Context) error {
 		return fmt.Errorf("init run: %w", err)
 	}
 	defer func() {
-		if _, err = t.SealRun(context.Background()); err != nil {
+		if _, err = t.DBClient.SealRun(context.Background(), t.DBRun); err != nil {
 			log.WithError(err).Warnln("Couldn't seal run")
 		}
 	}()
@@ -149,7 +158,8 @@ func RunAction(c *cli.Context) error {
 		time.Sleep(sleepDur)
 
 		for i := 0; i < c.Int("times"); i++ {
-			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+			for _, mType := range []string{models.MeasurementTypeHTTP} {
+				// for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
 					pr, err := t.Probe(c, websiteURL(c, website, mType))
 					if err != nil {
@@ -160,9 +170,10 @@ func RunAction(c *cli.Context) error {
 						"ttfb": p2f(pr.TimeToFirstByte),
 						"lcp":  p2f(pr.LargestContentfulPaint),
 						"fcp":  p2f(pr.FirstContentfulPaint),
+						"tti":  p2f(pr.TimeToInteract),
 					}).WithError(pr.Error).Infoln("Probed website", website)
 
-					if _, err := t.Save(c, pr, website, mType, i); err != nil {
+					if _, err := t.DBClient.SaveMeasurement(c, t.DBRun, pr, website, mType, i); err != nil {
 						return fmt.Errorf("save measurement: %w", err)
 					}
 

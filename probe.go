@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -12,7 +13,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/dennis-tra/tiros/models"
 )
@@ -34,7 +34,7 @@ func handleTimeoutErr(err error, deadlineErr error) {
 const websiteRequestTimeout = 30 * time.Second
 
 type Tiros struct {
-	DBClient *DBClient
+	DBClient IDBClient
 	Kubo     *shell.Shell
 	DBRun    *models.Run
 }
@@ -75,15 +75,15 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	}
 	defer func() {
 		logEntry.Debugln("Closing connection to browser...")
-		if err := browser.Close(); err != nil {
+		if err := browser.Close(); err != nil && !errors.Is(err, context.Canceled) {
 			logEntry.WithError(err).Warnln("Error closing browser")
 		}
 	}()
 
-	var perfEntriesStr string
+	var metricsStr string
 	err := rod.Try(func() {
 		logEntry.Debugln("Initialize incognito browser")
-		browser = browser.MustIncognito() // first defense to prevent hitting the cache
+		browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
 
 		logEntry.Debugln("Clearing browser cookies") // empty arguments clear cookies
 		browser.MustSetCookies()                     // second defense to prevent hitting the cache
@@ -101,129 +101,110 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 			panic(err)
 		}
 
-		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "and waiting for page to settle...")
-		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
-		// idle: fired when network has come to a halt (1 Minute)
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "...")
 		err = page.Timeout(websiteRequestTimeout).Navigate(url)
 		handleTimeoutErr(err, ErrNavigateTimeout)
 
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Waiting for onload event ...")
+		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
 		err = page.Timeout(websiteRequestTimeout).WaitLoad()
-		handleTimeoutErr(err, ErrOnLoadTimeout)
+		if errors.Is(err, context.Canceled) {
+			panic(err)
+		} else if err != nil {
+			pr.Error = ErrOnLoadTimeout
+		}
 
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Waiting for network idle event ...")
+		// idle: fired when network has come to a halt (1 Minute)
 		err = page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
-		// don't error out but just keep track of it
-		if err != nil {
+		if errors.Is(err, context.Canceled) {
+			panic(err)
+		} else if err != nil {
+			if pr.Error != nil {
+				err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), pr.Error)
+			}
 			pr.Error = ErrNetworkIdleTimeout
 		}
 
-		logEntry.WithFields(log.Fields{
-			"href":       page.MustEval("() => window.location.href").Str(),
-			"errorCount": page.MustEval("() => `${window.errorCount}`").Str(),
-		}).Debugln("Getting performance entries...")
-		perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
+		logEntry.Debugln("Running polyfill JS ...")
+		page.MustEval(wrapInFn(jsTTIPolyfill)) // add TTI polyfill + web-vitals
+		page.MustEval(wrapInFn(jsWebVitalsIIFE))
+
+		logEntry.Debugln("Running measurement ...")
+		metricsStr = page.MustEval(jsMeasurement).Str() // finally actually measure the stuff
 
 		page.MustClose()
 	})
-	if err != nil {
-		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
-	}
 	if errors.Is(err, ErrNavigateTimeout) {
+		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
 		pr.Error = ErrNavigateTimeout
 		return &pr, nil
-	} else if errors.Is(err, ErrOnLoadTimeout) {
-		pr.Error = ErrOnLoadTimeout
-		return &pr, nil
-		//} else if errors.Is(err, ErrNetworkIdleTimeout) {
-		//	pr.Error = ErrNetworkIdleTimeout
-		//	return &pr, nil
 	} else if errors.Is(err, context.Canceled) {
 		return nil, err
 	} else if err != nil {
+		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
 		pr.Error = err
 		return &pr, nil
 	}
 
-	perfEntries, err := unmarshalPerformanceEntries([]byte(perfEntriesStr))
-	if err != nil {
-		fmt.Println(perfEntriesStr)
-		return nil, fmt.Errorf("parse performance entries: %w", err)
+	vitals := WebVitals{}
+	if err := json.Unmarshal([]byte(metricsStr), &vitals); err != nil {
+		return nil, fmt.Errorf("unmarshal web-vitals: %w", err)
 	}
 
-	// https://developer.mozilla.org/en-US/docs/Learn/Performance/Perceived_performance#performance_metrics
-	for _, e := range perfEntries {
-		switch e.EntryType {
-		case "resource":
-		case "navigation":
-			pne, err := e.NavigationEntry()
-			if err != nil {
-				return nil, fmt.Errorf("parse navigation entry: %w", err)
-			}
-
-			// https://developer.mozilla.org/en-US/docs/Web/Performance/Navigation_and_resource_timings#time_to_first_byte
-			ttfb := pne.ResponseStart - pne.StartTime
-			pr.TimeToFirstByte = &ttfb
-			pr.NavigationPerformance = pne
-
-		case "paint":
-			if e.Name != "first-contentful-paint" {
-				continue
-			}
-
-			// https://web.dev/fcp/
-			if pr.FirstContentfulPaint == nil || e.StartTime < *pr.FirstContentfulPaint {
-				pr.FirstContentfulPaint = &e.StartTime
-			}
-
-		case "largest-contentful-paint":
-			// https://web.dev/lcp/
-			if pr.LargestContentfulPaint == nil || e.StartTime > *pr.LargestContentfulPaint {
-				pr.LargestContentfulPaint = &e.StartTime
-			}
+	for _, v := range vitals {
+		v := v
+		switch v.Name {
+		case "LCP":
+			pr.LargestContentfulPaint = &v.Value
+			pr.LargestContentfulPaintRating = &v.Rating
+		case "FCP":
+			pr.FirstContentfulPaint = &v.Value
+			pr.FirstContentfulPaintRating = &v.Rating
+		case "TTFB":
+			pr.TimeToFirstByte = &v.Value
+			pr.TimeToFirstByteRating = &v.Rating
+		case "TTI":
+			pr.TimeToInteract = &v.Value
+			pr.TimeToInteractRating = &v.Rating
+		case "CLS":
+			pr.CumulativeLayoutShift = &v.Value
+			pr.CumulativeLayoutShiftRating = &v.Rating
 		}
+		logEntry.Infoln(v.Name, v.Value, v.Rating)
 	}
 
 	return &pr, nil
 }
 
-func (t *Tiros) SealRun(ctx context.Context) (*models.Run, error) {
-	t.DBRun.FinishedAt = null.TimeFrom(time.Now())
-	_, err := t.DBRun.Update(ctx, t.DBClient.handle, boil.Infer())
-	return t.DBRun, err
+type ProbeResult struct {
+	URL string
+
+	TimeToFirstByte       *float64
+	TimeToFirstByteRating *string
+
+	FirstContentfulPaint       *float64
+	FirstContentfulPaintRating *string
+
+	LargestContentfulPaint       *float64
+	LargestContentfulPaintRating *string
+
+	TimeToInteract       *float64
+	TimeToInteractRating *string
+
+	CumulativeLayoutShift       *float64
+	CumulativeLayoutShiftRating *string
+
+	Error error `json:"-"`
 }
 
-func (t *Tiros) Save(c *cli.Context, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
-	metrics, err := pr.NullJSON()
-	if err != nil {
-		return nil, fmt.Errorf("extract metrics from probe result: %w", err)
+func (pr *ProbeResult) NullError() null.String {
+	if pr.Error != nil {
+		return null.StringFrom(pr.Error.Error())
 	}
-
-	m := &models.Measurement{
-		RunID:   t.DBRun.ID,
-		Website: website,
-		URL:     pr.URL,
-		Type:    mType,
-		Try:     int16(try),
-		TTFB:    intervalMs(pr.TimeToFirstByte),
-		FCP:     intervalMs(pr.FirstContentfulPaint),
-		LCP:     intervalMs(pr.LargestContentfulPaint),
-		Metrics: metrics,
-		Error:   pr.NullError(),
-	}
-
-	if err := m.Insert(c.Context, t.DBClient.handle, boil.Infer()); err != nil {
-		return nil, fmt.Errorf("insert measurement: %w", err)
-	}
-
-	return m, nil
+	return null.NewString("", false)
 }
 
 func (t *Tiros) KuboGC(ctx context.Context) error {
 	return t.Kubo.Request("repo/gc").Exec(ctx, nil)
-}
-
-func intervalMs(val *float64) null.String {
-	if val == nil {
-		return null.NewString("", false)
-	}
-	return null.StringFrom(fmt.Sprintf("%f Milliseconds", *val))
 }
