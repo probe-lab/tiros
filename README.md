@@ -49,86 +49,138 @@ defer browser.Close()
 
 var perfEntriesStr string
 rod.Try(func() {
-    browser = browser.MustIncognito() // first defense to prevent hitting the cache
-    browser.MustSetCookies()                     // second defense to prevent hitting the cache
-
-    page := browser.MustPage()
-    page.MustEvalOnNewDocument(jsOnNewDocument) // third defense to prevent hitting the cache
-
+    browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
+    browser.MustSetCookies()                             // second defense to prevent hitting the cache (empty args clears cookies)
+    
+    page := browser.MustPage() // Get a handle of a new page in our incognito browser
+    
+    page.MustEvalOnNewDocument(jsOnNewDocument) // third defense to prevent hitting the cache - clears the cache by running `localStorage.clear()`
+    
+    // disable caching in general
     proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page) // fourth defense to prevent hitting the cache
 
-    page.Timeout(websiteRequestTimeout).Navigate(url)
-    page.Timeout(websiteRequestTimeout).WaitLoad() // wait for window.onload
-    page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
-    
-    perfEntriesStr = page.MustEval(jsPerformanceEntries).Str()
 
+    // finally navigate to url and fail out of rod.Try by panicking
+    page.Timeout(websiteRequestTimeout).Navigate(url)
+    page.Timeout(websiteRequestTimeout).WaitLoad()
+    page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
+
+    page.MustEval(wrapInFn(jsTTIPolyfill)) // add TTI polyfill
+    page.MustEval(wrapInFn(jsWebVitalsIIFE)) // add web-vitals
+
+    // finally actually measure the stuff
+    metricsStr = page.MustEval(jsMeasurement).Str()
+    
     page.MustClose()
 })
-// parse perfEntriesStr
+// parse metricsStr
 ```
 
-`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're adding an event listener that adds error handlers to `link`, `img`, and `script` tags to count HTTP errors. (this is not tracked yet). Then we're also clearing the local storage. This is the code ([link to source](https://github.com/dennis-tra/tiros/blob/871054f38527298aeea6511dc6cdf1683c15f80c/js.go#L11)):
+`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're adding an event listener that adds error handlers to `link`, `img`, and `script` tags to count HTTP errors. (this is not tracked yet). Then we're also clearing the local storage. This is the code ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/onNewDocument.js)):
 
 ```javascript
-window.errorCount = 0
-
-document.addEventListener('readystatechange', () => {
-    if (document.readyState != "interactive") {
-        return;
-    }
-
-    const tags = [
-        ...document.querySelectorAll('link'),
-        ...document.querySelectorAll('img'),
-        ...document.querySelectorAll('script'),
-    ]
-
-    tags.map(tag => {
-        tag.onerror = () => window.errorCount += 1;
-    });
-});
+// From https://github.com/GoogleChromeLabs/tti-polyfill#usage
+!function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};
+    g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});
+    g.o.observe({entryTypes:['longtask']})}}();
 
 localStorage.clear();
 ```
 
-Then, after the website has loaded we are executing the following javascript on that page ([link to source](https://github.com/dennis-tra/tiros/blob/871054f38527298aeea6511dc6cdf1683c15f80c/js.go#L35)):
+Then, after the website has loaded we are adding a [TTI polyfill](https://github.com/dennis-tra/tiros/blob/main/js/tti-polyfill.js) and [web-vitals](https://github.com/dennis-tra/tiros/blob/main/js/web-vitals.iife.js) to the page.
+
+We got the tti-polyfill from [GoogleChromeLabs/tti-polyfill](https://github.com/GoogleChromeLabs/tti-polyfill/blob/master/tti-polyfill.js) (archived in favor of the [First Input Delay](https://web.dev/fid/) metric).
+We got the web-vitals javascript from [GoogleChrome/web-vitals](https://github.com/GoogleChrome/web-vitals) by building it ourselves with `npm run build` and then copying the `web-vitals.iife.js` (`iife` = immediately invoked function execution)
+
+Then we execute the following javascript on that page ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/measurement.js)):
 
 ```javascript
 async () => {
-    const perfEntries = window.performance.getEntries();
-    
-    function aggregatePerformanceEntries() {
-        return Promise.race([
-            new Promise(resolve => {
-                const observer = new PerformanceObserver((list) => {
-                    const lcpEntries = list.getEntries();
-                    const allEntries = [...perfEntries, ...lcpEntries]
-                    resolve(JSON.stringify(allEntries));
-                });
-                observer.observe({ type: "largest-contentful-paint", buffered: true });
-            }),
-            new Promise((resolve, reject) => {
-                setTimeout(() => resolve(JSON.stringify(perfEntries)), 5000);
-            })
-        ]);
-    }
-    
-    return await aggregatePerformanceEntries();
+
+    const onTTI = async (callback) => {
+        const tti = await window.ttiPolyfill.getFirstConsistentlyInteractive({})
+
+        // https://developer.chrome.com/docs/lighthouse/performance/interactive/#how-lighthouse-determines-your-tti-score
+        let rating = "good";
+        if (tti > 7300) {
+            rating = "poor";
+        } else if (tti > 3800) {
+            rating = "needs-improvement";
+        }
+
+        callback({
+            name: "TTI",
+            value: tti,
+            rating: rating,
+            delta: tti,
+            entries: [],
+        });
+    };
+
+    const {onCLS, onFCP, onLCP, onTTFB} = window.webVitals;
+
+    const wrapMetric = (metricFn) =>
+        new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => resolve(null), 10000);
+            metricFn(
+                (metric) => {
+                    clearTimeout(timeout);
+                    resolve(metric);
+                },
+                {reportAllChanges: true}
+            );
+        });
+
+    const data = await Promise.all([
+        wrapMetric(onCLS),
+        wrapMetric(onFCP),
+        wrapMetric(onLCP),
+        wrapMetric(onTTFB),
+        wrapMetric(onTTI),
+    ]);
+
+    return JSON.stringify(data);
 }
 ```
 
-`perfEntries` will contain an array of all [`PerformanceEntry`](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceEntry) objects. This allows us to track the following metrics we're interested in
+This function will return a JSON array of the following format:
 
-- `timeToFirstByte` - difference be `responseStart` and `startTime` of the `PerformanceEntry` with `entryType == "navigation"`. This is the [`PerformanceNavigationTiming`](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) entry.
+```json
+[
+  {
+    "name": "CLS",
+    "value": 1.3750143983783765e-05,
+    "rating": "good",
+    ...
+  },
+  {
+    "name": "FCP",
+    "value": 872,
+    "rating": "good",
+    ...
+  },
+  {
+    "name": "LCP",
+    "value": 872,
+    "rating": "good",
+    ...
+  },
+  {
+    "name": "TTFB",
+    "value": 717,
+    "rating": "good",
+    ...
+  },
+  {
+    "name": "TTI",
+    "value": 999,
+    "rating": "good",
+    ...
+  }
+]
+```
 
-- `first-contentful-paint` - `startTime` of the PerformanceEntry of type `first-contentful-paint`
-
-We're also interested in the `largest-contentful-paint` metric. [As the docs say](https://developer.mozilla.org/en-US/docs/Web/API/Performance/getEntries), this isn't part of the `performance.getEntries()` return value. Therefore, we register a performance observer that will resolve a promise with the relevant `PerformanceEntry`'s. To be safe we're racing this promise against atimeout of `5s`. `go-rod` can await these js functions.
-
-If the website request was a request that went through the `kubo` gateway we're running one round of garbage collection by calling the `/api/v0/repo/gc` endpoint. With this we make sure that the next request to that website won't come from the local kubo node cache.
-
-
+If the website request went through the `kubo` gateway we're running one round of garbage collection by calling the `/api/v0/repo/gc` endpoint. With this we make sure that the next request to that website won't come from the local kubo node cache.
 
 To also measure a "warmed up" kubo node, we also configured a "settle time". This is just the time to wait before the first website requests are made. After the scheduler has looped through all websites we configured another settle time of 10min before all websites are requested again. Each run in between settles also has a "times" counter which is set to `5` right now in our deployment. This means that we request a single website 5 times in between each settle times. The loop looks like this:
 
@@ -214,6 +266,7 @@ OPTIONS:
    --region value                                 In which region does this tiros task run in [$TIROS_RUN_REGION]
    --settle-times value [ --settle-times value ]  a list of times to settle in seconds (default: 10, 1200) [$TIROS_RUN_SETTLE_TIMES]
    --times value                                  number of times to test each URL (default: 3) [$TIROS_RUN_TIMES]
+   --dry-run                                      Whether to skip DB interactions (default: false) [$TIROS_RUN_DRY_RUN]
    --db-host value                                On which host address can this clustertest reach the database [$TIROS_RUN_DATABASE_HOST]
    --db-port value                                On which port can this clustertest reach the database (default: 0) [$TIROS_RUN_DATABASE_PORT]
    --db-name value                                The name of the database to use [$TIROS_RUN_DATABASE_NAME]
