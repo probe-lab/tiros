@@ -39,7 +39,7 @@ Each ECS task consists of three containers:
 
 `kubo` is running with `LIBP2P_RCMGR=0` which disables the [libp2p Network Resource Manager](https://github.com/libp2p/go-libp2p-resource-manager#readme).
 
-The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`. The scheduler probes each website via `kubo` by requesting `http://localhost:8080/ipns/<website>` and `https://<website>`. Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance. The following excerpt is a gist of what's happening when requesting a website:
+The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`. The scheduler probes each website via `kubo` by requesting `http://localhost:8080/ipns/<website>` and via HTTP  by requesting`https://<website>`. Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance. The following excerpt is a gist of what's happening when requesting a website:
 
 ```go
 browser := rod.New().Context(ctx).ControlURL("ws://localhost:3000")) // default CDP chrome port
@@ -47,7 +47,7 @@ browser := rod.New().Context(ctx).ControlURL("ws://localhost:3000")) // default 
 browser.Connect()
 defer browser.Close()
 
-var perfEntriesStr string
+var metricsStr string
 rod.Try(func() {
     browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
     browser.MustSetCookies()                             // second defense to prevent hitting the cache (empty args clears cookies)
