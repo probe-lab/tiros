@@ -7,10 +7,6 @@ docker:
 docker-push: docker
 	docker push "${REPO_SERVER}/probelab:tiros-${GIT_TAG}"
 
-nodeagent:
-	GOARCH=amd64 GOOS=linux GOBIN="$(PWD)" go install github.com/guseggert/clustertest/cmd/agent@latest
-	mv agent nodeagent
-
 tools:
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.15.2
 	go install github.com/volatiletech/sqlboiler/v4@v4.14.1
@@ -28,4 +24,4 @@ migrate-up:
 migrate-down:
 	migrate -database 'postgres://tiros_test:password@localhost:5439/tiros_test?sslmode=disable' -path migrations down
 
-.PHONY: nodeagent tools docker-push models database
+.PHONY: tools docker-push models database
