@@ -128,8 +128,8 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		}
 
 		logEntry.Debugln("Running polyfill JS ...")
-		page.MustEval(wrapInFn(jsTTIPolyfill)) // add TTI polyfill + web-vitals
-		page.MustEval(wrapInFn(jsWebVitalsIIFE))
+		page.MustEval(wrapInFn(jsTTIPolyfill))   // add TTI polyfill
+		page.MustEval(wrapInFn(jsWebVitalsIIFE)) // web-vitals
 
 		logEntry.Debugln("Running measurement ...")
 		metricsStr = page.MustEval(jsMeasurement).Str() // finally actually measure the stuff
@@ -138,8 +138,9 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		rro, err := page.Eval(jsNavPerfEntry)
 		if err != nil {
 			logEntry.WithError(err).Warnln("Couldn't get navigation performance entry")
+		} else {
+			navPerfEntryStr = rro.Value.Str()
 		}
-		navPerfEntryStr = rro.Value.Str()
 
 		page.MustClose()
 	})
