@@ -76,7 +76,7 @@ rod.Try(func() {
 // parse metricsStr
 ```
 
-`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're adding an event listener that adds error handlers to `link`, `img`, and `script` tags to count HTTP errors. (this is not tracked yet). Then we're also clearing the local storage. This is the code ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/onNewDocument.js)):
+`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're subscribing to performance events which is necessary for TTI polyfill and we're clearing the local storage. This is the code ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/onNewDocument.js)):
 
 ```javascript
 // From https://github.com/GoogleChromeLabs/tti-polyfill#usage
