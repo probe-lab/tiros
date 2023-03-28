@@ -158,8 +158,7 @@ func RunAction(c *cli.Context) error {
 		time.Sleep(sleepDur)
 
 		for i := 0; i < c.Int("times"); i++ {
-			for _, mType := range []string{models.MeasurementTypeHTTP} {
-				// for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
 					pr, err := t.Probe(c, websiteURL(c, website, mType))
 					if err != nil {
