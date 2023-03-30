@@ -258,31 +258,33 @@ def plot_kubo_vs_http(df_query: pd.DataFrame) -> plt.Figure:
 
 def main():
     conn = sa.create_engine(connection_string())
-    date_min = "2023-03-20"
-    date_max = "2023-03-27"
+    date_min = "2023-03-27"
+    date_max = "2023-04-03"
 
     df = get_measurements(conn, date_min, date_max)
 
     kubo_requests = df[(df["type"] == "KUBO") & (df["has_error"] == False)]
 
     fig = plot_metric(kubo_requests, "First Contentful Paint", "fcp")
-    fig.savefig("./plots/tiros-heatmap-fcp.png", dpi=DPI)
+    fig.savefig("./plots/tiros-fcp.png", dpi=DPI)
 
     fig = plot_metric(kubo_requests, "Largest Contentful Paint", "lcp")
-    fig.savefig("./plots/tiros-heatmap-lcp.png", dpi=DPI)
+    fig.savefig("./plots/tiros-lcp.png", dpi=DPI)
 
     fig = plot_metric(kubo_requests, "Time To First Byte", "ttfb")
-    fig.savefig("./plots/tiros-heatmap-ttfb.png", dpi=DPI)
+    fig.savefig("./plots/tiros-ttfb.png", dpi=DPI)
 
     errors = df[df["type"] == "KUBO"].copy().groupby(["date", "has_error", "website"]) \
         .count() \
         .reset_index()
+
     fig = plot_errors(errors)
-    fig.savefig("./plots/tiros-errors-kubo.png", dpi=DPI)
+    fig.savefig("./plots/tiros-errors.png", dpi=DPI)
 
     errors = df[df["type"] == "HTTP"].copy().groupby(["date", "has_error", "website"]) \
         .count() \
         .reset_index()
+
     fig = plot_errors(errors)
     fig.savefig("./plots/tiros-errors-http.png", dpi=DPI)
 

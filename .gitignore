@@ -460,3 +460,5 @@ pyrightconfig.json
 
 nodeagent
 rod
+
+analysis/plots/*.png
