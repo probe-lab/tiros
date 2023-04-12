@@ -90,27 +90,6 @@ var RunTableColumns = struct {
 
 // Generated where
 
-type whereHelpertypes_StringArray struct{ field string }
-
-func (w whereHelpertypes_StringArray) EQ(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
-}
-func (w whereHelpertypes_StringArray) NEQ(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelpertypes_StringArray) LT(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpertypes_StringArray) LTE(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpertypes_StringArray) GT(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpertypes_StringArray) GTE(x types.StringArray) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
 type whereHelpernull_Time struct{ field string }
 
 func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
@@ -162,13 +141,16 @@ var RunWhere = struct {
 // RunRels is where relationship names are stored.
 var RunRels = struct {
 	Measurements string
+	Providers    string
 }{
 	Measurements: "Measurements",
+	Providers:    "Providers",
 }
 
 // runR is where relationships are stored.
 type runR struct {
 	Measurements MeasurementSlice `boil:"Measurements" json:"Measurements" toml:"Measurements" yaml:"Measurements"`
+	Providers    ProviderSlice    `boil:"Providers" json:"Providers" toml:"Providers" yaml:"Providers"`
 }
 
 // NewStruct creates a new relationship struct
@@ -181,6 +163,13 @@ func (r *runR) GetMeasurements() MeasurementSlice {
 		return nil
 	}
 	return r.Measurements
+}
+
+func (r *runR) GetProviders() ProviderSlice {
+	if r == nil {
+		return nil
+	}
+	return r.Providers
 }
 
 // runL is where Load methods for each relationship are stored.
@@ -486,6 +475,20 @@ func (o *Run) Measurements(mods ...qm.QueryMod) measurementQuery {
 	return Measurements(queryMods...)
 }
 
+// Providers retrieves all the provider's Providers with an executor.
+func (o *Run) Providers(mods ...qm.QueryMod) providerQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"providers\".\"run_id\"=?", o.ID),
+	)
+
+	return Providers(queryMods...)
+}
+
 // LoadMeasurements allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (runL) LoadMeasurements(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRun interface{}, mods queries.Applicator) error {
@@ -600,6 +603,120 @@ func (runL) LoadMeasurements(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
+// LoadProviders allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (runL) LoadProviders(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRun interface{}, mods queries.Applicator) error {
+	var slice []*Run
+	var object *Run
+
+	if singular {
+		var ok bool
+		object, ok = maybeRun.(*Run)
+		if !ok {
+			object = new(Run)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeRun)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeRun))
+			}
+		}
+	} else {
+		s, ok := maybeRun.(*[]*Run)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeRun)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeRun))
+			}
+		}
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &runR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &runR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`providers`),
+		qm.WhereIn(`providers.run_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load providers")
+	}
+
+	var resultSlice []*Provider
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice providers")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on providers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for providers")
+	}
+
+	if len(providerAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Providers = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &providerR{}
+			}
+			foreign.R.Run = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.RunID {
+				local.R.Providers = append(local.R.Providers, foreign)
+				if foreign.R == nil {
+					foreign.R = &providerR{}
+				}
+				foreign.R.Run = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // AddMeasurements adds the given related objects to the existing relationships
 // of the run, optionally inserting them as new records.
 // Appends related to o.R.Measurements.
@@ -644,6 +761,59 @@ func (o *Run) AddMeasurements(ctx context.Context, exec boil.ContextExecutor, in
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &measurementR{
+				Run: o,
+			}
+		} else {
+			rel.R.Run = o
+		}
+	}
+	return nil
+}
+
+// AddProviders adds the given related objects to the existing relationships
+// of the run, optionally inserting them as new records.
+// Appends related to o.R.Providers.
+// Sets related.R.Run appropriately.
+func (o *Run) AddProviders(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Provider) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.RunID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"providers\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"run_id"}),
+				strmangle.WhereClause("\"", "\"", 2, providerPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.RunID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &runR{
+			Providers: related,
+		}
+	} else {
+		o.R.Providers = append(o.R.Providers, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &providerR{
 				Run: o,
 			}
 		} else {

@@ -5,8 +5,10 @@ package models
 
 var TableNames = struct {
 	Measurements string
+	Providers    string
 	Runs         string
 }{
 	Measurements: "measurements",
+	Providers:    "providers",
 	Runs:         "runs",
 }

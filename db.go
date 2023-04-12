@@ -30,6 +30,7 @@ var migrations embed.FS
 type IDBClient interface {
 	InsertRun(c *cli.Context, version string) (*models.Run, error)
 	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error)
+	SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error)
 	SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error)
 }
 
@@ -155,6 +156,37 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
+func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error) {
+	log.Infoln("Saving providers for", wps.Website)
+	dbProviders := []*models.Provider{}
+
+	for _, provider := range wps.Providers {
+
+		maddrs := make([]string, len(provider.Addrs))
+		for i, maddr := range provider.Addrs {
+			maddrs[i] = maddr.String()
+		}
+
+		dbProvider := &models.Provider{
+			RunID:          dbRun.ID,
+			Website:        wps.Website,
+			Path:           wps.Path,
+			PeerID:         provider.ID.String(),
+			AgentVersion:   null.NewString(provider.AgentVersion, provider.AgentVersion != ""),
+			MultiAddresses: maddrs,
+		}
+		
+		if err := dbProvider.Insert(c.Context, db.handle, boil.Infer()); err != nil {
+			log.WithError(err).Warnln("Couldn't insert provider")
+			continue
+		}
+
+		dbProviders = append(dbProviders, dbProvider)
+	}
+
+	return dbProviders, nil
+}
+
 func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
 	metrics, err := pr.NullJSON()
 	if err != nil {
@@ -217,6 +249,10 @@ var _ IDBClient = (*DBDummyClient)(nil)
 
 func (D DBDummyClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
 	return nil, nil
+}
+
+func (D DBDummyClient) SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error) {
+	return []*models.Provider{}, nil
 }
 
 func (D DBDummyClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error) {
