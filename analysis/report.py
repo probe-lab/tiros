@@ -285,7 +285,9 @@ def main():
     else:
         output_dir = '.'
 
-    plots_dir = os.path.join(output_dir, f"plots-{calendar_week}")
+    # allow name of plots directory to be overridden
+    plots_dirname = os.getenv('PARSEC_PLOTS_DIRNAME', 'plots')
+    plots_dir = os.path.join(output_dir, plots_dirname)
     if not os.path.isdir(plots_dir):
         os.mkdir(plots_dir)
 
@@ -304,30 +306,30 @@ def main():
     kubo_requests = df[(df["type"] == "KUBO") & (df["has_error"] == False)]
 
     fig = plot_metric(kubo_requests, "First Contentful Paint", "fcp")
-    fig.savefig("./plots/tiros-fcp.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-fcp.png", dpi=DPI)
 
     fig = plot_metric(kubo_requests, "Largest Contentful Paint", "lcp")
-    fig.savefig("./plots/tiros-lcp.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-lcp.png", dpi=DPI)
 
     fig = plot_metric(kubo_requests, "Time To First Byte", "ttfb")
-    fig.savefig("./plots/tiros-ttfb.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-ttfb.png", dpi=DPI)
 
     errors = df[df["type"] == "KUBO"].copy().groupby(["date", "has_error", "website"]) \
         .count() \
         .reset_index()
 
     fig = plot_errors(errors)
-    fig.savefig("./plots/tiros-errors.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-errors.png", dpi=DPI)
 
     errors = df[df["type"] == "HTTP"].copy().groupby(["date", "has_error", "website"]) \
         .count() \
         .reset_index()
 
     fig = plot_errors(errors)
-    fig.savefig("./plots/tiros-errors-http.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-errors-http.png", dpi=DPI)
 
     fig = plot_kubo_vs_http(df.copy())
-    fig.savefig("./plots/tiros-kubo-vs-http.png", dpi=DPI)
+    fig.savefig(f"{plots_dir}/tiros-kubo-vs-http.png", dpi=DPI)
 
 
 if __name__ == "__main__":
