@@ -187,8 +187,9 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		case "CLS":
 			pr.CumulativeLayoutShift = &v.Value
 			pr.CumulativeLayoutShiftRating = &v.Rating
+		default:
+			continue
 		}
-		logEntry.Infoln(v.Name, v.Value, v.Rating)
 	}
 
 	return &pr, nil
