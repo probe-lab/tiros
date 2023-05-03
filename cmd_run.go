@@ -119,6 +119,7 @@ func RunAction(c *cli.Context) error {
 	log.Infoln("Starting Tiros run...")
 	defer log.Infoln("Stopped Tiros run.")
 
+	// Initialize database client
 	var err error
 	var dbClient IDBClient = DBDummyClient{}
 	if !c.Bool("dry-run") {
@@ -128,23 +129,30 @@ func RunAction(c *cli.Context) error {
 		}
 	}
 
+	// Initialize kubo client
 	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
 
+	// configure Tiros struct
 	t := Tiros{
 		DBClient: dbClient,
 		Kubo:     kubo,
 	}
 
+	// Create a measurement run entry in the database. This entry will
+	// contain information about the measurement configuration.
 	if _, err := t.InitRun(c); err != nil {
 		return fmt.Errorf("init run: %w", err)
 	}
+	// Before we're completely exiting we "seal" the run entry. Right now, this only means we're setting the
+	// finished_at timestamp.
 	defer func() {
 		if _, err = t.DBClient.SealRun(context.Background(), t.DBRun); err != nil {
 			log.WithError(err).Warnln("Couldn't seal run")
 		}
 	}()
 
-	// shuffle websites
+	// shuffle websites, so that we have a different order in which we request the websites.
+	// If we didn't do this a single website would always be requested with a comparatively "cold" kubo node.
 	websites := c.StringSlice("websites")
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(websites), func(i, j int) {
@@ -157,7 +165,43 @@ func RunAction(c *cli.Context) error {
 		"times":       c.Int("times"),
 	}).Infoln("Starting run!")
 
-	wpsChan := t.FindAllProvidersAsync(c.Context, websites)
+	providerResults := make(chan *provider)
+	probeResults := make(chan *probeResult)
+
+	go t.measureWebsites(c, websites, probeResults)
+	go t.findAllProviders(c, websites, providerResults)
+
+	mwDone := false // measure websites done?
+	fpDone := false // find providers done?
+
+	for {
+		select {
+		case pr, more := <-probeResults:
+			if mwDone = !more; more {
+				if _, err := t.DBClient.SaveMeasurement(c, t.DBRun, pr); err != nil {
+					return fmt.Errorf("save measurement: %w", err)
+				}
+			}
+
+		case pr, more := <-providerResults:
+			if fpDone = !more; more {
+				_, err := t.DBClient.SaveProvider(c, t.DBRun, pr)
+				if err != nil {
+					return fmt.Errorf("save provider: %w", err)
+				}
+			}
+		}
+
+		if mwDone && fpDone {
+			break
+		}
+	}
+
+	return nil
+}
+
+func (t *Tiros) measureWebsites(c *cli.Context, websites []string, results chan<- *probeResult) {
+	defer close(results)
 
 	for _, settle := range c.IntSlice("settle-times") {
 
@@ -169,41 +213,35 @@ func RunAction(c *cli.Context) error {
 		for i := 0; i < c.Int("times"); i++ {
 			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
-					pr, err := t.Probe(c, websiteURL(c, website, mType))
+					pr, err := t.probeWebsite(c, websiteURL(c, website, mType))
 					if err != nil {
-						return fmt.Errorf("probing %s: %w", website, err)
+						log.WithError(err).WithField("website", website).Warnln("error probing website")
+						continue
 					}
+
+					pr.website = website
+					pr.mType = mType
+					pr.try = i
 
 					log.WithFields(log.Fields{
-						"ttfb": p2f(pr.TimeToFirstByte),
-						"lcp":  p2f(pr.LargestContentfulPaint),
-						"fcp":  p2f(pr.FirstContentfulPaint),
-						"tti":  p2f(pr.TimeToInteract),
-					}).WithError(pr.Error).Infoln("Probed website", website)
+						"ttfb": p2f(pr.ttfb),
+						"lcp":  p2f(pr.lcp),
+						"fcp":  p2f(pr.fcp),
+						"tti":  p2f(pr.tti),
+					}).WithError(pr.err).Infoln("Probed website", website)
 
-					if _, err := t.DBClient.SaveMeasurement(c, t.DBRun, pr, website, mType, i); err != nil {
-						return fmt.Errorf("save measurement: %w", err)
-					}
+					results <- pr
 
 					if mType == models.MeasurementTypeKUBO {
 						if err = t.KuboGC(c.Context); err != nil {
-							return fmt.Errorf("kubo gc: %w", err)
+							log.WithError(err).Warnln("error running kubo gc")
+							continue
 						}
 					}
 				}
 			}
 		}
 	}
-
-	wps := <-wpsChan
-	for _, wp := range wps {
-		_, err := t.DBClient.SaveProvider(c, t.DBRun, wp)
-		if err != nil {
-			log.WithError(err).WithField("website", wp.Website).Warnln("Couldn't save providers")
-		}
-	}
-
-	return nil
 }
 
 func websiteURL(c *cli.Context, website string, mType string) string {

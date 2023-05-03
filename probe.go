@@ -17,21 +17,13 @@ import (
 	"github.com/dennis-tra/tiros/models"
 )
 
+const websiteRequestTimeout = 30 * time.Second
+
 var (
 	ErrNavigateTimeout    = errors.New("navigation timed out")
 	ErrOnLoadTimeout      = errors.New("window.onload event timed out")
 	ErrNetworkIdleTimeout = errors.New("window.requestIdleCallback timed out")
 )
-
-func handleTimeoutErr(err error, deadlineErr error) {
-	if errors.Is(err, context.DeadlineExceeded) {
-		panic(deadlineErr)
-	} else if err != nil {
-		panic(err)
-	}
-}
-
-const websiteRequestTimeout = 30 * time.Second
 
 type Tiros struct {
 	DBClient IDBClient
@@ -55,14 +47,49 @@ func (t *Tiros) InitRun(c *cli.Context) (*models.Run, error) {
 	return t.DBRun, nil
 }
 
-func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
+type probeResult struct {
+	url     string
+	website string
+
+	// measurement type (KUBO or HTTP)
+	mType string
+	try   int
+
+	ttfb       *float64
+	ttfbRating *string
+
+	fcp       *float64
+	fcpRating *string
+
+	lcp       *float64
+	lcpRating *string
+
+	tti       *float64
+	ttiRating *string
+
+	cls       *float64
+	clsRating *string
+
+	navPerf *PerformanceNavigationEntry
+
+	err error `json:"-"`
+}
+
+func (pr *probeResult) NullError() null.String {
+	if pr.err != nil {
+		return null.StringFrom(pr.err.Error())
+	}
+	return null.NewString("", false)
+}
+
+func (t *Tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 	logEntry := log.WithField("url", url)
 
 	logEntry.Infoln("Probing", url)
 	defer logEntry.Infoln("Done probing", url)
 
-	pr := ProbeResult{
-		URL: url,
+	pr := probeResult{
+		url: url,
 	}
 
 	browser := rod.New().
@@ -112,7 +139,7 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		if errors.Is(err, context.Canceled) {
 			panic(err)
 		} else if err != nil {
-			pr.Error = ErrOnLoadTimeout
+			pr.err = ErrOnLoadTimeout
 		}
 
 		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Waiting for network idle event ...")
@@ -121,10 +148,10 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		if errors.Is(err, context.Canceled) {
 			panic(err)
 		} else if err != nil {
-			if pr.Error != nil {
-				err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), pr.Error)
+			if pr.err != nil {
+				err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), pr.err)
 			}
-			pr.Error = ErrNetworkIdleTimeout
+			pr.err = ErrNetworkIdleTimeout
 		}
 
 		logEntry.Debugln("Running polyfill JS ...")
@@ -146,13 +173,13 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	})
 	if errors.Is(err, ErrNavigateTimeout) {
 		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
-		pr.Error = ErrNavigateTimeout
+		pr.err = ErrNavigateTimeout
 		return &pr, nil
 	} else if errors.Is(err, context.Canceled) {
 		return nil, err
 	} else if err != nil {
 		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
-		pr.Error = err
+		pr.err = err
 		return &pr, nil
 	}
 
@@ -166,27 +193,27 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 		if err := json.Unmarshal([]byte(navPerfEntryStr), &navPerfEntry); err != nil {
 			return nil, fmt.Errorf("unmarshal navigation performance entry: %w", err)
 		}
-		pr.NavigationPerformance = &navPerfEntry
+		pr.navPerf = &navPerfEntry
 	}
 
 	for _, v := range vitals {
 		v := v
 		switch v.Name {
 		case "LCP":
-			pr.LargestContentfulPaint = &v.Value
-			pr.LargestContentfulPaintRating = &v.Rating
+			pr.lcp = &v.Value
+			pr.lcpRating = &v.Rating
 		case "FCP":
-			pr.FirstContentfulPaint = &v.Value
-			pr.FirstContentfulPaintRating = &v.Rating
+			pr.fcp = &v.Value
+			pr.fcpRating = &v.Rating
 		case "TTFB":
-			pr.TimeToFirstByte = &v.Value
-			pr.TimeToFirstByteRating = &v.Rating
+			pr.ttfb = &v.Value
+			pr.ttfbRating = &v.Rating
 		case "TTI":
-			pr.TimeToInteract = &v.Value
-			pr.TimeToInteractRating = &v.Rating
+			pr.tti = &v.Value
+			pr.ttiRating = &v.Rating
 		case "CLS":
-			pr.CumulativeLayoutShift = &v.Value
-			pr.CumulativeLayoutShiftRating = &v.Rating
+			pr.cls = &v.Value
+			pr.clsRating = &v.Rating
 		default:
 			continue
 		}
@@ -195,34 +222,12 @@ func (t *Tiros) Probe(c *cli.Context, url string) (*ProbeResult, error) {
 	return &pr, nil
 }
 
-type ProbeResult struct {
-	URL string
-
-	TimeToFirstByte       *float64
-	TimeToFirstByteRating *string
-
-	FirstContentfulPaint       *float64
-	FirstContentfulPaintRating *string
-
-	LargestContentfulPaint       *float64
-	LargestContentfulPaintRating *string
-
-	TimeToInteract       *float64
-	TimeToInteractRating *string
-
-	CumulativeLayoutShift       *float64
-	CumulativeLayoutShiftRating *string
-
-	NavigationPerformance *PerformanceNavigationEntry
-
-	Error error `json:"-"`
-}
-
-func (pr *ProbeResult) NullError() null.String {
-	if pr.Error != nil {
-		return null.StringFrom(pr.Error.Error())
+func handleTimeoutErr(err error, deadlineErr error) {
+	if errors.Is(err, context.DeadlineExceeded) {
+		panic(deadlineErr)
+	} else if err != nil {
+		panic(err)
 	}
-	return null.NewString("", false)
 }
 
 type Metrics struct {
@@ -230,9 +235,9 @@ type Metrics struct {
 	// can grow
 }
 
-func (pr *ProbeResult) NullJSON() (null.JSON, error) {
+func (pr *probeResult) NullJSON() (null.JSON, error) {
 	m := Metrics{
-		NavigationPerformance: pr.NavigationPerformance,
+		NavigationPerformance: pr.navPerf,
 	}
 
 	data, err := json.Marshal(m)
