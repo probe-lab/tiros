@@ -1,0 +1,31 @@
+version: "3.9"
+name: tiros
+services:
+  ipfs:
+    image: ipfs/kubo:v0.19.0
+    restart: unless-stopped
+    volumes:
+      - ipfs_path:/data/ipfs
+      - ipfs_fuse:/ipfs
+      - ipns_fuse:/ipns
+    ports:
+      - "4001:4001/tcp"
+      - "4001:4001/udp"
+      - "127.0.0.1:5001:5001"
+      - "127.0.0.1:8080:8080"
+  chrome:
+    image: browserless/chrome:latest
+    ports:
+      - "3000:3000"
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: tiros_test
+      POSTGRES_DB: tiros_test
+volumes:
+  ipfs_path:
+  ipfs_fuse:
+  ipns_fuse:
