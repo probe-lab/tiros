@@ -9,6 +9,7 @@ CREATE TABLE providers
     peer_id         TEXT        NOT NULL,
     agent_version   TEXT,
     multi_addresses TEXT[],
+    error           TEXT,
 
     created_at      TIMESTAMPTZ NOT NULL,
 

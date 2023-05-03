@@ -164,6 +164,12 @@ func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *pr
 		maddrs[i] = maddr.String()
 	}
 
+	errMsg := ""
+
+	if provider.err != nil {
+		errMsg = provider.err.Error()
+	}
+
 	dbProvider := &models.Provider{
 		RunID:          dbRun.ID,
 		Website:        provider.website,
@@ -171,6 +177,7 @@ func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *pr
 		PeerID:         provider.id.String(),
 		AgentVersion:   null.NewString(provider.agent, provider.agent != ""),
 		MultiAddresses: maddrs,
+		Error:          null.NewString(errMsg, errMsg != ""),
 	}
 
 	if err := dbProvider.Insert(c.Context, db.handle, boil.Infer()); err != nil {

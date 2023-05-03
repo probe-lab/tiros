@@ -171,20 +171,23 @@ func RunAction(c *cli.Context) error {
 	go t.measureWebsites(c, websites, probeResults)
 	go t.findAllProviders(c, websites, providerResults)
 
-	mwDone := false // measure websites done?
-	fpDone := false // find providers done?
-
 	for {
 		select {
 		case pr, more := <-probeResults:
-			if mwDone = !more; more {
+			if !more {
+				probeResults = nil
+			} else {
+				log.Infoln("Handling probe result")
 				if _, err := t.DBClient.SaveMeasurement(c, t.DBRun, pr); err != nil {
 					return fmt.Errorf("save measurement: %w", err)
 				}
 			}
 
 		case pr, more := <-providerResults:
-			if fpDone = !more; more {
+			if !more {
+				providerResults = nil
+			} else {
+				log.Infoln("Handling provider result")
 				_, err := t.DBClient.SaveProvider(c, t.DBRun, pr)
 				if err != nil {
 					return fmt.Errorf("save provider: %w", err)
@@ -192,7 +195,7 @@ func RunAction(c *cli.Context) error {
 			}
 		}
 
-		if mwDone && fpDone {
+		if probeResults == nil && providerResults == nil {
 			break
 		}
 	}
