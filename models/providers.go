@@ -32,6 +32,7 @@ type Provider struct {
 	PeerID         string            `boil:"peer_id" json:"peer_id" toml:"peer_id" yaml:"peer_id"`
 	AgentVersion   null.String       `boil:"agent_version" json:"agent_version,omitempty" toml:"agent_version" yaml:"agent_version,omitempty"`
 	MultiAddresses types.StringArray `boil:"multi_addresses" json:"multi_addresses,omitempty" toml:"multi_addresses" yaml:"multi_addresses,omitempty"`
+	Error          null.String       `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
 	CreatedAt      time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *providerR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -46,6 +47,7 @@ var ProviderColumns = struct {
 	PeerID         string
 	AgentVersion   string
 	MultiAddresses string
+	Error          string
 	CreatedAt      string
 }{
 	ID:             "id",
@@ -55,6 +57,7 @@ var ProviderColumns = struct {
 	PeerID:         "peer_id",
 	AgentVersion:   "agent_version",
 	MultiAddresses: "multi_addresses",
+	Error:          "error",
 	CreatedAt:      "created_at",
 }
 
@@ -66,6 +69,7 @@ var ProviderTableColumns = struct {
 	PeerID         string
 	AgentVersion   string
 	MultiAddresses string
+	Error          string
 	CreatedAt      string
 }{
 	ID:             "providers.id",
@@ -75,6 +79,7 @@ var ProviderTableColumns = struct {
 	PeerID:         "providers.peer_id",
 	AgentVersion:   "providers.agent_version",
 	MultiAddresses: "providers.multi_addresses",
+	Error:          "providers.error",
 	CreatedAt:      "providers.created_at",
 }
 
@@ -114,6 +119,7 @@ var ProviderWhere = struct {
 	PeerID         whereHelperstring
 	AgentVersion   whereHelpernull_String
 	MultiAddresses whereHelpertypes_StringArray
+	Error          whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
 }{
 	ID:             whereHelperint{field: "\"providers\".\"id\""},
@@ -123,6 +129,7 @@ var ProviderWhere = struct {
 	PeerID:         whereHelperstring{field: "\"providers\".\"peer_id\""},
 	AgentVersion:   whereHelpernull_String{field: "\"providers\".\"agent_version\""},
 	MultiAddresses: whereHelpertypes_StringArray{field: "\"providers\".\"multi_addresses\""},
+	Error:          whereHelpernull_String{field: "\"providers\".\"error\""},
 	CreatedAt:      whereHelpertime_Time{field: "\"providers\".\"created_at\""},
 }
 
@@ -154,9 +161,9 @@ func (r *providerR) GetRun() *Run {
 type providerL struct{}
 
 var (
-	providerAllColumns            = []string{"id", "run_id", "website", "path", "peer_id", "agent_version", "multi_addresses", "created_at"}
+	providerAllColumns            = []string{"id", "run_id", "website", "path", "peer_id", "agent_version", "multi_addresses", "error", "created_at"}
 	providerColumnsWithoutDefault = []string{"run_id", "website", "path", "peer_id", "created_at"}
-	providerColumnsWithDefault    = []string{"id", "agent_version", "multi_addresses"}
+	providerColumnsWithDefault    = []string{"id", "agent_version", "multi_addresses", "error"}
 	providerPrimaryKeyColumns     = []string{"id"}
 	providerGeneratedColumns      = []string{"id"}
 )
