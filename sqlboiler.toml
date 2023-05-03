@@ -4,7 +4,7 @@ wipe     = true
 [psql]
 dbname = "tiros_test"
 host = "localhost"
-port = 5439
+port = 5432
 user = "tiros_test"
 pass = "password"
 sslmode = "disable"

@@ -13,15 +13,15 @@ tools:
 	go install github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-psql@v4.14.1
 
 database:
-	docker run --rm -p 5439:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tiros_test -e POSTGRES_DB=tiros_test postgres:14
+	docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tiros_test -e POSTGRES_DB=tiros_test --name tiros_test postgres:14
 
 models:
 	sqlboiler --no-tests psql
 
 migrate-up:
-	migrate -database 'postgres://tiros_test:password@localhost:5439/tiros_test?sslmode=disable' -path migrations up
+	migrate -database 'postgres://tiros_test:password@localhost:5432/tiros_test?sslmode=disable' -path migrations up
 
 migrate-down:
-	migrate -database 'postgres://tiros_test:password@localhost:5439/tiros_test?sslmode=disable' -path migrations down
+	migrate -database 'postgres://tiros_test:password@localhost:5432/tiros_test?sslmode=disable' -path migrations down
 
 .PHONY: tools docker-push models database
