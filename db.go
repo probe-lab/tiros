@@ -29,8 +29,8 @@ var migrations embed.FS
 
 type IDBClient interface {
 	InsertRun(c *cli.Context, version string) (*models.Run, error)
-	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error)
-	SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error)
+	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error)
+	SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error)
 	SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error)
 }
 
@@ -156,38 +156,31 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
-func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error) {
-	log.Infoln("Saving providers for", wps.Website)
-	dbProviders := []*models.Provider{}
+func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error) {
+	log.Infoln("Saving provider for", provider.website)
 
-	for _, provider := range wps.Providers {
-
-		maddrs := make([]string, len(provider.Addrs))
-		for i, maddr := range provider.Addrs {
-			maddrs[i] = maddr.String()
-		}
-
-		dbProvider := &models.Provider{
-			RunID:          dbRun.ID,
-			Website:        wps.Website,
-			Path:           wps.Path,
-			PeerID:         provider.ID.String(),
-			AgentVersion:   null.NewString(provider.AgentVersion, provider.AgentVersion != ""),
-			MultiAddresses: maddrs,
-		}
-		
-		if err := dbProvider.Insert(c.Context, db.handle, boil.Infer()); err != nil {
-			log.WithError(err).Warnln("Couldn't insert provider")
-			continue
-		}
-
-		dbProviders = append(dbProviders, dbProvider)
+	maddrs := make([]string, len(provider.addrs))
+	for i, maddr := range provider.addrs {
+		maddrs[i] = maddr.String()
 	}
 
-	return dbProviders, nil
+	dbProvider := &models.Provider{
+		RunID:          dbRun.ID,
+		Website:        provider.website,
+		Path:           provider.path,
+		PeerID:         provider.id.String(),
+		AgentVersion:   null.NewString(provider.agent, provider.agent != ""),
+		MultiAddresses: maddrs,
+	}
+
+	if err := dbProvider.Insert(c.Context, db.handle, boil.Infer()); err != nil {
+		return nil, fmt.Errorf("insert provider: %w", err)
+	}
+
+	return dbProvider, nil
 }
 
-func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
+func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error) {
 	metrics, err := pr.NullJSON()
 	if err != nil {
 		return nil, fmt.Errorf("getting metrics json")
@@ -195,20 +188,20 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *Probe
 
 	m := &models.Measurement{
 		RunID:      dbRun.ID,
-		Website:    website,
-		URL:        pr.URL,
-		Type:       mType,
-		Try:        int16(try),
-		TTFB:       intervalMs(pr.TimeToFirstByte),
-		FCP:        intervalMs(pr.FirstContentfulPaint),
-		LCP:        intervalMs(pr.LargestContentfulPaint),
-		CLS:        intervalMs(pr.CumulativeLayoutShift),
-		Tti:        intervalMs(pr.TimeToInteract),
-		TtiRating:  mapRating(pr.TimeToInteractRating),
-		TTFBRating: mapRating(pr.TimeToFirstByteRating),
-		FCPRating:  mapRating(pr.FirstContentfulPaintRating),
-		LCPRating:  mapRating(pr.LargestContentfulPaintRating),
-		CLSRating:  mapRating(pr.CumulativeLayoutShiftRating),
+		Website:    pr.website,
+		URL:        pr.url,
+		Type:       pr.mType,
+		Try:        int16(pr.try),
+		TTFB:       intervalMs(pr.ttfb),
+		FCP:        intervalMs(pr.fcp),
+		LCP:        intervalMs(pr.lcp),
+		CLS:        intervalMs(pr.cls),
+		Tti:        intervalMs(pr.tti),
+		TtiRating:  mapRating(pr.ttiRating),
+		TTFBRating: mapRating(pr.ttfbRating),
+		FCPRating:  mapRating(pr.fcpRating),
+		LCPRating:  mapRating(pr.lcpRating),
+		CLSRating:  mapRating(pr.clsRating),
 		Metrics:    metrics,
 		Error:      pr.NullError(),
 	}
@@ -247,12 +240,12 @@ type DBDummyClient struct{}
 
 var _ IDBClient = (*DBDummyClient)(nil)
 
-func (D DBDummyClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *ProbeResult, website string, mType string, try int) (*models.Measurement, error) {
+func (D DBDummyClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error) {
 	return nil, nil
 }
 
-func (D DBDummyClient) SaveProvider(c *cli.Context, dbRun *models.Run, wps *WebsiteProviders) ([]*models.Provider, error) {
-	return []*models.Provider{}, nil
+func (D DBDummyClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error) {
+	return &models.Provider{}, nil
 }
 
 func (D DBDummyClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error) {
