@@ -38,9 +38,15 @@ type nameResolveResponse struct {
 func (t *tiros) findAllProviders(c *cli.Context, websites []string, results chan<- *provider) {
 	defer close(results)
 	for _, website := range websites {
-		err := t.findProviders(c.Context, website, results)
-		if err != nil {
-			log.WithError(err).WithField("website", website).Warnln("Couldn't find providers")
+		for retry := 0; retry < 3; retry++ {
+			err := t.findProviders(c.Context, website, results)
+			if err != nil {
+				log.WithError(err).WithField("retry", retry).WithField("website", website).Warnln("Couldn't find providers")
+				if strings.Contains(err.Error(), "routing/findprovs") {
+					continue
+				}
+			}
+			break
 		}
 	}
 }
@@ -75,6 +81,8 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		Send(ctx)
 	if err != nil {
 		return fmt.Errorf("routing/findprovs: %w", err)
+	} else if resp.Error != nil {
+		return fmt.Errorf("routing/findprovs: %s", resp.Error.Error())
 	}
 
 	var providerPeers []*peer.AddrInfo
