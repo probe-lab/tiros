@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
-	github.com/dennis-tra/nebula-crawler v0.0.0-20230423182656-29dfc1d3e6b5
+	github.com/dennis-tra/nebula-crawler v0.0.0-20230504190743-a20481d35509
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-rod/rod v0.112.6
 	github.com/golang-migrate/migrate/v4 v4.15.2
