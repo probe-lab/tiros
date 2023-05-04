@@ -16,7 +16,7 @@ import (
 	"github.com/dennis-tra/tiros/models"
 )
 
-const websiteRequestTimeout = 30 * time.Second
+const websiteRequestTimeout = 15 * time.Second
 
 var (
 	ErrNavigateTimeout    = errors.New("navigation timed out")
