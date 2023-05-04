@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -108,7 +109,7 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 	idJobs := make(chan *peer.AddrInfo, numJobs)
 	idResults := make(chan idResult, numJobs)
 
-	for w := 0; w < 5; w++ {
+	for w := 0; w < 10; w++ {
 		go t.idWorker(ctx, idJobs, idResults)
 	}
 

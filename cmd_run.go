@@ -219,11 +219,10 @@ func RunAction(c *cli.Context) error {
 				log.Infoln("Searching for providers done!")
 				providerResults = nil
 			} else {
-				err = pr.err
-				if errors.Is(err, context.DeadlineExceeded) {
-					err = context.DeadlineExceeded
+				if errors.Is(pr.err, context.DeadlineExceeded) {
+					pr.err = context.DeadlineExceeded
 				}
-				log.WithError(err).
+				log.WithError(pr.err).
 					WithField("peerID", pr.id.String()[:16]).
 					WithField("website", pr.website).
 					Infoln("Handling provider result")
