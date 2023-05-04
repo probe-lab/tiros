@@ -56,15 +56,20 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 	logEntry := log.WithField("website", website)
 	logEntry.Infoln("Finding providers for", website)
 
-	resp, err := t.kubo.Request("name/resolve").
+	nameResp, err := t.kubo.Request("name/resolve").
 		Option("arg", website).
 		Option("nocache", "true").
 		Option("dht-timeout", "30s").Send(ctx)
 	if err != nil {
 		return fmt.Errorf("name/resolve: %w", err)
 	}
+	defer func() {
+		if err = nameResp.Close(); err != nil {
+			log.WithError(err).Warnln("Error closing name/resolve response")
+		}
+	}()
 
-	dat, err := io.ReadAll(resp.Output)
+	dat, err := io.ReadAll(nameResp.Output)
 	if err != nil {
 		return fmt.Errorf("read name/resolve bytes: %w", err)
 	}
@@ -75,19 +80,24 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		return fmt.Errorf("unmarshal name/resolve response: %w", err)
 	}
 
-	resp, err = t.kubo.
+	findResp, err := t.kubo.
 		Request("routing/findprovs").
 		Option("arg", nrr.Path).
 		Option("num-providers", "1000").
 		Send(ctx)
 	if err != nil {
 		return fmt.Errorf("routing/findprovs: %w", err)
-	} else if resp.Error != nil {
-		return fmt.Errorf("routing/findprovs: %s", resp.Error.Error())
+	} else if findResp.Error != nil {
+		return fmt.Errorf("routing/findprovs: %s", findResp.Error.Error())
 	}
+	defer func() {
+		if err = findResp.Close(); err != nil {
+			log.WithError(err).Warnln("Error closing name/resolve response")
+		}
+	}()
 
 	var providerPeers []*peer.AddrInfo
-	dec := json.NewDecoder(resp.Output)
+	dec := json.NewDecoder(findResp.Output)
 	for dec.More() {
 		evt := routing.QueryEvent{}
 		if err = dec.Decode(&evt); err != nil {
