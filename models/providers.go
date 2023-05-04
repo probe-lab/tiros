@@ -32,6 +32,11 @@ type Provider struct {
 	PeerID         string            `boil:"peer_id" json:"peer_id" toml:"peer_id" yaml:"peer_id"`
 	AgentVersion   null.String       `boil:"agent_version" json:"agent_version,omitempty" toml:"agent_version" yaml:"agent_version,omitempty"`
 	MultiAddresses types.StringArray `boil:"multi_addresses" json:"multi_addresses,omitempty" toml:"multi_addresses" yaml:"multi_addresses,omitempty"`
+	IsRelayed      null.Bool         `boil:"is_relayed" json:"is_relayed,omitempty" toml:"is_relayed" yaml:"is_relayed,omitempty"`
+	Country        null.String       `boil:"country" json:"country,omitempty" toml:"country" yaml:"country,omitempty"`
+	Continent      null.String       `boil:"continent" json:"continent,omitempty" toml:"continent" yaml:"continent,omitempty"`
+	Asn            null.Int          `boil:"asn" json:"asn,omitempty" toml:"asn" yaml:"asn,omitempty"`
+	DatacenterID   null.Int          `boil:"datacenter_id" json:"datacenter_id,omitempty" toml:"datacenter_id" yaml:"datacenter_id,omitempty"`
 	Error          null.String       `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
 	CreatedAt      time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
@@ -47,6 +52,11 @@ var ProviderColumns = struct {
 	PeerID         string
 	AgentVersion   string
 	MultiAddresses string
+	IsRelayed      string
+	Country        string
+	Continent      string
+	Asn            string
+	DatacenterID   string
 	Error          string
 	CreatedAt      string
 }{
@@ -57,6 +67,11 @@ var ProviderColumns = struct {
 	PeerID:         "peer_id",
 	AgentVersion:   "agent_version",
 	MultiAddresses: "multi_addresses",
+	IsRelayed:      "is_relayed",
+	Country:        "country",
+	Continent:      "continent",
+	Asn:            "asn",
+	DatacenterID:   "datacenter_id",
 	Error:          "error",
 	CreatedAt:      "created_at",
 }
@@ -69,6 +84,11 @@ var ProviderTableColumns = struct {
 	PeerID         string
 	AgentVersion   string
 	MultiAddresses string
+	IsRelayed      string
+	Country        string
+	Continent      string
+	Asn            string
+	DatacenterID   string
 	Error          string
 	CreatedAt      string
 }{
@@ -79,6 +99,11 @@ var ProviderTableColumns = struct {
 	PeerID:         "providers.peer_id",
 	AgentVersion:   "providers.agent_version",
 	MultiAddresses: "providers.multi_addresses",
+	IsRelayed:      "providers.is_relayed",
+	Country:        "providers.country",
+	Continent:      "providers.continent",
+	Asn:            "providers.asn",
+	DatacenterID:   "providers.datacenter_id",
 	Error:          "providers.error",
 	CreatedAt:      "providers.created_at",
 }
@@ -111,6 +136,68 @@ func (w whereHelpertypes_StringArray) IsNotNull() qm.QueryMod {
 	return qmhelper.WhereIsNotNull(w.field)
 }
 
+type whereHelpernull_Bool struct{ field string }
+
+func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Bool) NEQ(x null.Bool) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Bool) LT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Bool) LTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Bool) GT(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var ProviderWhere = struct {
 	ID             whereHelperint
 	RunID          whereHelperint
@@ -119,6 +206,11 @@ var ProviderWhere = struct {
 	PeerID         whereHelperstring
 	AgentVersion   whereHelpernull_String
 	MultiAddresses whereHelpertypes_StringArray
+	IsRelayed      whereHelpernull_Bool
+	Country        whereHelpernull_String
+	Continent      whereHelpernull_String
+	Asn            whereHelpernull_Int
+	DatacenterID   whereHelpernull_Int
 	Error          whereHelpernull_String
 	CreatedAt      whereHelpertime_Time
 }{
@@ -129,6 +221,11 @@ var ProviderWhere = struct {
 	PeerID:         whereHelperstring{field: "\"providers\".\"peer_id\""},
 	AgentVersion:   whereHelpernull_String{field: "\"providers\".\"agent_version\""},
 	MultiAddresses: whereHelpertypes_StringArray{field: "\"providers\".\"multi_addresses\""},
+	IsRelayed:      whereHelpernull_Bool{field: "\"providers\".\"is_relayed\""},
+	Country:        whereHelpernull_String{field: "\"providers\".\"country\""},
+	Continent:      whereHelpernull_String{field: "\"providers\".\"continent\""},
+	Asn:            whereHelpernull_Int{field: "\"providers\".\"asn\""},
+	DatacenterID:   whereHelpernull_Int{field: "\"providers\".\"datacenter_id\""},
 	Error:          whereHelpernull_String{field: "\"providers\".\"error\""},
 	CreatedAt:      whereHelpertime_Time{field: "\"providers\".\"created_at\""},
 }
@@ -161,9 +258,9 @@ func (r *providerR) GetRun() *Run {
 type providerL struct{}
 
 var (
-	providerAllColumns            = []string{"id", "run_id", "website", "path", "peer_id", "agent_version", "multi_addresses", "error", "created_at"}
+	providerAllColumns            = []string{"id", "run_id", "website", "path", "peer_id", "agent_version", "multi_addresses", "is_relayed", "country", "continent", "asn", "datacenter_id", "error", "created_at"}
 	providerColumnsWithoutDefault = []string{"run_id", "website", "path", "peer_id", "created_at"}
-	providerColumnsWithDefault    = []string{"id", "agent_version", "multi_addresses", "error"}
+	providerColumnsWithDefault    = []string{"id", "agent_version", "multi_addresses", "is_relayed", "country", "continent", "asn", "datacenter_id", "error"}
 	providerPrimaryKeyColumns     = []string{"id"}
 	providerGeneratedColumns      = []string{"id"}
 )

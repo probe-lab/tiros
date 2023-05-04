@@ -283,6 +283,32 @@ OPTIONS:
 
 ## Development
 
+To test the tool locally you need to start a database, kubo node, and headless chrome. You can do all of this by running:
+
+```shell
+docker compose up -d
+```
+
+Then you need to point `tiros` to your local deployment. I'm running it with the following environment variables:
+
+```env
+TIROS_RUN_DATABASE_HOST=localhost
+TIROS_RUN_DATABASE_NAME=tiros_test
+TIROS_RUN_DATABASE_PASSWORD=password
+TIROS_RUN_DATABASE_PORT=5432
+TIROS_RUN_DATABASE_SSL_MODE=disable
+TIROS_RUN_DATABASE_USER=tiros_test
+TIROS_RUN_KUBO_HOST=ipfs # necessary so that the chrome container can access kubo
+TIROS_RUN_REGION=local
+TIROS_RUN_SETTLE_TIMES=5,5
+TIROS_RUN_TIMES=2
+TIROS_RUN_WEBSITES=filecoin.io,protocol.ai
+TIROS_UDGER_DB_PATH=./udgerdb_v3.dat # can be left blank if you don't have the DB handy
+```
+
+
+### Migrations
+
 To create a new migration run:
 
 ```shell

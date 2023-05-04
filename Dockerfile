@@ -1,4 +1,3 @@
-# Build latency clustertest
 FROM golang:1.19 AS builder
 
 WORKDIR /build
@@ -21,4 +20,4 @@ USER tiros
 COPY --from=builder /build/tiros /usr/local/bin/tiros
 COPY --from=builder /go/bin/linux_amd64/agent /home/tiros/nodeagent
 
-CMD latency
+CMD tiros

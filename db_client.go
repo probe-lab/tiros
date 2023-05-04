@@ -157,8 +157,6 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 }
 
 func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error) {
-	log.Infoln("Saving provider for", provider.website)
-
 	maddrs := make([]string, len(provider.addrs))
 	for i, maddr := range provider.addrs {
 		maddrs[i] = maddr.String()
@@ -177,6 +175,11 @@ func (db *DBClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *pr
 		PeerID:         provider.id.String(),
 		AgentVersion:   null.NewString(provider.agent, provider.agent != ""),
 		MultiAddresses: maddrs,
+		IsRelayed:      provider.isRelayed,
+		Country:        provider.country,
+		Continent:      provider.continent,
+		Asn:            provider.asn,
+		DatacenterID:   provider.datacenterID,
 		Error:          null.NewString(errMsg, errMsg != ""),
 	}
 
@@ -241,31 +244,4 @@ func mapRating(rating *string) null.String {
 	default:
 		panic("unknown rating " + *rating)
 	}
-}
-
-type DBDummyClient struct{}
-
-var _ IDBClient = (*DBDummyClient)(nil)
-
-func (D DBDummyClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error) {
-	return nil, nil
-}
-
-func (D DBDummyClient) SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error) {
-	return &models.Provider{}, nil
-}
-
-func (D DBDummyClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error) {
-	return nil, nil
-}
-
-func (D DBDummyClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
-	return &models.Run{
-		ID:     2,
-		Region: "dummy",
-	}, nil
-}
-
-func (D DBDummyClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
-	return nil, nil
 }

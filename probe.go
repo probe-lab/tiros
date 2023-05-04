@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/proto"
-	shell "github.com/ipfs/go-ipfs-api"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/volatiletech/null/v8"
@@ -24,28 +23,6 @@ var (
 	ErrOnLoadTimeout      = errors.New("window.onload event timed out")
 	ErrNetworkIdleTimeout = errors.New("window.requestIdleCallback timed out")
 )
-
-type Tiros struct {
-	DBClient IDBClient
-	Kubo     *shell.Shell
-	DBRun    *models.Run
-}
-
-func (t *Tiros) InitRun(c *cli.Context) (*models.Run, error) {
-	version, sha, err := t.Kubo.Version()
-	if err != nil {
-		return nil, fmt.Errorf("kubo api offline: %w", err)
-	}
-
-	dbRun, err := t.DBClient.InsertRun(c, fmt.Sprintf("%s-%s", version, sha))
-	if err != nil {
-		return nil, fmt.Errorf("insert run: %w", err)
-	}
-
-	t.DBRun = dbRun
-
-	return t.DBRun, nil
-}
 
 type probeResult struct {
 	url     string
@@ -72,7 +49,7 @@ type probeResult struct {
 
 	navPerf *PerformanceNavigationEntry
 
-	err error `json:"-"`
+	err error
 }
 
 func (pr *probeResult) NullError() null.String {
@@ -82,7 +59,51 @@ func (pr *probeResult) NullError() null.String {
 	return null.NewString("", false)
 }
 
-func (t *Tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
+func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<- *probeResult) {
+	defer close(results)
+
+	for j, settle := range c.IntSlice("settle-times") {
+
+		sleepDur := time.Duration(settle) * time.Second
+
+		log.Infof("Letting Kubo settle for %s\n", sleepDur)
+		time.Sleep(sleepDur)
+
+		for i := 0; i < c.Int("times"); i++ {
+			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+				for _, website := range websites {
+					pr, err := t.probeWebsite(c, websiteURL(c, website, mType))
+					if err != nil {
+						log.WithError(err).WithField("website", website).Warnln("error probing website")
+						continue
+					}
+
+					pr.website = website
+					pr.mType = mType
+					pr.try = i + j*len(c.IntSlice("settle-times"))
+
+					log.WithFields(log.Fields{
+						"ttfb": p2f(pr.ttfb),
+						"lcp":  p2f(pr.lcp),
+						"fcp":  p2f(pr.fcp),
+						"tti":  p2f(pr.tti),
+					}).WithError(pr.err).Infoln("Probed website", website)
+
+					results <- pr
+
+					if mType == models.MeasurementTypeKUBO {
+						if err = t.KuboGC(c.Context); err != nil {
+							log.WithError(err).Warnln("error running kubo gc")
+							continue
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 	logEntry := log.WithField("url", url)
 
 	logEntry.Infoln("Probing", url)
@@ -131,7 +152,11 @@ func (t *Tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 
 		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "...")
 		err = page.Timeout(websiteRequestTimeout).Navigate(url)
-		handleTimeoutErr(err, ErrNavigateTimeout)
+		if errors.Is(err, context.DeadlineExceeded) {
+			panic(ErrNavigateTimeout)
+		} else if err != nil {
+			panic(err)
+		}
 
 		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Waiting for onload event ...")
 		// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
@@ -222,65 +247,24 @@ func (t *Tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 	return &pr, nil
 }
 
-func handleTimeoutErr(err error, deadlineErr error) {
-	if errors.Is(err, context.DeadlineExceeded) {
-		panic(deadlineErr)
-	} else if err != nil {
-		panic(err)
+func websiteURL(c *cli.Context, website string, mType string) string {
+	switch mType {
+	case models.MeasurementTypeKUBO:
+		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("kubo-host"), c.Int("kubo-gateway-port"), website)
+	case models.MeasurementTypeHTTP:
+		return fmt.Sprintf("https://%s", website)
+	default:
+		panic(fmt.Sprintf("unknown measurement type: %s", mType))
 	}
 }
 
-type Metrics struct {
-	NavigationPerformance *PerformanceNavigationEntry
-	// can grow
+func (t *tiros) KuboGC(ctx context.Context) error {
+	return t.kubo.Request("repo/gc").Exec(ctx, nil)
 }
 
-func (pr *probeResult) NullJSON() (null.JSON, error) {
-	m := Metrics{
-		NavigationPerformance: pr.navPerf,
+func p2f(ptr *float64) float64 {
+	if ptr == nil {
+		return 0
 	}
-
-	data, err := json.Marshal(m)
-	if err != nil {
-		return null.NewJSON(nil, false), err
-	}
-
-	return null.JSONFrom(data), nil
-}
-
-type PerformanceNavigationEntry struct {
-	Name                       string  `json:"name"`
-	EntryType                  string  `json:"entryType"`
-	StartTime                  float64 `json:"startTime"`
-	Duration                   float64 `json:"duration"`
-	InitiatorType              string  `json:"initiatorType"`
-	NextHopProtocol            string  `json:"nextHopProtocol"`
-	RenderBlockingStatus       string  `json:"renderBlockingStatus"`
-	WorkerStart                float64 `json:"workerStart"`
-	RedirectStart              float64 `json:"redirectStart"`
-	RedirectEnd                float64 `json:"redirectEnd"`
-	FetchStart                 float64 `json:"fetchStart"`
-	DomainLookupStart          float64 `json:"domainLookupStart"`
-	DomainLookupEnd            float64 `json:"domainLookupEnd"`
-	ConnectStart               float64 `json:"connectStart"`
-	SecureConnectionStart      float64 `json:"secureConnectionStart"`
-	ConnectEnd                 float64 `json:"connectEnd"`
-	RequestStart               float64 `json:"requestStart"`
-	ResponseStart              float64 `json:"responseStart"`
-	ResponseEnd                float64 `json:"responseEnd"`
-	TransferSize               int64   `json:"transferSize"`
-	EncodedBodySize            int64   `json:"encodedBodySize"`
-	DecodedBodySize            int64   `json:"decodedBodySize"`
-	ResponseStatus             int64   `json:"responseStatus"`
-	UnloadEventStart           float64 `json:"unloadEventStart"`
-	UnloadEventEnd             float64 `json:"unloadEventEnd"`
-	DOMInteractive             float64 `json:"domInteractive"`
-	DOMContentLoadedEventStart float64 `json:"domContentLoadedEventStart"`
-	DOMContentLoadedEventEnd   float64 `json:"domContentLoadedEventEnd"`
-	DOMComplete                float64 `json:"domComplete"`
-	LoadEventStart             float64 `json:"loadEventStart"`
-	LoadEventEnd               float64 `json:"loadEventEnd"`
-	Type                       string  `json:"type"`
-	RedirectCount              int64   `json:"redirectCount"`
-	ActivationStart            float64 `json:"activationStart"`
+	return *ptr
 }
