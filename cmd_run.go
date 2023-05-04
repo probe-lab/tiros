@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -10,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
+	"github.com/dennis-tra/nebula-crawler/pkg/maxmind"
+	"github.com/dennis-tra/nebula-crawler/pkg/udger"
 	"github.com/dennis-tra/tiros/models"
 )
 
@@ -111,8 +114,21 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_MEMORY"},
 			Value:   4096,
 		},
+		&cli.StringFlag{
+			Name:    "udger-db",
+			Usage:   "Path to the Udger DB",
+			EnvVars: []string{"TIROS_UDGER_DB_PATH"},
+		},
 	},
 	Action: RunAction,
+}
+
+type tiros struct {
+	dbClient IDBClient
+	kubo     *shell.Shell
+	dbRun    *models.Run
+	mmClient *maxmind.Client
+	uClient  *udger.Client
 }
 
 func RunAction(c *cli.Context) error {
@@ -132,10 +148,24 @@ func RunAction(c *cli.Context) error {
 	// Initialize kubo client
 	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
 
-	// configure Tiros struct
-	t := Tiros{
-		DBClient: dbClient,
-		Kubo:     kubo,
+	// Initialize maxmind client
+	mmClient, err := maxmind.NewClient()
+	if err != nil {
+		return fmt.Errorf("new maxmind client: %w", err)
+	}
+
+	// Initialize udger db client
+	uClient, err := udger.NewClient(c.String("udger-db"))
+	if err != nil {
+		return fmt.Errorf("new udger db client: %w", err)
+	}
+
+	// configure tiros struct
+	t := tiros{
+		dbClient: dbClient,
+		kubo:     kubo,
+		mmClient: mmClient,
+		uClient:  uClient,
 	}
 
 	// Create a measurement run entry in the database. This entry will
@@ -146,7 +176,7 @@ func RunAction(c *cli.Context) error {
 	// Before we're completely exiting we "seal" the run entry. Right now, this only means we're setting the
 	// finished_at timestamp.
 	defer func() {
-		if _, err = t.DBClient.SealRun(context.Background(), t.DBRun); err != nil {
+		if _, err = t.dbClient.SealRun(context.Background(), t.dbRun); err != nil {
 			log.WithError(err).Warnln("Couldn't seal run")
 		}
 	}()
@@ -175,20 +205,29 @@ func RunAction(c *cli.Context) error {
 		select {
 		case pr, more := <-probeResults:
 			if !more {
+				log.Infoln("Probing websites done!")
 				probeResults = nil
 			} else {
 				log.Infoln("Handling probe result")
-				if _, err := t.DBClient.SaveMeasurement(c, t.DBRun, pr); err != nil {
+				if _, err := t.dbClient.SaveMeasurement(c, t.dbRun, pr); err != nil {
 					return fmt.Errorf("save measurement: %w", err)
 				}
 			}
 
 		case pr, more := <-providerResults:
 			if !more {
+				log.Infoln("Searching for providers done!")
 				providerResults = nil
 			} else {
-				log.Infoln("Handling provider result")
-				_, err := t.DBClient.SaveProvider(c, t.DBRun, pr)
+				err = pr.err
+				if errors.Is(err, context.DeadlineExceeded) {
+					err = context.DeadlineExceeded
+				}
+				log.WithError(err).
+					WithField("peerID", pr.id.String()[:16]).
+					WithField("website", pr.website).
+					Infoln("Handling provider result")
+				_, err := t.dbClient.SaveProvider(c, t.dbRun, pr)
 				if err != nil {
 					return fmt.Errorf("save provider: %w", err)
 				}
@@ -203,68 +242,18 @@ func RunAction(c *cli.Context) error {
 	return nil
 }
 
-func (t *Tiros) measureWebsites(c *cli.Context, websites []string, results chan<- *probeResult) {
-	defer close(results)
-
-	for _, settle := range c.IntSlice("settle-times") {
-
-		sleepDur := time.Duration(settle) * time.Second
-
-		log.Infof("Letting Kubo settle for %s\n", sleepDur)
-		time.Sleep(sleepDur)
-
-		for i := 0; i < c.Int("times"); i++ {
-			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
-				for _, website := range websites {
-					pr, err := t.probeWebsite(c, websiteURL(c, website, mType))
-					if err != nil {
-						log.WithError(err).WithField("website", website).Warnln("error probing website")
-						continue
-					}
-
-					pr.website = website
-					pr.mType = mType
-					pr.try = i
-
-					log.WithFields(log.Fields{
-						"ttfb": p2f(pr.ttfb),
-						"lcp":  p2f(pr.lcp),
-						"fcp":  p2f(pr.fcp),
-						"tti":  p2f(pr.tti),
-					}).WithError(pr.err).Infoln("Probed website", website)
-
-					results <- pr
-
-					if mType == models.MeasurementTypeKUBO {
-						if err = t.KuboGC(c.Context); err != nil {
-							log.WithError(err).Warnln("error running kubo gc")
-							continue
-						}
-					}
-				}
-			}
-		}
+func (t *tiros) InitRun(c *cli.Context) (*models.Run, error) {
+	version, sha, err := t.kubo.Version()
+	if err != nil {
+		return nil, fmt.Errorf("kubo api offline: %w", err)
 	}
-}
 
-func websiteURL(c *cli.Context, website string, mType string) string {
-	switch mType {
-	case models.MeasurementTypeKUBO:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("kubo-host"), c.Int("kubo-gateway-port"), website)
-	case models.MeasurementTypeHTTP:
-		return fmt.Sprintf("https://%s", website)
-	default:
-		panic(fmt.Sprintf("unknown measurement type: %s", mType))
+	dbRun, err := t.dbClient.InsertRun(c, fmt.Sprintf("%s-%s", version, sha))
+	if err != nil {
+		return nil, fmt.Errorf("insert run: %w", err)
 	}
-}
 
-func p2f(ptr *float64) float64 {
-	if ptr == nil {
-		return 0
-	}
-	return *ptr
-}
+	t.dbRun = dbRun
 
-func (t *Tiros) KuboGC(ctx context.Context) error {
-	return t.Kubo.Request("repo/gc").Exec(ctx, nil)
+	return t.dbRun, nil
 }
