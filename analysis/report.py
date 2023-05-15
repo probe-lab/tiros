@@ -238,7 +238,7 @@ def plot_kubo_vs_http(df_query: pd.DataFrame) -> plt.Figure:
         if i + 1 == len(websites):
             ax.set_xlabel("Website")
 
-        ax.set_ylabel("Latency in ms")
+        ax.set_ylabel("Latency in Seconds")
         ax.set_ylim(0, np.max(values) + 0.18 * np.max(values))
 
         legend_elements = [
