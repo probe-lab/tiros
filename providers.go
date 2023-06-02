@@ -95,7 +95,11 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 	if err != nil {
 		return fmt.Errorf("routing/findprovs: %w", err)
 	} else if findResp.Error != nil {
-		return fmt.Errorf("routing/findprovs: %s", findResp.Error.Error())
+		return fmt.Errorf("routing/findprovs: %w", findResp.Error)
+	} else if findResp == nil {
+		return fmt.Errorf("routing/findprovs no error but response nil")
+	} else if findResp.Output == nil {
+		return fmt.Errorf("routing/findprovs no error but response output nil")
 	}
 	defer func() {
 		if err = findResp.Close(); err != nil {
