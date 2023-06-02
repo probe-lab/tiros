@@ -62,7 +62,14 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		Option("dht-timeout", "30s").Send(ctx)
 	if err != nil {
 		return fmt.Errorf("name/resolve: %w", err)
+	} else if nameResp.Error != nil {
+		return fmt.Errorf("name/resolve: %w", nameResp.Error)
+	} else if nameResp == nil {
+		return fmt.Errorf("name/resolve no error but response nil")
+	} else if nameResp.Output == nil {
+		return fmt.Errorf("name/resolve no error but response output nil")
 	}
+
 	defer func() {
 		if err = nameResp.Close(); err != nil {
 			log.WithError(err).Warnln("Error closing name/resolve response")
