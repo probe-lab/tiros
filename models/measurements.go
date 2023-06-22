@@ -43,6 +43,8 @@ type Measurement struct {
 	TTFBRating null.String `boil:"ttfb_rating" json:"ttfb_rating,omitempty" toml:"ttfb_rating" yaml:"ttfb_rating,omitempty"`
 	FCPRating  null.String `boil:"fcp_rating" json:"fcp_rating,omitempty" toml:"fcp_rating" yaml:"fcp_rating,omitempty"`
 	LCPRating  null.String `boil:"lcp_rating" json:"lcp_rating,omitempty" toml:"lcp_rating" yaml:"lcp_rating,omitempty"`
+	StatusCode null.Int    `boil:"status_code" json:"status_code,omitempty" toml:"status_code" yaml:"status_code,omitempty"`
+	Body       null.String `boil:"body" json:"body,omitempty" toml:"body" yaml:"body,omitempty"`
 
 	R *measurementR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L measurementL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -68,6 +70,8 @@ var MeasurementColumns = struct {
 	TTFBRating string
 	FCPRating  string
 	LCPRating  string
+	StatusCode string
+	Body       string
 }{
 	ID:         "id",
 	RunID:      "run_id",
@@ -88,6 +92,8 @@ var MeasurementColumns = struct {
 	TTFBRating: "ttfb_rating",
 	FCPRating:  "fcp_rating",
 	LCPRating:  "lcp_rating",
+	StatusCode: "status_code",
+	Body:       "body",
 }
 
 var MeasurementTableColumns = struct {
@@ -110,6 +116,8 @@ var MeasurementTableColumns = struct {
 	TTFBRating string
 	FCPRating  string
 	LCPRating  string
+	StatusCode string
+	Body       string
 }{
 	ID:         "measurements.id",
 	RunID:      "measurements.run_id",
@@ -130,6 +138,8 @@ var MeasurementTableColumns = struct {
 	TTFBRating: "measurements.ttfb_rating",
 	FCPRating:  "measurements.fcp_rating",
 	LCPRating:  "measurements.lcp_rating",
+	StatusCode: "measurements.status_code",
+	Body:       "measurements.body",
 }
 
 // Generated where
@@ -286,6 +296,44 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var MeasurementWhere = struct {
 	ID         whereHelperint
 	RunID      whereHelperint
@@ -306,6 +354,8 @@ var MeasurementWhere = struct {
 	TTFBRating whereHelpernull_String
 	FCPRating  whereHelpernull_String
 	LCPRating  whereHelpernull_String
+	StatusCode whereHelpernull_Int
+	Body       whereHelpernull_String
 }{
 	ID:         whereHelperint{field: "\"measurements\".\"id\""},
 	RunID:      whereHelperint{field: "\"measurements\".\"run_id\""},
@@ -326,6 +376,8 @@ var MeasurementWhere = struct {
 	TTFBRating: whereHelpernull_String{field: "\"measurements\".\"ttfb_rating\""},
 	FCPRating:  whereHelpernull_String{field: "\"measurements\".\"fcp_rating\""},
 	LCPRating:  whereHelpernull_String{field: "\"measurements\".\"lcp_rating\""},
+	StatusCode: whereHelpernull_Int{field: "\"measurements\".\"status_code\""},
+	Body:       whereHelpernull_String{field: "\"measurements\".\"body\""},
 }
 
 // MeasurementRels is where relationship names are stored.
@@ -356,9 +408,9 @@ func (r *measurementR) GetRun() *Run {
 type measurementL struct{}
 
 var (
-	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
+	measurementAllColumns            = []string{"id", "run_id", "website", "url", "type", "try", "ttfb", "fcp", "lcp", "metrics", "error", "created_at", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating", "status_code", "body"}
 	measurementColumnsWithoutDefault = []string{"run_id", "website", "url", "type", "try", "created_at"}
-	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating"}
+	measurementColumnsWithDefault    = []string{"id", "ttfb", "fcp", "lcp", "metrics", "error", "tti", "cls", "tti_rating", "cls_rating", "ttfb_rating", "fcp_rating", "lcp_rating", "status_code", "body"}
 	measurementPrimaryKeyColumns     = []string{"id"}
 	measurementGeneratedColumns      = []string{"id"}
 )

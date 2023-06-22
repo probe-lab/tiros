@@ -214,6 +214,8 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probe
 		CLSRating:  mapRating(pr.clsRating),
 		Metrics:    metrics,
 		Error:      pr.NullError(),
+		StatusCode: null.NewInt(pr.httpStatus, pr.httpStatus != 0),
+		Body:       null.NewString(pr.httpBody, pr.httpBody != ""),
 	}
 
 	if err := m.Insert(c.Context, db.handle, boil.Infer()); err != nil {
