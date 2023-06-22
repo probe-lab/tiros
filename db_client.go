@@ -196,6 +196,11 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probe
 		return nil, fmt.Errorf("getting metrics json")
 	}
 
+	bodyStr := ""
+	if pr.httpStatus != 0 && (pr.httpStatus < 200 || pr.httpStatus >= 300) {
+		bodyStr = pr.httpBody
+	}
+
 	m := &models.Measurement{
 		RunID:      dbRun.ID,
 		Website:    pr.website,
@@ -215,7 +220,7 @@ func (db *DBClient) SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probe
 		Metrics:    metrics,
 		Error:      pr.NullError(),
 		StatusCode: null.NewInt(pr.httpStatus, pr.httpStatus != 0),
-		Body:       null.NewString(pr.httpBody, pr.httpBody != ""),
+		Body:       null.NewString(bodyStr, bodyStr != ""),
 	}
 
 	if err := m.Insert(c.Context, db.handle, boil.Infer()); err != nil {

@@ -208,7 +208,7 @@ func RunAction(c *cli.Context) error {
 				log.Infoln("Probing websites done!")
 				probeResults = nil
 			} else {
-				log.Infoln("Handling probe result")
+				log.WithField("url", pr.url).Infoln("Handling probe result")
 				if _, err := t.dbClient.SaveMeasurement(c, t.dbRun, pr); err != nil {
 					return fmt.Errorf("save measurement: %w", err)
 				}
