@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -150,7 +151,10 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 	}()
 
 	hijackHandler := func(hijack *rod.Hijack) {
-		hijack.MustLoadResponse()
+		if err := hijack.LoadResponse(http.DefaultClient, true); err != nil {
+			logEntry.WithError(err).Warnln("Failed loading response")
+			return
+		}
 
 		// this context will be cancelled when router.Stop() is called.
 		// After that, it's safe to close hijackChan.
@@ -187,7 +191,7 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 			panic(err)
 		}
 
-		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating to", url, "...")
+		logEntry.WithField("timeout", websiteRequestTimeout).Debugln("Navigating...")
 		err = page.Timeout(websiteRequestTimeout).Navigate(url)
 		if errors.Is(err, context.DeadlineExceeded) {
 			panic(ErrNavigateTimeout)
