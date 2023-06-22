@@ -56,27 +56,9 @@ type probeResult struct {
 }
 
 func (pr *probeResult) NullError() null.String {
-	if pr.httpStatus != 0 && (pr.httpStatus < 200 || pr.httpStatus >= 300) {
-		// Loading the website yielded an HTTP error
-
-		errStr := fmt.Sprintf("http error %d", pr.httpStatus)
-
-		// If we got a 500er error code via Kubo, also attach the body as
-		// it could give us insights in what was going wrong.
-		if pr.mType == models.MeasurementTypeKUBO && (pr.httpStatus >= 500 || pr.httpStatus < 600) {
-			errStr = fmt.Sprintf("%s: %s", errStr, pr.httpBody)
-		}
-
-		// Carry all other errors as well
-		if pr.err != nil {
-			errStr = fmt.Sprintf("%s: %s", pr.err.Error(), errStr)
-		}
-
-		return null.StringFrom(errStr)
-	} else if pr.err != nil {
+	if pr.err != nil {
 		return null.StringFrom(pr.err.Error())
 	}
-
 	return null.NewString("", false)
 }
 

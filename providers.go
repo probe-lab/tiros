@@ -114,6 +114,7 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		if err = dec.Decode(&evt); err != nil {
 			return fmt.Errorf("decode routing/findprovs response: %w", err)
 		}
+
 		if evt.Type != routing.Provider {
 			continue
 		}
