@@ -11,8 +11,8 @@ services:
     ports:
       - "4001:4001/tcp"
       - "4001:4001/udp"
-      - "127.0.0.1:5001:5001"
-      - "127.0.0.1:8080:8080"
+      - "0.0.0.0:5001:5001"
+      - "0.0.0.0:8080:8080"
   chrome:
     image: browserless/chrome:latest
     ports:
@@ -20,7 +20,7 @@ services:
   db:
     image: postgres:14
     ports:
-      - "5432:5432"
+      - "0.0.0.0:5432:5432"
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: tiros_test
