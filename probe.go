@@ -49,13 +49,34 @@ type probeResult struct {
 
 	navPerf *PerformanceNavigationEntry
 
+	httpStatus int
+	httpBody   string
+
 	err error
 }
 
 func (pr *probeResult) NullError() null.String {
-	if pr.err != nil {
+	if pr.httpStatus != 0 && (pr.httpStatus < 200 || pr.httpStatus >= 300) {
+		// Loading the website yielded an HTTP error
+
+		errStr := fmt.Sprintf("http error %d", pr.httpStatus)
+
+		// If we got a 500er error code via Kubo, also attach the body as
+		// it could give us insights in what was going wrong.
+		if pr.mType == models.MeasurementTypeKUBO && (pr.httpStatus >= 500 || pr.httpStatus < 600) {
+			errStr = fmt.Sprintf("%s: %s", errStr, pr.httpBody)
+		}
+
+		// Carry all other errors as well
+		if pr.err != nil {
+			errStr = fmt.Sprintf("%s: %s", pr.err.Error(), errStr)
+		}
+
+		return null.StringFrom(errStr)
+	} else if pr.err != nil {
 		return null.StringFrom(pr.err.Error())
 	}
+
 	return null.NewString("", false)
 }
 
@@ -73,7 +94,9 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
 					pr, err := t.probeWebsite(c, websiteURL(c, website, mType))
-					if err != nil {
+					if errors.Is(c.Context.Err(), context.Canceled) {
+						return
+					} else if err != nil {
 						log.WithError(err).WithField("website", website).Warnln("error probing website")
 						continue
 					}
@@ -106,17 +129,20 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 	logEntry := log.WithField("url", url)
 
-	logEntry.Infoln("Probing", url)
-	defer logEntry.Infoln("Done probing", url)
+	logEntry.Infoln("Probing website...")
+	defer logEntry.Infoln("Done probing!")
 
+	// Initialize the probe result that we'll hand back
 	pr := probeResult{
 		url: url,
 	}
 
+	// Initialize browser reference
 	browser := rod.New().
 		Context(c.Context). // stop when outer ctx stops
 		ControlURL(fmt.Sprintf("ws://localhost:%d", c.Int("chrome-cdp-port")))
 
+	// Connecting to headless chrome
 	logEntry.Debugln("Connecting to browser...")
 	if err := browser.Connect(); err != nil {
 		return nil, fmt.Errorf("connecting to browser: %w", err)
@@ -128,9 +154,38 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 		}
 	}()
 
+	// Initialize hijack results chanel
+	hijackChan := make(chan *rod.HijackResponse)
+	defer close(hijackChan)
+
+	// Initialize request hijacking
+	router := browser.HijackRequests()
+	go router.Run()
+	defer func() {
+		if err := router.Stop(); err != nil && !errors.Is(err, context.Canceled) {
+			logEntry.WithError(err).Warnln("Failed stopping request hijack router")
+		}
+	}()
+
+	hijackHandler := func(hijack *rod.Hijack) {
+		hijack.MustLoadResponse()
+
+		// this context will be cancelled when router.Stop() is called.
+		// After that, it's safe to close hijackChan.
+		ctx := hijack.Request.Req().Context()
+		select {
+		case hijackChan <- hijack.Response:
+		case <-ctx.Done():
+		}
+	}
+
 	var metricsStr string
 	var navPerfEntryStr string
 	err := rod.Try(func() {
+		// register hijack handlers
+		router.MustAdd(url, hijackHandler)     // IPNS requests match here
+		router.MustAdd(url+"/", hijackHandler) // https requests match here
+
 		logEntry.Debugln("Initialize incognito browser")
 		browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
 
@@ -196,8 +251,21 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 
 		page.MustClose()
 	})
+
+	select {
+	case hijackResponse := <-hijackChan:
+		pr.httpStatus = hijackResponse.Payload().ResponseCode
+		pr.httpBody = hijackResponse.Body()
+	default:
+		logEntry.Warnln("No hijack entry consumed")
+	}
+
+	if err := router.Stop(); err != nil && !errors.Is(err, context.Canceled) {
+		logEntry.WithError(err).Warnln("Failed stopping request hijack router")
+	}
+
 	if errors.Is(err, ErrNavigateTimeout) {
-		logEntry.WithError(err).Warnln("Couldn't measure website performance.")
+		logEntry.WithError(ErrNavigateTimeout).Warnln("Couldn't measure website performance.")
 		pr.err = ErrNavigateTimeout
 		return &pr, nil
 	} else if errors.Is(err, context.Canceled) {
