@@ -156,13 +156,15 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 			return
 		}
 
-		// this context will be cancelled when router.Stop() is called.
-		// After that, it's safe to close hijackChan.
-		ctx := hijack.Request.Req().Context()
-		select {
-		case hijackChan <- hijack.Response:
-		case <-ctx.Done():
-		}
+		go func() {
+			// this context will be cancelled when router.Stop() is called.
+			// After that, it's safe to close hijackChan.
+			ctx := hijack.Request.Req().Context()
+			select {
+			case hijackChan <- hijack.Response:
+			case <-ctx.Done():
+			}
+		}()
 	}
 
 	var metricsStr string
