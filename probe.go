@@ -248,10 +248,6 @@ func (t *tiros) probeWebsite(c *cli.Context, url string) (*probeResult, error) {
 		logEntry.Warnln("No hijack entry consumed")
 	}
 
-	if err := router.Stop(); err != nil && !errors.Is(err, context.Canceled) {
-		logEntry.WithError(err).Warnln("Failed stopping request hijack router")
-	}
-
 	if errors.Is(err, ErrNavigateTimeout) {
 		logEntry.WithError(ErrNavigateTimeout).Warnln("Couldn't measure website performance.")
 		pr.err = ErrNavigateTimeout
