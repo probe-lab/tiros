@@ -56,7 +56,7 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 	logEntry := log.WithField("website", website)
 	logEntry.Infoln("Finding providers for", website)
 
-	nameResp, err := t.kubo.Request("name/resolve").
+	nameResp, err := t.ipfs.Request("name/resolve").
 		Option("arg", website).
 		Option("nocache", "true").
 		Option("dht-timeout", "30s").Send(ctx)
@@ -87,7 +87,7 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		return fmt.Errorf("unmarshal name/resolve response: %w", err)
 	}
 
-	findResp, err := t.kubo.
+	findResp, err := t.ipfs.
 		Request("routing/findprovs").
 		Option("arg", nrr.Path).
 		Option("num-providers", "1000").
@@ -183,7 +183,7 @@ func (t *tiros) idWorker(ctx context.Context, jobs <-chan *peer.AddrInfo, idResu
 		var out shell.IdOutput
 
 		tCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-		err := t.kubo.Request("id", j.ID.String()).Exec(tCtx, &out)
+		err := t.ipfs.Request("id", j.ID.String()).Exec(tCtx, &out)
 		cancel()
 
 		idResults <- idResult{

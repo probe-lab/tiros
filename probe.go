@@ -38,11 +38,11 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 
 		sleepDur := time.Duration(settle) * time.Second
 
-		log.Infof("Letting Kubo settle for %s\n", sleepDur)
+		log.Infof("Letting the IPFS implementation settle for %s\n", sleepDur)
 		time.Sleep(sleepDur)
 
 		for i := 0; i < c.Int("times"); i++ {
-			for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+			for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
 
 					pr, err := newProbe(c, website, mType).run()
@@ -67,9 +67,9 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 
 					results <- pr
 
-					if mType == models.MeasurementTypeKUBO {
-						if err = t.KuboGC(c.Context); err != nil {
-							log.WithError(err).Warnln("error running kubo gc")
+					if mType == models.MeasurementTypeIPFS {
+						if err = t.GarbageCollect(c.Context); err != nil {
+							log.WithError(err).Warnln("error running ipfs gc")
 							continue
 						}
 					}
@@ -98,7 +98,7 @@ type probeResult struct {
 	url     string
 	website string
 
-	// measurement type (KUBO or HTTP)
+	// measurement type (IPFS or HTTP)
 	mType string
 	try   int
 
@@ -329,8 +329,8 @@ func (p *probe) close() {
 
 func websiteURL(c *cli.Context, website string, mType string) string {
 	switch mType {
-	case models.MeasurementTypeKUBO:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("kubo-host"), c.Int("kubo-gateway-port"), website)
+	case models.MeasurementTypeIPFS:
+		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host"), c.Int("ipfs-gateway-port"), website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:
@@ -338,8 +338,8 @@ func websiteURL(c *cli.Context, website string, mType string) string {
 	}
 }
 
-func (t *tiros) KuboGC(ctx context.Context) error {
-	return t.kubo.Request("repo/gc").Exec(ctx, nil)
+func (t *tiros) GarbageCollect(ctx context.Context) error {
+	return t.ipfs.Request("repo/gc").Exec(ctx, nil)
 }
 
 func p2f(ptr *float64) float64 {

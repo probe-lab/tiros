@@ -24,10 +24,11 @@ func (D DBDummyClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.
 	return nil, nil
 }
 
-func (D DBDummyClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
+func (D DBDummyClient) InsertRun(c *cli.Context, ipfsImpl string, version string) (*models.Run, error) {
 	return &models.Run{
-		ID:     2,
-		Region: "dummy",
+		ID:       2,
+		Region:   "dummy",
+		IpfsImpl: ipfsImpl,
 	}, nil
 }
 
