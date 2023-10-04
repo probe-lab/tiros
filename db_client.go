@@ -28,7 +28,7 @@ import (
 var migrations embed.FS
 
 type IDBClient interface {
-	InsertRun(c *cli.Context, version string) (*models.Run, error)
+	InsertRun(c *cli.Context, ipfsImpl string, version string) (*models.Run, error)
 	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error)
 	SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error)
 	SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error)
@@ -135,7 +135,7 @@ func (db *DBClient) SealRun(ctx context.Context, dbRun *models.Run) (*models.Run
 	return dbRun, err
 }
 
-func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, error) {
+func (db *DBClient) InsertRun(c *cli.Context, ipfsImpl string, version string) (*models.Run, error) {
 	log.Infoln("Inserting Run...")
 
 	websites := make([]string, len(c.StringSlice("websites")))
@@ -148,6 +148,7 @@ func (db *DBClient) InsertRun(c *cli.Context, version string) (*models.Run, erro
 		Region:   c.String("region"),
 		Websites: websites,
 		Version:  version,
+		IpfsImpl: ipfsImpl,
 		Times:    int16(c.Int("times")),
 		CPU:      c.Int("cpu"),
 		Memory:   c.Int("memory"),

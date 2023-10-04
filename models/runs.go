@@ -35,6 +35,7 @@ type Run struct {
 	UpdatedAt  time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt  time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	FinishedAt null.Time         `boil:"finished_at" json:"finished_at,omitempty" toml:"finished_at" yaml:"finished_at,omitempty"`
+	IpfsImpl   string            `boil:"ipfs_impl" json:"ipfs_impl" toml:"ipfs_impl" yaml:"ipfs_impl"`
 
 	R *runR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L runL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -51,6 +52,7 @@ var RunColumns = struct {
 	UpdatedAt  string
 	CreatedAt  string
 	FinishedAt string
+	IpfsImpl   string
 }{
 	ID:         "id",
 	Region:     "region",
@@ -62,6 +64,7 @@ var RunColumns = struct {
 	UpdatedAt:  "updated_at",
 	CreatedAt:  "created_at",
 	FinishedAt: "finished_at",
+	IpfsImpl:   "ipfs_impl",
 }
 
 var RunTableColumns = struct {
@@ -75,6 +78,7 @@ var RunTableColumns = struct {
 	UpdatedAt  string
 	CreatedAt  string
 	FinishedAt string
+	IpfsImpl   string
 }{
 	ID:         "runs.id",
 	Region:     "runs.region",
@@ -86,6 +90,7 @@ var RunTableColumns = struct {
 	UpdatedAt:  "runs.updated_at",
 	CreatedAt:  "runs.created_at",
 	FinishedAt: "runs.finished_at",
+	IpfsImpl:   "runs.ipfs_impl",
 }
 
 // Generated where
@@ -125,6 +130,7 @@ var RunWhere = struct {
 	UpdatedAt  whereHelpertime_Time
 	CreatedAt  whereHelpertime_Time
 	FinishedAt whereHelpernull_Time
+	IpfsImpl   whereHelperstring
 }{
 	ID:         whereHelperint{field: "\"runs\".\"id\""},
 	Region:     whereHelperstring{field: "\"runs\".\"region\""},
@@ -136,6 +142,7 @@ var RunWhere = struct {
 	UpdatedAt:  whereHelpertime_Time{field: "\"runs\".\"updated_at\""},
 	CreatedAt:  whereHelpertime_Time{field: "\"runs\".\"created_at\""},
 	FinishedAt: whereHelpernull_Time{field: "\"runs\".\"finished_at\""},
+	IpfsImpl:   whereHelperstring{field: "\"runs\".\"ipfs_impl\""},
 }
 
 // RunRels is where relationship names are stored.
@@ -176,8 +183,8 @@ func (r *runR) GetProviders() ProviderSlice {
 type runL struct{}
 
 var (
-	runAllColumns            = []string{"id", "region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at", "finished_at"}
-	runColumnsWithoutDefault = []string{"region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at"}
+	runAllColumns            = []string{"id", "region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at", "finished_at", "ipfs_impl"}
+	runColumnsWithoutDefault = []string{"region", "websites", "version", "times", "cpu", "memory", "updated_at", "created_at", "ipfs_impl"}
 	runColumnsWithDefault    = []string{"id", "finished_at"}
 	runPrimaryKeyColumns     = []string{"id"}
 	runGeneratedColumns      = []string{"id"}

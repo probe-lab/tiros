@@ -54,13 +54,13 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 // Enum values for MeasurementType
 const (
 	MeasurementTypeHTTP string = "HTTP"
-	MeasurementTypeKUBO string = "KUBO"
+	MeasurementTypeIPFS string = "IPFS"
 )
 
 func AllMeasurementType() []string {
 	return []string{
 		MeasurementTypeHTTP,
-		MeasurementTypeKUBO,
+		MeasurementTypeIPFS,
 	}
 }
 

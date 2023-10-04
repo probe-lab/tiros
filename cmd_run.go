@@ -44,6 +44,12 @@ var RunCommand = &cli.Command{
 			Value:   3,
 		},
 		&cli.BoolFlag{
+			Name:    "lookup-providers",
+			Usage:   "Whether to lookup website providers",
+			EnvVars: []string{"TIROS_RUN_LOOKUP_PROVIDERS"},
+			Value:   true,
+		},
+		&cli.BoolFlag{
 			Name:    "dry-run",
 			Usage:   "Whether to skip DB interactions",
 			EnvVars: []string{"TIROS_RUN_DRY_RUN"},
@@ -79,21 +85,21 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_DATABASE_SSL_MODE"},
 		},
 		&cli.StringFlag{
-			Name:    "kubo-host",
-			Usage:   "port to reach the Kubo Gateway",
-			EnvVars: []string{"TIROS_RUN_KUBO_HOST"},
+			Name:    "ipfs-host",
+			Usage:   "host at which to reach the IPFS Gateway",
+			EnvVars: []string{"TIROS_RUN_IPFS_HOST", "TIROS_RUN_KUBO_HOST" /* <- legacy */},
 			Value:   "localhost",
 		},
 		&cli.IntFlag{
-			Name:    "kubo-api-port",
-			Usage:   "port to reach the Kubo API",
-			EnvVars: []string{"TIROS_RUN_KUBO_API_PORT"},
+			Name:    "ipfs-api-port",
+			Usage:   "port to reach a Kubo-compatible RPC API",
+			EnvVars: []string{"TIROS_RUN_IPFS_API_PORT", "TIROS_RUN_KUBO_API_PORT" /* <- legacy */},
 			Value:   5001,
 		},
 		&cli.IntFlag{
-			Name:    "kubo-gateway-port",
-			Usage:   "port to reach the Kubo Gateway",
-			EnvVars: []string{"TIROS_RUN_KUBO_GATEWAY_PORT"},
+			Name:    "ipfs-gateway-port",
+			Usage:   "port to reach the IPFS Gateway",
+			EnvVars: []string{"TIROS_RUN_IPFS_GATEWAY_PORT", "TIROS_RUN_KUBO_GATEWAY_PORT" /* <- legacy */},
 			Value:   8080,
 		},
 		&cli.IntFlag{
@@ -119,13 +125,19 @@ var RunCommand = &cli.Command{
 			Usage:   "Path to the Udger DB",
 			EnvVars: []string{"TIROS_UDGER_DB_PATH"},
 		},
+		&cli.StringFlag{
+			Name:    "ipfs-implementation",
+			Usage:   "Which implementation are we testing (KUBO, HELIA)",
+			EnvVars: []string{"TIROS_IPFS_IMPLEMENTATION"},
+			Value:   "KUBO",
+		},
 	},
 	Action: RunAction,
 }
 
 type tiros struct {
 	dbClient IDBClient
-	kubo     *shell.Shell
+	ipfs     *shell.Shell
 	dbRun    *models.Run
 	mmClient *maxmind.Client
 	uClient  *udger.Client
@@ -145,8 +157,11 @@ func RunAction(c *cli.Context) error {
 		}
 	}
 
-	// Initialize kubo client
-	kubo := shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("kubo-api-port")))
+	// Initialize ipfs client
+	var ipfsClient *shell.Shell
+	if c.Int("ipfs-api-port") != 0 {
+		ipfsClient = shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("ipfs-api-port")))
+	}
 
 	// Initialize maxmind client
 	mmClient, err := maxmind.NewClient()
@@ -163,7 +178,7 @@ func RunAction(c *cli.Context) error {
 	// configure tiros struct
 	t := tiros{
 		dbClient: dbClient,
-		kubo:     kubo,
+		ipfs:     ipfsClient,
 		mmClient: mmClient,
 		uClient:  uClient,
 	}
@@ -182,7 +197,7 @@ func RunAction(c *cli.Context) error {
 	}()
 
 	// shuffle websites, so that we have a different order in which we request the websites.
-	// If we didn't do this a single website would always be requested with a comparatively "cold" kubo node.
+	// If we didn't do this a single website would always be requested with a comparatively "cold" ipfs node.
 	websites := c.StringSlice("websites")
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(websites), func(i, j int) {
@@ -199,7 +214,12 @@ func RunAction(c *cli.Context) error {
 	probeResults := make(chan *probeResult)
 
 	go t.measureWebsites(c, websites, probeResults)
-	go t.findAllProviders(c, websites, providerResults)
+
+	if c.Bool("lookup-providers") {
+		go t.findAllProviders(c, websites, providerResults)
+	} else {
+		close(providerResults)
+	}
 
 	for {
 		select {
@@ -242,12 +262,13 @@ func RunAction(c *cli.Context) error {
 }
 
 func (t *tiros) InitRun(c *cli.Context) (*models.Run, error) {
-	version, sha, err := t.kubo.Version()
+	version, sha, err := t.ipfs.Version()
 	if err != nil {
-		return nil, fmt.Errorf("kubo api offline: %w", err)
+		return nil, fmt.Errorf("ipfs api offline: %w", err)
 	}
 
-	dbRun, err := t.dbClient.InsertRun(c, fmt.Sprintf("%s-%s", version, sha))
+	ipfsImpl := c.String("ipfs-implementation")
+	dbRun, err := t.dbClient.InsertRun(c, ipfsImpl, fmt.Sprintf("%s-%s", version, sha))
 	if err != nil {
 		return nil, fmt.Errorf("insert run: %w", err)
 	}
