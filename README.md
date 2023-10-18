@@ -18,28 +18,21 @@ Tiros is an IPFS website measurement tool. It is intended to run on AWS ECS in m
 We are running Tiros as a scheduled AWS ECS task in six different AWS regions. These regions are:
 
 - `eu-central-1`
-
 - `ap-south-1`
-
 - `af-southeast-2`
-
 - `sa-east-1`
-
 - `us-west-1`
-
 - `af-south-1`
 
 Each ECS task consists of three containers:
 
 1. `scheduler` (this repository)
-
 2. `chrome` - via [`browserless/chrome`](https://github.com/browserless/chrome)
+3. `ipfs` - an IPFS implementation like [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/) or [ipfs/helia-docker](https://github.com/ipfs/helia-docker)
 
-3. `kubo` - via [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/)
+If run with `kubo` we'll run it with `LIBP2P_RCMGR=0` which disables the [libp2p Network Resource Manager](https://github.com/libp2p/go-libp2p-resource-manager#readme).
 
-`kubo` is running with `LIBP2P_RCMGR=0` which disables the [libp2p Network Resource Manager](https://github.com/libp2p/go-libp2p-resource-manager#readme).
-
-The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`. The scheduler probes each website via `kubo` by requesting `http://localhost:8080/ipns/<website>` and via HTTP  by requesting`https://<website>`. Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance. The following excerpt is a gist of what's happening when requesting a website:
+The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`. The scheduler probes each website via the IPFS implementation by requesting `http://localhost:8080/ipns/<website>` and via HTTP by requesting`https://<website>`. Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance. The following excerpt is a gist of what's happening when requesting a website:
 
 ```go
 browser := rod.New().Context(ctx).ControlURL("ws://localhost:3000")) // default CDP chrome port
@@ -180,7 +173,7 @@ This function will return a JSON array of the following format:
 ]
 ```
 
-If the website request went through the `kubo` gateway we're running one round of garbage collection by calling the `/api/v0/repo/gc` endpoint. With this we make sure that the next request to that website won't come from the local kubo node cache.
+If the website request went through the IPFS gateway we're running one round of garbage collection by calling the [`/api/v0/repo/gc` endpoint](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-repo-gc). With this, we make sure that the next request to that website won't come from the local kubo node cache.
 
 To also measure a "warmed up" kubo node, we also configured a "settle time". This is just the time to wait before the first website requests are made. After the scheduler has looped through all websites we configured another settle time of 10min before all websites are requested again. Each run in between settles also has a "times" counter which is set to `5` right now in our deployment. This means that we request a single website 5 times in between each settle times. The loop looks like this:
 
@@ -188,15 +181,15 @@ To also measure a "warmed up" kubo node, we also configured a "settle time". Thi
 for _, settle := range c.IntSlice("settle-times") {
     time.Sleep(time.Duration(settle) * time.Second)
     for i := 0; i < c.Int("times"); i++ {
-        for _, mType := range []string{models.MeasurementTypeKUBO, models.MeasurementTypeHTTP} {
+        for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP} {
             for _, website := range websites {
 
                 pr, _ := t.Probe(c, websiteURL(c, website, mType))
                 
                 t.Save(c, pr, website, mType, i)
 
-                if mType == models.MeasurementTypeKUBO {
-                    t.KuboGC(c.Context)
+                if mType == models.MeasurementTypeIPFS {
+                    t.GarbageCollect(c.Context)
                 }
             }
         }
@@ -204,7 +197,7 @@ for _, settle := range c.IntSlice("settle-times") {
 }
 ```
 
-So in total, each run measures `settle-times * times * len([http, kubo]) * len(websites)` website requests. In our case it's `2 * 5 * 2 * 14 = 280` requests. This takes around `1h` because some websites time out and the second settle time is configured to be `10m`
+So in total, each run measures `settle-times * times * len([http, ipfs]) * len(websites)` website requests. In our case it's `2 * 5 * 2 * 14 = 280` requests. This takes around `1h` because some websites time out and the second settle time is configured to be `10m`
 
 ## Measurement Metrics
 
@@ -306,7 +299,6 @@ TIROS_RUN_WEBSITES=filecoin.io,protocol.ai
 TIROS_UDGER_DB_PATH=./udgerdb_v3.dat # can be left blank if you don't have the DB handy
 ```
 
-
 ### Migrations
 
 To create a new migration run:
@@ -320,6 +312,14 @@ To create the database models
 ```shell
 make models
 ```
+
+## Alternative IPFS Implementation
+
+An alternative IPFS implementation needs to support a couple of things:
+
+1. The [`/api/v0/repo/gc`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-repo-gc) endpoint
+2. The [`/api/v0/version`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-version) endpoint
+3. Expose a [rudimentary IPFS Gateway](https://docs.ipfs.tech/reference/http/gateway/) that at least supports resolving IPNS links
 
 ## Maintainers
 
