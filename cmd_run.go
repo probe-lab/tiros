@@ -222,6 +222,7 @@ func RunAction(c *cli.Context) error {
 	}
 
 	for {
+		log.Infoln("Awaiting Provider or Probe result...")
 		select {
 		case pr, more := <-probeResults:
 			if !more {

@@ -45,6 +45,7 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 			for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP} {
 				for _, website := range websites {
 
+					log.Infoln("Start probing", website, mType)
 					pr, err := newProbe(c, website, mType).run()
 					if errors.Is(c.Context.Err(), context.Canceled) {
 						return
