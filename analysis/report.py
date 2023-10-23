@@ -53,6 +53,7 @@ def get_measurements(conn: sa.engine.Engine, start_date: str, end_date: str) -> 
         INNER JOIN runs r on m.run_id = r.id
     WHERE m.created_at >= '{start_date}'
       AND m.created_at < '{end_date}'
+      AND r.ipfs_impl = 'KUBO'
     ORDER BY m.created_at
     """
     return pd.read_sql_query(query, con=conn)
@@ -163,7 +164,7 @@ def plot_errors(df: pd.DataFrame) -> plt.Figure:
 
         ax.plot(dat["date"], dat["%"], ls=ls, label=website)
 
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncols=5)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncols=6)
     ax.set_xlabel("Date")
     ax.set_ylabel("Daily Error Rate in % of All Website Requests / day")
 
@@ -203,7 +204,7 @@ def plot_kubo_vs_http(df_query: pd.DataFrame) -> plt.Figure:
             dat = dat[dat["website"] == website]
             dat = dat[dat["region"] == region]
             dat_http = dat[dat["type"] == "HTTP"]
-            dat_kubo = dat[dat["type"] == "KUBO"]
+            dat_kubo = dat[dat["type"] == "IPFS"]
 
             samples_kubo = df_query[
                 (df_query["website"] == website) & (df_query["type"] == "KUBO") & (
@@ -303,7 +304,7 @@ def main():
 
     df = get_measurements(conn, date_min, date_max)
 
-    kubo_requests = df[(df["type"] == "KUBO") & (df["has_error"] == False)]
+    kubo_requests = df[(df["type"] == "IPFS") & (df["has_error"] == False)]
 
     fig = plot_metric(kubo_requests, "First Contentful Paint", "fcp")
     fig.savefig(f"{plots_dir}/tiros-fcp.png", dpi=DPI)
