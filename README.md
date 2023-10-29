@@ -327,7 +327,7 @@ An alternative IPFS implementation needs to support a couple of things:
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/RichardLitt/standard-readme/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/plprobelab/tiros/issues/new) or submit PRs.
 
 ## License
 
