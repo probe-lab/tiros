@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"math/rand"
+	"net/http"
 	"time"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -262,8 +265,44 @@ func RunAction(c *cli.Context) error {
 	return nil
 }
 
+type versionResponse struct {
+	Version string
+	Commit  string
+}
+
+func (t *tiros) GetHeliaVersion(c *cli.Context) (string, string, error) {
+	// TODO: use env vars for host location and port
+	// make http request to http://localhost:${PORT}/api/v0/version
+	// and return the version and commit
+	requestURL := fmt.Sprintf("http://localhost:%d/api/v0/version", 8888)
+	res, err := http.Get(requestURL)
+	if err != nil {
+		return "", "", fmt.Errorf("Failed to make http request to get version: %w", err)
+	}
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", "", fmt.Errorf("Failed to read version response body: %w", err)
+	}
+	log.Infoln("Response body:", string(resBody))
+
+	vObj := versionResponse{}
+	err = json.Unmarshal(resBody, &vObj)
+	if err != nil {
+		return "", "", fmt.Errorf("Failed to parse JSON response: %w", err)
+	}
+
+	return vObj.Version, vObj.Commit, nil
+}
+func (t *tiros) GetImplementationVersion(c *cli.Context) (string, string, error) {
+	if c.String("ipfs-implementation") == "HELIA" {
+		return t.GetHeliaVersion(c)
+	}
+	return t.ipfs.Version()
+}
+
 func (t *tiros) InitRun(c *cli.Context) (*models.Run, error) {
-	version, sha, err := t.ipfs.Version()
+	log.Infoln("Initializing run with implementation", c.String("ipfs-implementation"))
+	version, sha, err := t.GetImplementationVersion(c)
 	if err != nil {
 		return nil, fmt.Errorf("ipfs api offline: %w", err)
 	}

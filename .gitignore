@@ -465,3 +465,4 @@ analysis/plots/*.png
 
 db.toml
 /udgerdb_v3.dat
+.envrc

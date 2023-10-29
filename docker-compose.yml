@@ -2,7 +2,7 @@ version: "3.9"
 name: tiros
 services:
   ipfs:
-    image: helia:latest
+    image: helia-http-gateway:latest
     restart: unless-stopped
     volumes:
       - ipfs_path:/data/ipfs
@@ -11,7 +11,7 @@ services:
     environment:
       DEBUG: helia-server
     ports:
-      - "0.0.0.0:8080:8080"
+      - "0.0.0.0:${HELIA_PORT:-8080}:8080"
   chrome:
     image: browserless/chrome:latest
     ports:
@@ -19,7 +19,7 @@ services:
   db:
     image: postgres:14
     ports:
-      - "0.0.0.0:5432:5432"
+      - "0.0.0.0:${TIROS_RUN_DATABASE_PORT:-5432}:5432"
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: tiros_test
