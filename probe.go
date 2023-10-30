@@ -333,7 +333,7 @@ func (p *probe) close() {
 func websiteURL(c *cli.Context, website string, mType string) string {
 	switch mType {
 	case models.MeasurementTypeIPFS:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host"), c.Int("ipfs-gateway-port"), website)
+		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host-name"), c.Int("ipfs-gateway-port"), website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:

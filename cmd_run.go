@@ -85,9 +85,15 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_DATABASE_SSL_MODE"},
 		},
 		&cli.StringFlag{
-			Name:    "ipfs-host",
+			Name:    "ipfs-host-ip",
 			Usage:   "host at which to reach the IPFS Gateway",
-			EnvVars: []string{"TIROS_RUN_IPFS_HOST", "TIROS_RUN_KUBO_HOST" /* <- legacy */},
+			EnvVars: []string{"TIROS_RUN_IPFS_HOST_IP", "TIROS_RUN_KUBO_HOST_IP"},
+			Value:   "127.0.0.1",
+		},
+		&cli.StringFlag{
+			Name:    "ipfs-host-name",
+			Usage:   "hostname at which to reach the IPFS Gateway",
+			EnvVars: []string{"TIROS_RUN_IPFS_HOST_NAME", "TIROS_RUN_KUBO_HOST_NAME"},
 			Value:   "localhost",
 		},
 		&cli.IntFlag{
@@ -166,7 +172,7 @@ func RunAction(c *cli.Context) error {
 	// Initialize ipfs client
 	var ipfsClient *shell.Shell
 	if c.Int("ipfs-api-port") != 0 {
-		ipfsClient = shell.NewShell(fmt.Sprintf("/ip4/%s/tcp/%d", c.String("ipfs-host"), c.Int("ipfs-api-port")))
+		ipfsClient = shell.NewShell(fmt.Sprintf("/ip4/%s/tcp/%d", c.String("ipfs-host-ip"), c.Int("ipfs-api-port")))
 	}
 
 	// Initialize maxmind client
