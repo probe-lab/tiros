@@ -48,18 +48,19 @@ services:
       - chrome
     environment:
       - TIROS_DEBUG=true
-      - TIROS_RUN_DATABASE_HOST=172.20.0.4
+      - TIROS_IPFS_IMPLEMENTATION=KUBO
+      - TIROS_RUN_CHROME_HOST=chrome
+      - TIROS_RUN_DATABASE_HOST=db
       - TIROS_RUN_DATABASE_NAME=tiros_test
       - TIROS_RUN_DATABASE_PASSWORD=password
       - TIROS_RUN_DATABASE_PORT=5432
       - TIROS_RUN_DATABASE_SSL_MODE=disable
       - TIROS_RUN_DATABASE_USER=tiros_test
       - TIROS_RUN_KUBO_API_PORT=8080
-      - TIROS_RUN_KUBO_HOST=172.20.0.2
+      - TIROS_RUN_KUBO_HOST_IP=172.20.0.2
+      - TIROS_RUN_KUBO_HOST_NAME=helia
       - TIROS_RUN_LOOKUP_PROVIDERS=false
       - TIROS_RUN_REGION=local
-      - TIROS_IPFS_IMPLEMENTATION=KUBO
-      - TIROS_RUN_CHROME_HOST=172.20.0.3
       - TIROS_RUN_SETTLE_TIMES=1 # <- set the first 1 to something larger to wait x number of seconds before the first request is made
       - TIROS_RUN_TIMES=1
-      - TIROS_RUN_WEBSITES=filecoin.io # <- you can add comma separated values here
+      - TIROS_RUN_WEBSITES=probelab.io # <- you can add comma separated values here
