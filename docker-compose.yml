@@ -2,15 +2,16 @@ version: "3.9"
 name: tiros
 services:
   ipfs:
-    image: helia:latest
+    image: ipfs/kubo:v0.19.0
     restart: unless-stopped
     volumes:
       - ipfs_path:/data/ipfs
       - ipfs_fuse:/ipfs
       - ipns_fuse:/ipns
-    environment:
-      DEBUG: helia-server
     ports:
+      - "4001:4001/tcp"
+      - "4001:4001/udp"
+      - "0.0.0.0:5001:5001"
       - "0.0.0.0:8080:8080"
   chrome:
     image: browserless/chrome:latest
