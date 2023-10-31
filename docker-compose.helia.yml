@@ -5,20 +5,36 @@ networks:
     ipam:
       config:
         - subnet: 172.20.0.0/24
+
 services:
+  # Inspired by: https://gist.github.com/NAR8789/92da076d0c35b434107fb4f4f198fd12
+  # https://hub.docker.com/r/4km3/dnsmasq
+  dnsmasq:
+    image: 4km3/dnsmasq:2.85-r2
+    command: -A /.helia/172.20.0.2
+    ports:
+      - 53:53/udp
+    cap_add:
+      - NET_ADMIN
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.10 # Static IP here makes it possible to point other containers' dns here.
+
   helia:
     image: ghcr.io/ipfs/helia-http-gateway:main
     restart: unless-stopped
-    platform: linux/amd64
     ports:
       - "8080:8080"
     networks:
       tiros_net:
         ipv4_address: 172.20.0.2
+
   chrome:
     image: browserless/chrome:latest
     ports:
       - "3000:3000"
+    dns:
+      - 172.20.0.10
     networks:
       tiros_net:
         ipv4_address: 172.20.0.3
@@ -40,6 +56,8 @@ services:
     networks:
       tiros_net:
         ipv4_address: 172.20.0.5
+    dns:
+      - 172.20.0.10 # <- this is the dnsmasq container
     volumes:
       - .:/tiros
     depends_on:
