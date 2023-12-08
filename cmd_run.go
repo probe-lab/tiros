@@ -131,6 +131,12 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_IPFS_IMPLEMENTATION"},
 			Value:   "KUBO",
 		},
+		&cli.DurationFlag{
+			Name:    "timeout",
+			Usage:   "The maximum allowed time for this experiment to run (0 no timeout)",
+			EnvVars: []string{"TIROS_RUN_TIMEOUT"},
+			Value:   time.Duration(0),
+		},
 	},
 	Action: RunAction,
 }
@@ -146,6 +152,14 @@ type tiros struct {
 func RunAction(c *cli.Context) error {
 	log.Infoln("Starting Tiros run...")
 	defer log.Infoln("Stopped Tiros run.")
+
+	// create global timeout context
+	timeout := c.Duration("timeout")
+	if timeout > 0 {
+		ctx, cancel := context.WithTimeout(c.Context, timeout)
+		defer cancel()
+		c.Context = ctx
+	}
 
 	// Initialize database client
 	var err error
