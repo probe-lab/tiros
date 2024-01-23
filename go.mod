@@ -1,4 +1,4 @@
-module github.com/dennis-tra/tiros
+module github.com/probe-lab/tiros
 
 go 1.19
 

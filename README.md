@@ -69,7 +69,7 @@ rod.Try(func() {
 // parse metricsStr
 ```
 
-`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're subscribing to performance events which is necessary for TTI polyfill and we're clearing the local storage. This is the code ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/onNewDocument.js)):
+`jsOnNewDocument` contains javascript that gets executed on a new page before anything happens. We're subscribing to performance events which is necessary for TTI polyfill and we're clearing the local storage. This is the code ([link to source](https://github.com/probe-lab/tiros/blob/main/js/onNewDocument.js)):
 
 ```javascript
 // From https://github.com/GoogleChromeLabs/tti-polyfill#usage
@@ -80,12 +80,12 @@ rod.Try(func() {
 localStorage.clear();
 ```
 
-Then, after the website has loaded we are adding a [TTI polyfill](https://github.com/dennis-tra/tiros/blob/main/js/tti-polyfill.js) and [web-vitals](https://github.com/dennis-tra/tiros/blob/main/js/web-vitals.iife.js) to the page.
+Then, after the website has loaded we are adding a [TTI polyfill](https://github.com/probe-lab/tiros/blob/main/js/tti-polyfill.js) and [web-vitals](https://github.com/probe-lab/tiros/blob/main/js/web-vitals.iife.js) to the page.
 
 We got the tti-polyfill from [GoogleChromeLabs/tti-polyfill](https://github.com/GoogleChromeLabs/tti-polyfill/blob/master/tti-polyfill.js) (archived in favor of the [First Input Delay](https://web.dev/fid/) metric).
 We got the web-vitals javascript from [GoogleChrome/web-vitals](https://github.com/GoogleChrome/web-vitals) by building it ourselves with `npm run build` and then copying the `web-vitals.iife.js` (`iife` = immediately invoked function execution)
 
-Then we execute the following javascript on that page ([link to source](https://github.com/dennis-tra/tiros/blob/main/js/measurement.js)):
+Then we execute the following javascript on that page ([link to source](https://github.com/probe-lab/tiros/blob/main/js/measurement.js)):
 
 ```javascript
 async () => {

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/dennis-tra/tiros/models"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/probe-lab/tiros/models"
 	"github.com/urfave/cli/v2"
 )
 
