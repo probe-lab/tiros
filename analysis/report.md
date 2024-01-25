@@ -1,6 +1,6 @@
 ## Website Monitoring
 
-For a description of our measurement methodology check out [this repository](https://github.com/dennis-tra/tiros).
+For a description of our measurement methodology check out [this repository](https://github.com/probe-lab/tiros).
 
 ### Time To First Byte
 

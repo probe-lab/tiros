@@ -13,7 +13,7 @@ import (
 
 	"github.com/dennis-tra/nebula-crawler/pkg/maxmind"
 	"github.com/dennis-tra/nebula-crawler/pkg/udger"
-	"github.com/dennis-tra/tiros/models"
+	"github.com/probe-lab/tiros/models"
 )
 
 var RunCommand = &cli.Command{

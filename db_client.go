@@ -21,7 +21,7 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
-	"github.com/dennis-tra/tiros/models"
+	"github.com/probe-lab/tiros/models"
 )
 
 //go:embed migrations

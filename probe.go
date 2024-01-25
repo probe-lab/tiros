@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"github.com/volatiletech/null/v8"
 
-	"github.com/dennis-tra/tiros/models"
+	"github.com/probe-lab/tiros/models"
 )
 
 const websiteRequestTimeout = 15 * time.Second
