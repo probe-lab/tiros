@@ -6,12 +6,17 @@ Tiros is an IPFS website measurement tool. It is intended to run on AWS ECS in m
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Run](#run)
-- [Development](#development)
-- [Maintainers](#maintainers)
-- [Contributing](#contributing)
-- [License](#license)
+- [Tiros](#tiros)
+  - [Table of Contents](#table-of-contents)
+  - [Measurement Methodology](#measurement-methodology)
+  - [Measurement Metrics](#measurement-metrics)
+  - [Run](#run)
+  - [Development](#development)
+    - [Migrations](#migrations)
+  - [Alternative IPFS Implementation](#alternative-ipfs-implementation)
+  - [Maintainers](#maintainers)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Measurement Methodology
 
@@ -44,11 +49,11 @@ var metricsStr string
 rod.Try(func() {
     browser = browser.Context(c.Context).MustIncognito() // first defense to prevent hitting the cache
     browser.MustSetCookies()                             // second defense to prevent hitting the cache (empty args clears cookies)
-    
+
     page := browser.MustPage() // Get a handle of a new page in our incognito browser
-    
+
     page.MustEvalOnNewDocument(jsOnNewDocument) // third defense to prevent hitting the cache - clears the cache by running `localStorage.clear()`
-    
+
     // disable caching in general
     proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(page) // fourth defense to prevent hitting the cache
 
@@ -63,7 +68,7 @@ rod.Try(func() {
 
     // finally actually measure the stuff
     metricsStr = page.MustEval(jsMeasurement).Str()
-    
+
     page.MustClose()
 })
 // parse metricsStr
@@ -185,7 +190,7 @@ for _, settle := range c.IntSlice("settle-times") {
             for _, website := range websites {
 
                 pr, _ := t.Probe(c, websiteURL(c, website, mType))
-                
+
                 t.Save(c, pr, website, mType, i)
 
                 if mType == models.MeasurementTypeIPFS {
@@ -208,24 +213,24 @@ https://developer.mozilla.org/en-US/docs/Learn/Performance/Perceived_performance
 To quote the website:
 
 > ## [Performance metrics](https://developer.mozilla.org/en-US/docs/Learn/Performance/Perceived_performance#performance_metrics)
-> 
+>
 > There is no single metric or test that can be run on a site to evaluate how a user "feels". However, there are a number of metrics that can be "helpful indicators":
-> 
+>
 > [First paint](https://developer.mozilla.org/en-US/docs/Glossary/First_paint)
 > The time to start of first paint operation. Note that this change may not be visible; it can be a simple background color update or something even less noticeable.
-> 
+>
 > [First Contentful Paint](https://developer.mozilla.org/en-US/docs/Glossary/First_contentful_paint) (FCP)
 > The time until first significant rendering (e.g. of text, foreground or background image, canvas or SVG, etc.). Note that this content is not necessarily useful or meaningful.
-> 
+>
 > [First Meaningful Paint](https://developer.mozilla.org/en-US/docs/Glossary/First_meaningful_paint) (FMP)
 > The time at which useful content is rendered to the screen.
-> 
+>
 > [Largest Contentful Paint](https://wicg.github.io/largest-contentful-paint/) (LCP)
 > The render time of the largest content element visible in the viewport.
-> 
+>
 > [Speed index](https://developer.mozilla.org/en-US/docs/Glossary/Speed_index)
 > Measures the average time for pixels on the visible screen to be painted.
-> 
+>
 > [Time to interactive](https://developer.mozilla.org/en-US/docs/Glossary/Time_to_interactive)
 > Time until the UI is available for user interaction (i.e. the last [long task](https://developer.mozilla.org/en-US/docs/Glossary/Long_task) of the load process finishes).
 
@@ -268,6 +273,7 @@ OPTIONS:
    --db-sslmode value                             The sslmode to use when connecting the the database [$TIROS_RUN_DATABASE_SSL_MODE]
    --kubo-api-port value                          port to reach the Kubo API (default: 5001) [$TIROS_RUN_KUBO_API_PORT]
    --kubo-gateway-port value                      port to reach the Kubo Gateway (default: 8080) [$TIROS_RUN_KUBO_GATEWAY_PORT]
+   --chrome-host value                        port to reach the Chrome DevTools Protocol port (default: localhost) [$TIROS_RUN_CHROME_HOST]
    --chrome-cdp-port value                        port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_RUN_CHROME_CDP_PORT]
    --cpu value                                    CPU resources for this measurement run (default: 2) [$TIROS_RUN_CPU]
    --memory value                                 Memory resources for this measurement run (default: 4096) [$TIROS_RUN_MEMORY]
@@ -291,7 +297,8 @@ TIROS_RUN_DATABASE_PASSWORD=password
 TIROS_RUN_DATABASE_PORT=5432
 TIROS_RUN_DATABASE_SSL_MODE=disable
 TIROS_RUN_DATABASE_USER=tiros_test
-TIROS_RUN_KUBO_HOST=ipfs # necessary so that the chrome container can access kubo
+TIROS_RUN_KUBO_HOST_IP=127.0.0.1 # necessary so that the chrome container can access kubo
+TIROS_RUN_KUBO_HOST_NAME=ipfs # necessary so that the chrome container can access kubo
 TIROS_RUN_REGION=local
 TIROS_RUN_SETTLE_TIMES=5,5
 TIROS_RUN_TIMES=2

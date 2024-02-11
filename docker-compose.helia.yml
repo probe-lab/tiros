@@ -1,0 +1,84 @@
+version: "3.9"
+name: tiros
+networks:
+  tiros_net:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  # Inspired by: https://gist.github.com/NAR8789/92da076d0c35b434107fb4f4f198fd12
+  # https://hub.docker.com/r/4km3/dnsmasq
+  dnsmasq:
+    image: 4km3/dnsmasq:2.85-r2
+    command: -A /.helia/172.20.0.2
+    ports:
+      - 53:53/udp
+    cap_add:
+      - NET_ADMIN
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.10 # Static IP here makes it possible to point other containers' dns here.
+
+  helia:
+    image: ghcr.io/ipfs/helia-http-gateway:main
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.2
+
+  chrome:
+    image: browserless/chrome:latest
+    ports:
+      - "3000:3000"
+    dns:
+      - 172.20.0.10
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.3
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: tiros_test
+      POSTGRES_DB: tiros_test
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.4
+
+  tiros:
+    image: golang:1.19
+    command: bash -c "cd /tiros && go run *.go run"
+    networks:
+      tiros_net:
+        ipv4_address: 172.20.0.5
+    dns:
+      - 172.20.0.10 # <- this is the dnsmasq container
+    volumes:
+      - .:/tiros
+    depends_on:
+      - db
+      - helia
+      - chrome
+    environment:
+      - TIROS_DEBUG=true
+      - TIROS_IPFS_IMPLEMENTATION=KUBO
+      - TIROS_RUN_CHROME_HOST=chrome
+      - TIROS_RUN_DATABASE_HOST=db
+      - TIROS_RUN_DATABASE_NAME=tiros_test
+      - TIROS_RUN_DATABASE_PASSWORD=password
+      - TIROS_RUN_DATABASE_PORT=5432
+      - TIROS_RUN_DATABASE_SSL_MODE=disable
+      - TIROS_RUN_DATABASE_USER=tiros_test
+      - TIROS_RUN_KUBO_API_PORT=8080
+      - TIROS_RUN_KUBO_HOST_IP=172.20.0.2
+      - TIROS_RUN_KUBO_HOST_NAME=helia
+      - TIROS_RUN_LOOKUP_PROVIDERS=false
+      - TIROS_RUN_REGION=local
+      - TIROS_RUN_SETTLE_TIMES=1 # <- set the first 1 to something larger to wait x number of seconds before the first request is made
+      - TIROS_RUN_TIMES=1
+      - TIROS_RUN_WEBSITES=probelab.io # <- you can add comma separated values here

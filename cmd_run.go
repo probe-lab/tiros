@@ -85,9 +85,15 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_DATABASE_SSL_MODE"},
 		},
 		&cli.StringFlag{
-			Name:    "ipfs-host",
+			Name:    "ipfs-host-ip",
 			Usage:   "host at which to reach the IPFS Gateway",
-			EnvVars: []string{"TIROS_RUN_IPFS_HOST", "TIROS_RUN_KUBO_HOST" /* <- legacy */},
+			EnvVars: []string{"TIROS_RUN_IPFS_HOST_IP", "TIROS_RUN_KUBO_HOST_IP"},
+			Value:   "127.0.0.1",
+		},
+		&cli.StringFlag{
+			Name:    "ipfs-host-name",
+			Usage:   "hostname at which to reach the IPFS Gateway",
+			EnvVars: []string{"TIROS_RUN_IPFS_HOST_NAME", "TIROS_RUN_KUBO_HOST_NAME"},
 			Value:   "localhost",
 		},
 		&cli.IntFlag{
@@ -101,6 +107,12 @@ var RunCommand = &cli.Command{
 			Usage:   "port to reach the IPFS Gateway",
 			EnvVars: []string{"TIROS_RUN_IPFS_GATEWAY_PORT", "TIROS_RUN_KUBO_GATEWAY_PORT" /* <- legacy */},
 			Value:   8080,
+		},
+		&cli.StringFlag{
+			Name:    "chrome-host",
+			Usage:   "port to reach the Chrome DevTools Host",
+			EnvVars: []string{"TIROS_RUN_CHROME_HOST"},
+			Value:   "localhost",
 		},
 		&cli.IntFlag{
 			Name:    "chrome-cdp-port",
@@ -174,7 +186,7 @@ func RunAction(c *cli.Context) error {
 	// Initialize ipfs client
 	var ipfsClient *shell.Shell
 	if c.Int("ipfs-api-port") != 0 {
-		ipfsClient = shell.NewShell(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", c.Int("ipfs-api-port")))
+		ipfsClient = shell.NewShell(fmt.Sprintf("/ip4/%s/tcp/%d", c.String("ipfs-host-ip"), c.Int("ipfs-api-port")))
 	}
 
 	// Initialize maxmind client

@@ -85,6 +85,7 @@ type probe struct {
 	url     string
 	website string
 	mType   string
+	chromeHost string
 	cdpPort int
 
 	browser *rod.Browser
@@ -132,6 +133,7 @@ func newProbe(c *cli.Context, website string, mType string) *probe {
 		url:     websiteURL(c, website, mType),
 		website: website,
 		mType:   mType,
+		chromeHost: c.String("chrome-host"),
 		cdpPort: c.Int("chrome-cdp-port"),
 		result: &probeResult{
 			url:     websiteURL(c, website, mType),
@@ -176,7 +178,7 @@ func (p *probe) initBrowser() error {
 	// Initialize browser reference
 	p.browser = rod.New().
 		Context(p.ctx). // stop when outer ctx stops
-		ControlURL(fmt.Sprintf("ws://localhost:%d", p.cdpPort))
+		ControlURL(fmt.Sprintf("ws://%s:%d", p.chromeHost, p.cdpPort))
 
 	// Connecting to headless chrome
 	p.logEntry().Debugln("Connecting to browser...")
@@ -331,7 +333,7 @@ func (p *probe) close() {
 func websiteURL(c *cli.Context, website string, mType string) string {
 	switch mType {
 	case models.MeasurementTypeIPFS:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host"), c.Int("ipfs-gateway-port"), website)
+		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host-name"), c.Int("ipfs-gateway-port"), website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:
