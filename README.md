@@ -6,21 +6,27 @@ Tiros is an IPFS website measurement tool. It is intended to run on AWS ECS in m
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Run](#run)
-- [Development](#development)
-- [Maintainers](#maintainers)
-- [Contributing](#contributing)
-- [License](#license)
+- [Tiros](#tiros)
+  - [Table of Contents](#table-of-contents)
+  - [Measurement Methodology](#measurement-methodology)
+  - [Measurement Metrics](#measurement-metrics)
+  - [Run](#run)
+  - [Development](#development)
+    - [Migrations](#migrations)
+  - [Alternative IPFS Implementation](#alternative-ipfs-implementation)
+  - [Maintainers](#maintainers)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Measurement Methodology
 
-We are running Tiros as a scheduled AWS ECS task in six different AWS regions. These regions are:
+We are running Tiros as a scheduled AWS ECS task in seven different AWS regions. These regions are:
 
 - `eu-central-1`
 - `ap-south-1`
 - `af-southeast-2`
 - `sa-east-1`
+- `us-east-2`
 - `us-west-1`
 - `af-south-1`
 
@@ -28,11 +34,14 @@ Each ECS task consists of three containers:
 
 1. `scheduler` (this repository)
 2. `chrome` - via [`browserless/chrome`](https://github.com/browserless/chrome)
-3. `ipfs` - an IPFS implementation like [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/) or [ipfs/helia-docker](https://github.com/ipfs/helia-docker)
+3. `ipfs` - an IPFS implementation like [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/) or [ipfs/helia-http-gateway](https://github.com/ipfs/helia-http-gateway)
 
 If run with `kubo` we'll run it with `LIBP2P_RCMGR=0` which disables the [libp2p Network Resource Manager](https://github.com/libp2p/go-libp2p-resource-manager#readme).
 
-The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`. The scheduler probes each website via the IPFS implementation by requesting `http://localhost:8080/ipns/<website>` and via HTTP by requesting`https://<website>`. Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance. The following excerpt is a gist of what's happening when requesting a website:
+The `scheduler` gets configured with a list of websites that will then be probed. A typical website config looks like this `ipfs.io,docs.libp2p.io,ipld.io`.
+The scheduler probes each website via the IPFS implementation by requesting `http://localhost:8080/ipns/<website>` and via HTTP by requesting`https://<website>`.
+Port `8080` is the default `kubo` HTTP-Gateway port. The `scheduler` uses [`go-rod`](https://github.com/go-rod/rod) to communicate with the `browserless/chrome` instance.
+The following excerpt is a gist of what's happening when requesting a website:
 
 ```go
 browser := rod.New().Context(ctx).ControlURL("ws://localhost:3000")) // default CDP chrome port
@@ -276,27 +285,53 @@ OPTIONS:
 
 ## Development
 
-To test the tool locally you need to start a database, kubo node, and headless chrome. You can do all of this by running:
+To test the tool locally, you need to start a database, kubo node, and headless chrome. You can do all of this by running:
 
 ```shell
 docker compose up -d
 ```
 
-Then you need to point `tiros` to your local deployment. I'm running it with the following environment variables:
+Then you need to point `tiros` to your local deployment. You can do this by
+_sourcing_ the included [`.env.local`](./.env.local) file:
 
-```env
-TIROS_RUN_DATABASE_HOST=localhost
-TIROS_RUN_DATABASE_NAME=tiros_test
-TIROS_RUN_DATABASE_PASSWORD=password
-TIROS_RUN_DATABASE_PORT=5432
-TIROS_RUN_DATABASE_SSL_MODE=disable
-TIROS_RUN_DATABASE_USER=tiros_test
-TIROS_RUN_KUBO_HOST=ipfs # necessary so that the chrome container can access kubo
-TIROS_RUN_REGION=local
-TIROS_RUN_SETTLE_TIMES=5,5
-TIROS_RUN_TIMES=2
-TIROS_RUN_WEBSITES=filecoin.io,protocol.ai
-TIROS_UDGER_DB_PATH=./udgerdb_v3.dat # can be left blank if you don't have the DB handy
+```shell
+source .env.local
+```
+
+Finally, run `tiros` via:
+
+```shell
+go build -o tiros .
+./tiros run
+
+# OR
+
+go run . run
+```
+
+After the run has finished, you can check the local database for the measurement data. Run:
+
+```shell
+docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
+```
+
+to connect to the local database. If prompted for a password enter `password` or
+whatever is set in the [`.env.local`](./.env.local) file for the `TIROS_RUN_DATABASE_PASSWORD` environment variable.
+
+Example output:
+
+```
+$ docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test                                                                                                                                                                                                                                                                                                                                  3s 
+psql (14.6 (Debian 14.6-1.pgdg110+1))
+Type "help" for help.
+
+tiros_test=# select * from runs;
+ id | region |   websites    |    version     | times | cpu | memory |          updated_at           |          created_at           |          finished_at          | ipfs_impl 
+----+--------+---------------+----------------+-------+-----+--------+-------------------------------+-------------------------------+-------------------------------+-----------
+  1 | local  | {filecoin.io} | 0.19.0-1963219 |     1 |   2 |   4096 | 2024-03-26 09:26:07.948483+00 | 2024-03-26 09:25:30.600963+00 | 2024-03-26 09:26:07.948482+00 | KUBO
+  2 | local  | {filecoin.io} | 0.19.0-1963219 |     1 |   2 |   4096 | 2024-03-26 09:32:05.247122+00 | 2024-03-26 09:31:28.844582+00 | 2024-03-26 09:32:05.247122+00 | KUBO
+(2 rows)
+
 ```
 
 ### Migrations
