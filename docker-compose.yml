@@ -2,7 +2,7 @@ version: "3.9"
 name: tiros
 services:
   ipfs:
-    image: ipfs/kubo:v0.19.0
+    image: ${IPFS_IMAGE:-ipfs/kubo:v0.19.0}
     restart: unless-stopped
     volumes:
       - ipfs_path:/data/ipfs
@@ -13,6 +13,8 @@ services:
       - "4001:4001/udp"
       - "0.0.0.0:5001:5001"
       - "0.0.0.0:8080:8080"
+    env_file:
+      - ${IPFS_ENV_FILE:-/dev/null}
   chrome:
     image: browserless/chrome:latest
     ports:
