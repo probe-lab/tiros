@@ -206,18 +206,12 @@ def plot_kubo_vs_http(df_query: pd.DataFrame) -> plt.Figure:
             dat_http = dat[dat["type"] == "HTTP"]
             dat_kubo = dat[dat["type"] == "IPFS"]
 
-            samples_kubo = df_query[
-                (df_query["website"] == website) & (df_query["type"] == "KUBO") & (
-                        df_query["region"] == region)].count()[
-                "id"]
+            samples_kubo = df_query[(df_query["website"] == website) & (df_query["type"] == "IPFS") & (df_query["region"] == region)].count()["id"]
             kubo_y = dat_kubo["ttfb"].iloc[0]
             p = ax.bar(j - width, kubo_y, color="b", align="edge", label="KUBO", width=width)
             ax.bar_label(p, labels=[samples_kubo], fontsize=8)
 
-            samples_http = df_query[
-                (df_query["website"] == website) & (df_query["type"] == "HTTP") & (
-                        df_query["region"] == region)].count()[
-                "id"]
+            samples_http = df_query[(df_query["website"] == website) & (df_query["type"] == "HTTP") & ( df_query["region"] == region)].count()["id"]
             http_y = dat_http.reset_index()["ttfb"].iloc[0]
             p = ax.bar(j, http_y, color="r", align="edge", label="HTTP", width=width)
             ax.bar_label(p, labels=[samples_http], fontsize=8)
@@ -242,8 +236,10 @@ def plot_kubo_vs_http(df_query: pd.DataFrame) -> plt.Figure:
         if i + 1 == len(websites):
             ax.set_xlabel("Website")
 
+
         ax.set_ylabel("Latency in Seconds")
-        ax.set_ylim(0, np.max(values) + 0.18 * np.max(values))
+        values_nonans = np.max(np.array(values)[~np.isnan(values)])
+        ax.set_ylim(0, values_nonans + 0.18 * values_nonans)
 
         legend_elements = [
             Patch(facecolor='b', edgecolor='b', label='KUBO'),
@@ -315,7 +311,7 @@ def main():
     fig = plot_metric(kubo_requests, "Time To First Byte", "ttfb")
     fig.savefig(f"{plots_dir}/tiros-ttfb.png", dpi=DPI)
 
-    errors = df[df["type"] == "KUBO"].copy().groupby(["date", "has_error", "website"]) \
+    errors = df[df["type"] == "IPFS"].copy().groupby(["date", "has_error", "website"]) \
         .count() \
         .reset_index()
 
