@@ -108,6 +108,12 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_CHROME_CDP_PORT"},
 			Value:   3000,
 		},
+		&cli.StringFlag{
+			Name:    "service-worker-website",
+			Usage:   "the website at which the service worker will be registered",
+			EnvVars: []string{"TIROS_RUN_SERVICE_WORKER_WEBSITE"},
+			Value:   "inbrowser.link",
+		},
 		&cli.IntFlag{
 			Name:    "cpu",
 			Usage:   "CPU resources for this measurement run",

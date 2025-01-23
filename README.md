@@ -20,15 +20,12 @@ Tiros is an IPFS website measurement tool. It is intended to run on AWS ECS in m
 
 ## Measurement Methodology
 
-We are running Tiros as a scheduled AWS ECS task in seven different AWS regions. These regions are:
+We are running Tiros as a scheduled AWS ECS task in four different AWS regions. These regions are:
 
 - `eu-central-1`
-- `ap-south-1`
 - `af-southeast-2`
-- `sa-east-1`
 - `us-east-2`
 - `us-west-1`
-- `af-south-1`
 
 Each ECS task consists of three containers:
 

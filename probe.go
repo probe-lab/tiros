@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -42,7 +43,8 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 		time.Sleep(sleepDur)
 
 		for i := 0; i < c.Int("times"); i++ {
-			for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP} {
+			// for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP, models.MeasurementTypeSERVICE_WORKER} {
+			for _, mType := range []string{models.MeasurementTypeSERVICE_WORKER} {
 				for _, website := range websites {
 
 					log.Infoln("Start probing", website, mType)
@@ -81,7 +83,7 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 }
 
 type probe struct {
-	ctx     context.Context
+	ctx     context.Context // TODO: remove context from struct
 	url     string
 	website string
 	mType   string
@@ -90,6 +92,7 @@ type probe struct {
 	browser *rod.Browser
 	page    *rod.Page
 
+	offset          time.Duration // web-vitals measurement offset
 	result          *probeResult
 	metricsStr      string
 	navPerfEntryStr string
@@ -142,7 +145,7 @@ func newProbe(c *cli.Context, website string, mType string) *probe {
 }
 
 func (p *probe) logEntry() *log.Entry {
-	return log.WithField("url", p.url)
+	return log.WithField("url", p.url) // TODO: returns wrong result after redirect
 }
 
 func (p *probe) run() (*probeResult, error) {
@@ -153,7 +156,11 @@ func (p *probe) run() (*probeResult, error) {
 
 	err := rod.Try(func() {
 		p.mustInitPage()
-		p.mustNavigate()
+		if p.mType == models.MeasurementTypeSERVICE_WORKER {
+			p.mustNavigateServiceWorker()
+		} else {
+			p.mustNavigate()
+		}
 		p.mustMeasure()
 	})
 
@@ -213,17 +220,110 @@ func (p *probe) mustInitPage() {
 	}
 }
 
+// mustNavigateServiceWorker listens to navigation and request events to
+// validate the navigation process. Events are matched against an expected
+// pattern to confirm a successful operation.
+func (p *probe) mustNavigateServiceWorker() {
+	done := make(chan struct{})
+	navigationChan := make(chan *proto.PageFrameNavigated)
+	requestChan := make(chan *proto.NetworkRequestWillBeSent)
+	go p.page.EachEvent(
+		func(e *proto.PageFrameNavigated) {
+			select {
+			case navigationChan <- e:
+			case <-done:
+			}
+		},
+		func(e *proto.NetworkRequestWillBeSent) {
+			select {
+			case requestChan <- e:
+			case <-done:
+			}
+		},
+	)()
+
+	var finalRequestStarted time.Time
+	go func() {
+		// Here we track the order of redirects. For example, if we open
+		// https://inbrowser.link/ipns/specs.ipfs.tech in an incognito window
+		// (the service worker is not loaded), we eventually expect the browser to
+		// navigate to https://inbrowser.link/, then request
+		// https://specs-ipfs-tech.ipns.inbrowser.link/ and then emit a
+		// navigated event for the same page. I assume that the web-vitals will
+		// measure the time for the final redirect, so we keep the timestamp of
+		// when that redirect happens.
+
+		defer close(done)
+		subdomain := strings.ReplaceAll(p.website, ".", "-")
+		finalPage := fmt.Sprintf("https://%s.ipns.inbrowser.link/", subdomain)
+		intermediatePage := "https://inbrowser.link/"
+
+		eventIdx := 0
+		expectedEvents := []string{
+			"navigated:" + intermediatePage,
+			"request:" + finalPage,
+			"navigated:" + finalPage,
+		}
+
+		for {
+			select {
+			case e := <-requestChan:
+				if eventIdx == len(expectedEvents) || expectedEvents[eventIdx] != "request:"+e.Request.URL {
+					continue
+				}
+				p.logEntry().Debugln("Requesting", e.Request.URL)
+				eventIdx += 1
+
+				if eventIdx == 2 {
+					finalRequestStarted = time.Now() // start time that web-vitals will measure times against.
+				}
+
+			case e := <-navigationChan:
+				if eventIdx == len(expectedEvents) || expectedEvents[eventIdx] != "navigated:"+e.Frame.URL {
+					continue
+				}
+				p.logEntry().Debugln("Navigated to", e.Frame.URL)
+				eventIdx += 1
+			}
+
+			if eventIdx == len(expectedEvents) {
+				break
+			}
+		}
+	}()
+
+	start := time.Now()
+	p.logEntry().WithField("timeout", websiteRequestTimeout).Debugln("Navigating...")
+	err := p.page.Timeout(websiteRequestTimeout).Navigate(p.url)
+	if errors.Is(err, context.DeadlineExceeded) {
+		panic(ErrNavigateTimeout)
+	} else if err != nil {
+		panic(err)
+	}
+
+	// wait for the redirect to the final page.
+	select {
+	case <-done:
+	case <-time.After(websiteRequestTimeout):
+		panic(ErrNavigateTimeout)
+	}
+
+	p.offset = finalRequestStarted.Sub(start)
+
+	p.logEntry().Debugln("Took", finalRequestStarted.Sub(start), "to navigate to ", p.page.MustInfo().URL)
+}
+
 func (p *probe) mustNavigate() {
-	e := proto.NetworkResponseReceived{}
-	wait := p.page.Timeout(websiteRequestTimeout).WaitEvent(&e)
+	evtNetResp := proto.NetworkResponseReceived{}
+	waitNetResp := p.page.Timeout(websiteRequestTimeout).WaitEvent(&evtNetResp)
 
 	p.logEntry().WithField("timeout", websiteRequestTimeout).Debugln("Navigating...")
 	err := p.page.Timeout(websiteRequestTimeout).Navigate(p.url)
 
-	wait()
+	waitNetResp()
 
-	if e.Type == proto.NetworkResourceTypeDocument {
-		p.result.httpStatus = e.Response.Status
+	if evtNetResp.Type == proto.NetworkResourceTypeDocument {
+		p.result.httpStatus = evtNetResp.Response.Status
 		if p.result.httpStatus < 200 || p.result.httpStatus >= 300 {
 			p.result.httpBody = p.page.MustElement("body").MustText()
 		}
@@ -289,22 +389,22 @@ func (p *probe) parseMetrics() error {
 	}
 
 	for _, v := range vitals {
-		v := v
+		value := v.Value + 1000*p.offset.Seconds() // v.Value is in milliseconds
 		switch v.Name {
 		case "LCP":
-			p.result.lcp = &v.Value
+			p.result.lcp = &value
 			p.result.lcpRating = &v.Rating
 		case "FCP":
-			p.result.fcp = &v.Value
+			p.result.fcp = &value
 			p.result.fcpRating = &v.Rating
 		case "TTFB":
-			p.result.ttfb = &v.Value
+			p.result.ttfb = &value
 			p.result.ttfbRating = &v.Rating
 		case "TTI":
-			p.result.tti = &v.Value
+			p.result.tti = &value
 			p.result.ttiRating = &v.Rating
 		case "CLS":
-			p.result.cls = &v.Value
+			p.result.cls = &value
 			p.result.clsRating = &v.Rating
 		default:
 			continue
@@ -334,6 +434,8 @@ func websiteURL(c *cli.Context, website string, mType string) string {
 		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host"), c.Int("ipfs-gateway-port"), website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
+	case models.MeasurementTypeSERVICE_WORKER:
+		return fmt.Sprintf("https://%s/ipns/%s", c.String("service-worker-website"), website)
 	default:
 		panic(fmt.Sprintf("unknown measurement type: %s", mType))
 	}

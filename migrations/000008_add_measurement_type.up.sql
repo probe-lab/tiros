@@ -1,0 +1,1 @@
+ALTER TYPE measurement_type ADD VALUE 'SERVICE_WORKER';
