@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"math/rand"
+	"net/http"
 	"time"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -89,6 +92,12 @@ var RunCommand = &cli.Command{
 			Usage:   "host at which to reach the IPFS Gateway",
 			EnvVars: []string{"TIROS_RUN_IPFS_HOST", "TIROS_RUN_KUBO_HOST" /* <- legacy */},
 			Value:   "localhost",
+		},
+		&cli.StringFlag{
+			Name:    "ipfs-api-host",
+			Usage:   "port to reach a Kubo-compatible RPC API",
+			EnvVars: []string{"TIROS_RUN_IPFS_API_HOST"},
+			Value:   "127.0.0.1",
 		},
 		&cli.IntFlag{
 			Name:    "ipfs-api-port",
@@ -276,8 +285,49 @@ func RunAction(c *cli.Context) error {
 	return nil
 }
 
+// GetIpfsVersion tries to retrieve the IPFS version using the IPFS API client.
+// If it fails, it falls back to an HTTP request to the specified endpoint, using host and port from the context.
+func (t *tiros) GetIpfsVersion(c *cli.Context) (version string, sha string, err error) {
+	version, sha, err = t.ipfs.Version()
+	if err == nil {
+		return version, sha, nil
+	}
+
+	// Use host and port from the context for the fallback HTTP request
+	apiHost := c.String("ipfs-api-host")
+	apiPort := c.Int("ipfs-api-port")
+	apiUrl := fmt.Sprintf("http://%s:%d/api/v0/version", apiHost, apiPort)
+	// log that we're falling back to HTTP url for version
+	log.WithField("url", apiUrl).Debugln("Falling back to HTTP request for version")
+
+	resp, httpErr := http.Get(apiUrl)
+	if httpErr != nil {
+		return "", "", fmt.Errorf("ipfs api and http fallback both failed: %v, fallback error: %w", err, httpErr)
+	}
+	defer resp.Body.Close()
+
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return "", "", fmt.Errorf("error reading version endpoint response: %w", readErr)
+	}
+	// log the entire body of the response
+	log.WithField("body", string(body)).Debugln("HTTP response body")
+
+	var data struct {
+		Version string `json:"Version"`
+		Commit  string `json:"Commit"`
+	}
+
+	jsonErr := json.Unmarshal(body, &data)
+	if jsonErr != nil {
+		return "", "", fmt.Errorf("error parsing version endpoint JSON: %w", jsonErr)
+	}
+
+	return data.Version, data.Commit, nil
+}
+
 func (t *tiros) InitRun(c *cli.Context) (*models.Run, error) {
-	version, sha, err := t.ipfs.Version()
+	version, sha, err := t.GetIpfsVersion(c)
 	if err != nil {
 		return nil, fmt.Errorf("ipfs api offline: %w", err)
 	}
