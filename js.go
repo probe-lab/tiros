@@ -8,6 +8,9 @@ import (
 //go:embed js/tti-polyfill.js
 var jsTTIPolyfill string
 
+//go:embed js/check-service-worker-registered.js
+var jsCheckServiceWorkerRegistered string
+
 //go:embed js/web-vitals.iife.js
 var jsWebVitalsIIFE string
 

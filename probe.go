@@ -46,7 +46,7 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 				for _, website := range websites {
 
 					log.Infoln("Start probing", website, mType)
-					pr, err := newProbe(c, website, mType).run()
+					pr, err := newProbe(c, website, mType).run(c)
 					if errors.Is(c.Context.Err(), context.Canceled) {
 						return
 					} else if err != nil {
@@ -145,7 +145,7 @@ func (p *probe) logEntry() *log.Entry {
 	return log.WithField("url", p.url)
 }
 
-func (p *probe) run() (*probeResult, error) {
+func (p *probe) run(c *cli.Context) (*probeResult, error) {
 	if err := p.initBrowser(); err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (p *probe) run() (*probeResult, error) {
 
 	err := rod.Try(func() {
 		p.mustInitPage()
-		p.mustNavigate()
+		p.mustNavigate(c)
 		p.mustMeasure()
 	})
 
@@ -213,7 +213,10 @@ func (p *probe) mustInitPage() {
 	}
 }
 
-func (p *probe) mustNavigate() {
+func (p *probe) mustNavigate(c *cli.Context) {
+	if c.Bool("service-worker") {
+		proto.ServiceWorkerEnable{}.Call(p.page)
+	}
 	e := proto.NetworkResponseReceived{}
 	wait := p.page.Timeout(websiteRequestTimeout).WaitEvent(&e)
 
@@ -255,6 +258,49 @@ func (p *probe) mustNavigate() {
 		}
 		p.result.err = ErrNetworkIdleTimeout
 	}
+
+	if c.Bool("service-worker") {
+		// if there is no error, and idle was fired, log what the current url is
+		p.logEntry().WithField("url", p.page.MustInfo().URL).Debugln("Network idle event fired")
+
+		// log if a service worker is registered at the current URL
+		p.checkServiceWorker()
+	}
+}
+
+func (p *probe) checkServiceWorker() {
+	p.logEntry().Debugln("Checking for service worker registration...")
+
+	done := make(chan bool)
+	// retryCount := 5
+	// for i := 0; i < retryCount; i++ {
+	go p.page.EachEvent(func(e *proto.RuntimeConsoleAPICalled) {
+		logs := p.page.MustObjectsToJSON(e.Args)
+		p.logEntry().Debugln(logs)
+		for _, log := range logs.Arr() {
+			if log.String() == "Service worker registered" {
+				done <- true
+				return
+			}
+		}
+
+		close(done)
+		// delay a bit to allow the service worker to register
+	})
+
+	p.page.MustEval(wrapInFn(jsCheckServiceWorkerRegistered))
+
+	select {
+	case registered := <-done:
+		if registered {
+			p.logEntry().Debugln("Service worker registered successfully")
+			return
+		}
+	case <-time.After(websiteRequestTimeout):
+		p.logEntry().Warnln("Service worker registration timed out, retrying...")
+	}
+
+	p.logEntry().Warnln("Service worker registration failed after retries")
 }
 
 func (p *probe) mustMeasure() {
