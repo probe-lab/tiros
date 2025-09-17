@@ -10,11 +10,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/aarondl/sqlboiler/v4/boil"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 var app *cli.App

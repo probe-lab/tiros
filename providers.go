@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aarondl/null/v8"
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/routing"
@@ -15,7 +16,6 @@ import (
 	manet "github.com/multiformats/go-multiaddr/net"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/volatiletech/null/v8"
 )
 
 type provider struct {
