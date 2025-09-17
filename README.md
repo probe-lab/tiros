@@ -345,7 +345,7 @@ migrate create -ext sql -dir migrations -seq create_measurements_table
 To create the database models
 
 ```shell
-make models
+just models
 ```
 
 ## Alternative IPFS Implementation
