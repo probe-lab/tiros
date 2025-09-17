@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aarondl/null/v8"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/proto"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"github.com/volatiletech/null/v8"
 
 	"github.com/probe-lab/tiros/models"
 )
