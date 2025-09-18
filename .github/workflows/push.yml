@@ -1,0 +1,92 @@
+name: Push docker image
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "Which ref should be checked out?"
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE: arn:aws:iam::019120760881:role/prod-use1-github-oidc-role
+  AWS_ECR_REPOSITORY: probelab
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setting up Golang
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Setting up just
+        uses: extractions/setup-just@v3
+
+      - name: Running tests
+        run: just test
+
+  push_to_ecr:
+    name: Push Docker image to ProbeLab's ECR
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checking out the Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Configuring AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE }}
+          role-session-name: PushToECR
+
+      - name: Logging in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Building tiros Image Metadata
+        id: meta
+        run: |
+          SHA_SHORT=${{ github.sha }}
+          SHA_SHORT=${SHA_SHORT::7}
+          
+          NAMESPACE=${{ steps.login-ecr.outputs.registry }}
+          TAG="tiros-sha${SHA_SHORT}"
+          
+          IMAGE="$NAMESPACE/$AWS_ECR_REPOSITORY:$TAG"
+          
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Checking if Image exists in ECR
+        id: check-ecr
+        run: |
+          aws ecr describe-images --repository-name $AWS_ECR_REPOSITORY --image-ids imageTag=${{ steps.meta.outputs.tag }} || exit_code=$?
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+
+      - name: Building Docker Image ${{ steps.meta.outputs.tag }}
+        id: build
+        if: steps.check-ecr.outputs.exit_code != 0
+        run: docker build -t ${{ steps.meta.outputs.image }} .
+
+      - name: Pushing Docker Image ${{ steps.meta.outputs.tag }} to Amazon ECR
+        id: push
+        if: steps.check-ecr.outputs.exit_code != 0
+        run: docker push ${{ steps.meta.outputs.image }}

@@ -69,6 +69,9 @@ tidy:
 fmt:
     go fmt ./...
 
+test:
+    go test ./...
+
 # Connect to local database
 db-connect:
     docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
