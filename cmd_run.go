@@ -137,6 +137,12 @@ var RunCommand = &cli.Command{
 			EnvVars: []string{"TIROS_RUN_TIMEOUT"},
 			Value:   time.Duration(0),
 		},
+		&cli.BoolFlag{
+			Name:    "service-worker",
+			Usage:   "Whether to check for service worker registration",
+			EnvVars: []string{"TIROS_RUN_SERVICE_WORKER"},
+			Value:   false,
+		},
 	},
 	Action: RunAction,
 }
