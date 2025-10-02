@@ -18,6 +18,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/libp2p/go-libp2p/core/peer"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
@@ -29,7 +30,7 @@ var migrations embed.FS
 
 type IDBClient interface {
 	InsertRun(c *cli.Context, ipfsImpl string, version string) (*models.Run, error)
-	InsertUpload(c *cli.Context, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error)
+	InsertUpload(c *cli.Context, peerID peer.ID, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error)
 	SaveMeasurement(c *cli.Context, dbRun *models.Run, pr *probeResult) (*models.Measurement, error)
 	SaveProvider(c *cli.Context, dbRun *models.Run, provider *provider) (*models.Provider, error)
 	SealRun(ctx context.Context, dbRun *models.Run) (*models.Run, error)
@@ -158,13 +159,14 @@ func (db *DBClient) InsertRun(c *cli.Context, ipfsImpl string, version string) (
 	return r, r.Insert(c.Context, db.handle, boil.Infer())
 }
 
-func (db *DBClient) InsertUpload(c *cli.Context, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
+func (db *DBClient) InsertUpload(c *cli.Context, peerID peer.ID, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
 	dbUpload := &models.Upload{
 		Cid:         cid,
 		TraceID:     traceID,
 		FileSize:    fileSize,
 		Region:      region,
 		KuboVersion: kuboVersion,
+		PeerID:      peerID.String(),
 	}
 	return dbUpload, dbUpload.Insert(c.Context, db.handle, boil.Infer())
 }

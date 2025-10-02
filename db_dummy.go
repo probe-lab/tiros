@@ -4,6 +4,7 @@ import (
 	"context"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/probe-lab/tiros/models"
 	"github.com/urfave/cli/v2"
 )
@@ -36,13 +37,14 @@ func (D DBDummyClient) InsertMeasurement(ctx context.Context, m *models.Measurem
 	return nil, nil
 }
 
-func (D DBDummyClient) InsertUpload(c *cli.Context, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
+func (D DBDummyClient) InsertUpload(c *cli.Context, peerID peer.ID, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
 	dbUpload := &models.Upload{
 		Cid:         cid,
 		TraceID:     traceID,
 		FileSize:    fileSize,
 		Region:      region,
 		KuboVersion: kuboVersion,
+		PeerID:      peerID.String(),
 	}
 	return dbUpload, nil
 }

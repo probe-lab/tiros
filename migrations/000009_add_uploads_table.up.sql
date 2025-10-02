@@ -8,6 +8,7 @@ CREATE TABLE uploads
     file_size    INT         NOT NULL,
     region       TEXT        NOT NULL,
     kubo_version TEXT        NOT NULL,
+    peer_id      TEXT        NOT NULL,
 
     created_at   TIMESTAMPTZ NOT NULL,
 

@@ -29,6 +29,7 @@ type Upload struct {
 	FileSize    int       `boil:"file_size" json:"file_size" toml:"file_size" yaml:"file_size"`
 	Region      string    `boil:"region" json:"region" toml:"region" yaml:"region"`
 	KuboVersion string    `boil:"kubo_version" json:"kubo_version" toml:"kubo_version" yaml:"kubo_version"`
+	PeerID      string    `boil:"peer_id" json:"peer_id" toml:"peer_id" yaml:"peer_id"`
 	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *uploadR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -42,6 +43,7 @@ var UploadColumns = struct {
 	FileSize    string
 	Region      string
 	KuboVersion string
+	PeerID      string
 	CreatedAt   string
 }{
 	ID:          "id",
@@ -50,6 +52,7 @@ var UploadColumns = struct {
 	FileSize:    "file_size",
 	Region:      "region",
 	KuboVersion: "kubo_version",
+	PeerID:      "peer_id",
 	CreatedAt:   "created_at",
 }
 
@@ -60,6 +63,7 @@ var UploadTableColumns = struct {
 	FileSize    string
 	Region      string
 	KuboVersion string
+	PeerID      string
 	CreatedAt   string
 }{
 	ID:          "uploads.id",
@@ -68,6 +72,7 @@ var UploadTableColumns = struct {
 	FileSize:    "uploads.file_size",
 	Region:      "uploads.region",
 	KuboVersion: "uploads.kubo_version",
+	PeerID:      "uploads.peer_id",
 	CreatedAt:   "uploads.created_at",
 }
 
@@ -80,6 +85,7 @@ var UploadWhere = struct {
 	FileSize    whereHelperint
 	Region      whereHelperstring
 	KuboVersion whereHelperstring
+	PeerID      whereHelperstring
 	CreatedAt   whereHelpertime_Time
 }{
 	ID:          whereHelperint{field: "\"uploads\".\"id\""},
@@ -88,6 +94,7 @@ var UploadWhere = struct {
 	FileSize:    whereHelperint{field: "\"uploads\".\"file_size\""},
 	Region:      whereHelperstring{field: "\"uploads\".\"region\""},
 	KuboVersion: whereHelperstring{field: "\"uploads\".\"kubo_version\""},
+	PeerID:      whereHelperstring{field: "\"uploads\".\"peer_id\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"uploads\".\"created_at\""},
 }
 
@@ -108,8 +115,8 @@ func (*uploadR) NewStruct() *uploadR {
 type uploadL struct{}
 
 var (
-	uploadAllColumns            = []string{"id", "cid", "trace_id", "file_size", "region", "kubo_version", "created_at"}
-	uploadColumnsWithoutDefault = []string{"cid", "trace_id", "file_size", "region", "kubo_version", "created_at"}
+	uploadAllColumns            = []string{"id", "cid", "trace_id", "file_size", "region", "kubo_version", "peer_id", "created_at"}
+	uploadColumnsWithoutDefault = []string{"cid", "trace_id", "file_size", "region", "kubo_version", "peer_id", "created_at"}
 	uploadColumnsWithDefault    = []string{"id"}
 	uploadPrimaryKeyColumns     = []string{"id"}
 	uploadGeneratedColumns      = []string{"id"}
