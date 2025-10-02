@@ -16,6 +16,5 @@ WORKDIR /home/tiros
 USER tiros
 
 COPY --from=builder /build/tiros /usr/local/bin/tiros
-COPY --from=builder /build/udgerdb_v3.dat /home/tiros/udgerdb_v3.dat
 
 CMD tiros
