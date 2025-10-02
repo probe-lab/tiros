@@ -2,15 +2,21 @@ version: "3.9"
 name: tiros
 services:
   ipfs:
-    image: ipfs/kubo:v0.19.0
+    image: ipfs/kubo:v0.38.0
     restart: unless-stopped
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=kubo
+      - OTEL_TRACES_EXPORTER=otlp
     volumes:
       - ipfs_path:/data/ipfs
       - ipfs_fuse:/ipfs
       - ipns_fuse:/ipns
     ports:
-      - "4001:4001/tcp"
-      - "4001:4001/udp"
+      - "0.0.0.0:4001:4001/tcp"
+      - "0.0.0.0:4001:4001/udp"
       - "0.0.0.0:5001:5001"
       - "0.0.0.0:8080:8080"
   chrome:
@@ -25,7 +31,20 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: tiros_test
       POSTGRES_DB: tiros_test
+  alloy:
+    image: grafana/alloy:latest
+    command: ["run", "--server.http.listen-addr=0.0.0.0:12345", "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
+    environment:
+      - GRAFANA_CLOUD_USERNAME=${GRAFANA_CLOUD_USERNAME}
+      - GRAFANA_CLOUD_PASSWORD=${GRAFANA_CLOUD_PASSWORD}
+    ports:
+      - "0.0.0.0:12345:12345"
+      - "0.0.0.0:4317:4317"
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - alloy_data:/var/lib/alloy/data
 volumes:
   ipfs_path:
   ipfs_fuse:
   ipns_fuse:
+  alloy_data:

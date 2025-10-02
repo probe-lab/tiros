@@ -39,7 +39,13 @@ func (t *tiros) measureWebsites(c *cli.Context, websites []string, results chan<
 		sleepDur := time.Duration(settle) * time.Second
 
 		log.Infof("Letting the IPFS implementation settle for %s\n", sleepDur)
-		time.Sleep(sleepDur)
+
+		select {
+		case <-c.Context.Done():
+			return
+		case <-time.After(sleepDur):
+			// pass
+		}
 
 		for i := 0; i < c.Int("times"); i++ {
 			for _, mType := range []string{models.MeasurementTypeIPFS, models.MeasurementTypeHTTP} {
@@ -331,7 +337,7 @@ func (p *probe) close() {
 func websiteURL(c *cli.Context, website string, mType string) string {
 	switch mType {
 	case models.MeasurementTypeIPFS:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", c.String("ipfs-host"), c.Int("ipfs-gateway-port"), website)
+		return fmt.Sprintf("http://%s:%d/ipns/%s", probeConfig.IPFS.Host, probeConfig.IPFS.GatewayPort, website)
 	case models.MeasurementTypeHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:

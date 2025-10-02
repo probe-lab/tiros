@@ -1,23 +1,8 @@
 #!/usr/bin/env just --justfile
 
-# Variables
-REPO_SERVER := "019120760881.dkr.ecr.us-east-1.amazonaws.com"
-
 # Default recipe to display available recipes
 default:
     @just --list
-
-# Build Docker image with git tag
-docker:
-    #!/usr/bin/env bash
-    GIT_TAG=$(git rev-parse --short HEAD)
-    docker build --platform linux/amd64 -t "${REPO_SERVER}/probelab:tiros-${GIT_TAG}" .
-
-# Build and push Docker image
-docker-push: docker
-    #!/usr/bin/env bash
-    GIT_TAG=$(git rev-parse --short HEAD)
-    docker push "${REPO_SERVER}/probelab:tiros-${GIT_TAG}"
 
 # Install required Go tools
 tools:
@@ -60,10 +45,6 @@ run: dev-up
 # Clean up built artifacts
 clean:
     rm -f tiros
-
-# Run go mod tidy
-tidy:
-    go mod tidy
 
 # Format Go code
 fmt:

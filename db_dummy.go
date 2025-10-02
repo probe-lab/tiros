@@ -35,3 +35,14 @@ func (D DBDummyClient) InsertRun(c *cli.Context, ipfsImpl string, version string
 func (D DBDummyClient) InsertMeasurement(ctx context.Context, m *models.Measurement) (*models.Measurement, error) {
 	return nil, nil
 }
+
+func (D DBDummyClient) InsertUpload(c *cli.Context, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
+	dbUpload := &models.Upload{
+		Cid:         cid,
+		TraceID:     traceID,
+		FileSize:    fileSize,
+		Region:      region,
+		KuboVersion: kuboVersion,
+	}
+	return dbUpload, nil
+}
