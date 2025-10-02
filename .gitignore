@@ -458,4 +458,6 @@ analysis/plots/*.png
 
 db.toml
 /udgerdb_v3.dat
-tiros
+./tiros
+
+data-alloy

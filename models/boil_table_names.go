@@ -7,8 +7,10 @@ var TableNames = struct {
 	Measurements string
 	Providers    string
 	Runs         string
+	Uploads      string
 }{
 	Measurements: "measurements",
 	Providers:    "providers",
 	Runs:         "runs",
+	Uploads:      "uploads",
 }

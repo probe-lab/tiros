@@ -2,33 +2,42 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-Tiros is an IPFS website measurement tool. It is intended to run on AWS ECS in multiple regions.
+Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement tool. It is intended to run on AWS ECS in multiple regions.
 
 ## Table of Contents
 
-- [Tiros](#tiros)
-  - [Table of Contents](#table-of-contents)
-  - [Measurement Methodology](#measurement-methodology)
-  - [Measurement Metrics](#measurement-metrics)
-  - [Run](#run)
-  - [Development](#development)
-    - [Migrations](#migrations)
-  - [Alternative IPFS Implementation](#alternative-ipfs-implementation)
-  - [Maintainers](#maintainers)
-  - [Contributing](#contributing)
-  - [License](#license)
+
+<!-- TOC -->
+* [Tiros](#tiros)
+  * [Table of Contents](#table-of-contents)
+  * [Measurement Methodology](#measurement-methodology)
+    * [Website Performance](#website-performance)
+    * [Measurement Metrics](#measurement-metrics)
+    * [Run](#run)
+  * [Upload Perforamnce](#upload-perforamnce)
+  * [Development](#development)
+    * [Migrations](#migrations)
+  * [Alternative IPFS Implementation](#alternative-ipfs-implementation)
+  * [Maintainers](#maintainers)
+  * [Contributing](#contributing)
+  * [License](#license)
+<!-- TOC -->
 
 ## Measurement Methodology
 
-We are running Tiros as a scheduled AWS ECS task in seven different AWS regions. These regions are:
+We, [ProbeLab](https://probelab.io), are running Tiros as a scheduled AWS ECS task in four different AWS regions. These regions are:
 
 - `eu-central-1`
-- `ap-south-1`
-- `af-southeast-2`
-- `sa-east-1`
 - `us-east-2`
 - `us-west-1`
-- `af-south-1`
+- `ap-southeast-2`
+
+There are different types of experiments that Tiros can execute. We have the following types of experiments:
+
+- Website performance
+- Upload performance
+
+### Website Performance
 
 Each ECS task consists of three containers:
 
@@ -208,7 +217,7 @@ for _, settle := range c.IntSlice("settle-times") {
 
 So in total, each run measures `settle-times * times * len([http, ipfs]) * len(websites)` website requests. In our case it's `2 * 5 * 2 * 14 = 280` requests. This takes around `1h` because some websites time out and the second settle time is configured to be `10m`
 
-## Measurement Metrics
+### Measurement Metrics
 
 I read up on how to measure website performance and came across this list:
 
@@ -252,36 +261,66 @@ In the above graph you can also see the two timestamps `domContentLoadedEventSta
 
 We could instead define `domContentLoaded` as the time difference between `startTime` and `domContentLoadedEventEnd`.
 
-## Run
+### Execution
 
 You need to provide many configuration parameters to `tiros`. See this help page:
 
 ```text
 NAME:
-   tiros run
+   tiros probe
 
 USAGE:
-   tiros run [command options] [arguments...]
+   tiros probe [command options]
+
+COMMANDS:
+   websites  
+   upload    
+   help, h   Shows a list of commands or help for one command
 
 OPTIONS:
-   --websites value [ --websites value ]          Websites to test against. Example: 'ipfs.io' or 'filecoin.io [$TIROS_RUN_WEBSITES]
-   --region value                                 In which region does this tiros task run in [$TIROS_RUN_REGION]
-   --settle-times value [ --settle-times value ]  a list of times to settle in seconds (default: 10, 1200) [$TIROS_RUN_SETTLE_TIMES]
-   --times value                                  number of times to test each URL (default: 3) [$TIROS_RUN_TIMES]
-   --dry-run                                      Whether to skip DB interactions (default: false) [$TIROS_RUN_DRY_RUN]
-   --db-host value                                On which host address can this clustertest reach the database [$TIROS_RUN_DATABASE_HOST]
-   --db-port value                                On which port can this clustertest reach the database (default: 0) [$TIROS_RUN_DATABASE_PORT]
-   --db-name value                                The name of the database to use [$TIROS_RUN_DATABASE_NAME]
-   --db-password value                            The password for the database to use [$TIROS_RUN_DATABASE_PASSWORD]
-   --db-user value                                The user with which to access the database to use [$TIROS_RUN_DATABASE_USER]
-   --db-sslmode value                             The sslmode to use when connecting the the database [$TIROS_RUN_DATABASE_SSL_MODE]
-   --kubo-api-port value                          port to reach the Kubo API (default: 5001) [$TIROS_RUN_KUBO_API_PORT]
-   --kubo-gateway-port value                      port to reach the Kubo Gateway (default: 8080) [$TIROS_RUN_KUBO_GATEWAY_PORT]
-   --chrome-cdp-port value                        port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_RUN_CHROME_CDP_PORT]
-   --cpu value                                    CPU resources for this measurement run (default: 2) [$TIROS_RUN_CPU]
-   --memory value                                 Memory resources for this measurement run (default: 4096) [$TIROS_RUN_MEMORY]
+   --dry-run                    Whether to skip DB interactions (default: false) [$TIROS_PROBE_DRY_RUN]
+   --db-host value              On which host address can this clustertest reach the database (default: "localhost") [$TIROS_PROBE_DATABASE_HOST]
+   --db-port value              On which port can this clustertest reach the database (default: 5432) [$TIROS_PROBE_DATABASE_PORT]
+   --db-name value              The name of the database to use (default: "tiros") [$TIROS_PROBE_DATABASE_NAME]
+   --db-password value          The password for the database to use [$TIROS_PROBE_DATABASE_PASSWORD]
+   --db-user value              The user with which to access the database to use (default: "tiros") [$TIROS_PROBE_DATABASE_USER]
+   --db-sslmode value           The sslmode to use when connecting the the database (default: "disable") [$TIROS_PROBE_DATABASE_SSL_MODE]
+   --ipfs-host value            host at which to reach the IPFS Gateway (default: "127.0.0.1") [$TIROS_PROBE_IPFS_HOST]
+   --ipfs-api-port value        port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_IPFS_API_PORT]
+   --ipfs-gateway-port value    port to reach the IPFS Gateway (default: 8080) [$TIROS_PROBE_IPFS_GATEWAY_PORT]
+   --chrome-cdp-host value      host at which the Chrome DevTools Protocol is reachable (default: "localhost") [$TIROS_PROBE_CHROME_CDP_HOST]
+   --chrome-cdp-port value      port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_CHROME_CDP_PORT]
+   --ipfs-implementation value  Which implementation are we testing (KUBO, HELIA) (default: "KUBO") [$TIROS_PROBE_IPFS_IMPLEMENTATION]
+   --help, -h                   show help
+```
+
+```text
+NAME:
+   tiros probe websites
+
+USAGE:
+   tiros probe websites [command options]
+
+OPTIONS:
+   --websites value [ --websites value ]          Websites to test against. Example: 'ipfs.io' or 'filecoin.io [$TIROS_PROBE_WEBSITES_WEBSITES]
+   --settle-times value [ --settle-times value ]  a list of times to settle in seconds (default: 0, 0) [$TIROS_PROBE_WEBSITES_SETTLE_TIMES]
+   --times value                                  number of times to test each URL (default: 3) [$TIROS_PROBE_WEBSITES_TIMES]
+   --lookup-providers                             Whether to lookup website providers (default: true) [$TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS]
+   --timeout value                                The maximum allowed time for this experiment to run (0 no timeout) (default: 0s) [$TIROS_PROBE_WEBSITES_TIMEOUT]
    --help, -h                                     show help
 ```
+
+## Upload Performance
+
+Each ECS task consists of two containers:
+
+1. `scheduler` (this repository)
+2. `kubo` - [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/)
+3. `alloy` - [grafana/alloy](https://github.com/grafana/alloy)
+
+In this configuration, the scheduler generates a configurable amount of random data
+and adds it to kubo. Kubo then transmits traces covering the internals to alloy
+which will then be forwarded to an OpenTelemetry collector.
 
 ## Development
 

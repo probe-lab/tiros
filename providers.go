@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/aarondl/null/v8"
-	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
@@ -164,7 +164,6 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 		}
 
 		prov.isRelayed = isRelayed(prov.addrs)
-		prov.country, prov.continent, prov.asn, prov.datacenterID = t.addrInfos(ctx, prov.addrs)
 
 		results <- prov
 	}
@@ -174,21 +173,28 @@ func (t *tiros) findProviders(ctx context.Context, website string, results chan<
 
 type idResult struct {
 	peer  *peer.AddrInfo
-	idOut shell.IdOutput
+	idOut *IdOutput
 	err   error
+}
+
+type IdOutput struct { // nolint
+	ID           string
+	PublicKey    string
+	Addresses    []string
+	AgentVersion string
+	Protocols    []protocol.ID
 }
 
 func (t *tiros) idWorker(ctx context.Context, jobs <-chan *peer.AddrInfo, idResults chan<- idResult) {
 	for j := range jobs {
-		var out shell.IdOutput
-
+		var out IdOutput
 		tCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		err := t.ipfs.Request("id", j.ID.String()).Exec(tCtx, &out)
 		cancel()
 
 		idResults <- idResult{
 			peer:  j,
-			idOut: out,
+			idOut: &out,
 			err:   err,
 		}
 	}
@@ -208,74 +214,4 @@ func isRelayed(maddrs []multiaddr.Multiaddr) null.Bool {
 		}
 	}
 	return null.NewBool(true, true)
-}
-
-func (t *tiros) addrInfos(ctx context.Context, maddrs []multiaddr.Multiaddr) (null.String, null.String, null.Int, null.Int) {
-	var countries []string
-	var continents []string
-	var asns []int
-	var datacenters []int
-
-	countriesMap := map[string]struct{}{}
-	continentsMap := map[string]struct{}{}
-	asnsMap := map[int]struct{}{}
-	datacentersMap := map[int]struct{}{}
-
-	for _, maddr := range maddrs {
-		infos, err := t.mmClient.MaddrInfo(ctx, maddr)
-		if err != nil {
-			continue
-		}
-
-		for addr, info := range infos {
-			if _, found := countriesMap[info.Country]; !found {
-				countriesMap[info.Country] = struct{}{}
-				countries = append(countries, info.Country)
-			}
-
-			if _, found := continentsMap[info.Continent]; !found {
-				continentsMap[info.Continent] = struct{}{}
-				continents = append(continents, info.Continent)
-			}
-
-			if _, found := asnsMap[int(info.ASN)]; !found {
-				asnsMap[int(info.ASN)] = struct{}{}
-				asns = append(asns, int(info.ASN))
-			}
-
-			if t.uClient != nil {
-				datacenter, err := t.uClient.Datacenter(addr)
-				if err != nil {
-					continue
-				}
-
-				if _, found := datacentersMap[datacenter]; !found {
-					datacentersMap[datacenter] = struct{}{}
-					datacenters = append(datacenters, datacenter)
-				}
-			}
-		}
-	}
-
-	nullCountry := null.NewString("", false)
-	if len(countries) == 1 {
-		nullCountry = null.NewString(countries[0], true)
-	}
-
-	nullContinent := null.NewString("", false)
-	if len(continents) == 1 {
-		nullContinent = null.NewString(continents[0], true)
-	}
-
-	nullASN := null.NewInt(0, false)
-	if len(asns) == 1 {
-		nullASN = null.NewInt(asns[0], true)
-	}
-
-	nullDatacenters := null.NewInt(0, false)
-	if len(datacenters) == 1 {
-		nullDatacenters = null.NewInt(datacenters[0], true)
-	}
-
-	return nullCountry, nullContinent, nullASN, nullDatacenters
 }
