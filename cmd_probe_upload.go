@@ -17,8 +17,10 @@ import (
 )
 
 var probeUploadConfig = struct {
+	Interval    time.Duration
 	FileSizeMiB int
 }{
+	Interval:    time.Minute,
 	FileSizeMiB: 100,
 }
 
@@ -32,6 +34,13 @@ var probeUploadCmd = &cli.Command{
 			EnvVars:     []string{"TIROS_PROBE_UPLOAD_FILE_SIZE_MIB"},
 			Value:       probeUploadConfig.FileSizeMiB,
 			Destination: &probeUploadConfig.FileSizeMiB,
+		},
+		&cli.DurationFlag{
+			Name:        "interval",
+			Usage:       "how long to wait between each upload",
+			EnvVars:     []string{"TIROS_PROBE_UPLOAD_INTERVAL"},
+			Value:       probeUploadConfig.Interval,
+			Destination: &probeUploadConfig.Interval,
 		},
 	},
 }
@@ -47,6 +56,11 @@ func probeUploadAction(c *cli.Context) error {
 		return fmt.Errorf("ipfs api offline: %w", err)
 	}
 
+	var out IdOutput
+	if err := ipfs.Request("id").Exec(c.Context, &out); err != nil {
+		return fmt.Errorf("ipfs id: %w", err)
+	}
+
 	// Initialize database client
 	dbClient, err := newDBClient(c.Context)
 	if err != nil {
@@ -56,14 +70,13 @@ func probeUploadAction(c *cli.Context) error {
 
 	iteration := 0
 
-	interval := time.Minute
 	ticker := time.NewTimer(0)
 	iterationStart := time.Now()
 	var previousPath *path.ImmutablePath
 	for {
 		iteration += 1
 
-		waitTime := time.Until(iterationStart.Add(interval)).Truncate(time.Second)
+		waitTime := time.Until(iterationStart.Add(probeUploadConfig.Interval)).Truncate(time.Second)
 		if waitTime > 0 {
 			log.WithField("iteration", iteration).Infof("Waiting %s until the next iteration...", waitTime)
 		}
@@ -111,7 +124,7 @@ func probeUploadAction(c *cli.Context) error {
 		span.End()
 		cancel()
 
-		ticker.Reset(interval)
+		ticker.Reset(probeUploadConfig.Interval)
 
 		if err != nil {
 			logEntry.WithError(err).Warnln("Error adding file to IPFS")
@@ -127,7 +140,7 @@ func probeUploadAction(c *cli.Context) error {
 		})
 		logEntry.Infoln("Uploaded file to Kubo")
 
-		_, err = dbClient.InsertUpload(c, version.Version, rootConfig.Region, imPath.RootCid().String(), span.SpanContext().TraceID().String(), size)
+		_, err = dbClient.InsertUpload(c, out.ID, version.Version, rootConfig.Region, imPath.RootCid().String(), span.SpanContext().TraceID().String(), size)
 		if err != nil {
 			return fmt.Errorf("insert upload: %w", err)
 		}

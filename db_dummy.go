@@ -36,13 +36,14 @@ func (D DBDummyClient) InsertMeasurement(ctx context.Context, m *models.Measurem
 	return nil, nil
 }
 
-func (D DBDummyClient) InsertUpload(c *cli.Context, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
+func (D DBDummyClient) InsertUpload(c *cli.Context, peerID string, kuboVersion string, region string, cid string, traceID string, fileSize int) (*models.Upload, error) {
 	dbUpload := &models.Upload{
 		Cid:         cid,
 		TraceID:     traceID,
 		FileSize:    fileSize,
 		Region:      region,
 		KuboVersion: kuboVersion,
+		PeerID:      peerID,
 	}
 	return dbUpload, nil
 }
