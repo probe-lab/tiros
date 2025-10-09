@@ -461,3 +461,8 @@ db.toml
 ./tiros
 
 data-alloy
+json
+
+**/tmp.*
+
+results

@@ -1,0 +1,3560 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "Kubo"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "0.39.0-dev"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "go"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.38.0"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "go-libp2p-kad-dht"
+          },
+          "spans": [
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "GAOynJg9Iow=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498255000",
+              "endTimeUnixNano": "1760467567990872917",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVD6NhPamt4pA3puQdjShcTs1EQV9Xt5boqEyWqQ3Yws5"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVD6NhPamt4pA3puQdjShcTs1EQV9Xt5boqEyWqQ3Yws5: all dials failed\n  * [/ip4/154.12.177.55/tcp/52846] dial tcp4 154.12.177.55:52846: connect: connection refused\n  * [/ip4/154.12.177.55/tcp/38424] dial tcp4 154.12.177.55:38424: connect: connection refused",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "a0A29XVauKY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568013689000",
+              "endTimeUnixNano": "1760467568054998166",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmcjwrFSAweLfzKMxTz1P3zLBjEdV8ZMt3a1btMSFzDqRd"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmcjwrFSAweLfzKMxTz1P3zLBjEdV8ZMt3a1btMSFzDqRd"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmcjwrFSAweLfzKMxTz1P3zLBjEdV8ZMt3a1btMSFzDqRd: [/ip4/65.21.141.181/tcp/40345 /ip4/127.0.0.1/tcp/40345]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "ApQWHCvBZKk=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467567977825000",
+              "endTimeUnixNano": "1760467568130475375",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmR7anebJEttphuy7hLqqUfXESg5ostnYRPxtMSvw1DHLV"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmR7anebJEttphuy7hLqqUfXESg5ostnYRPxtMSvw1DHLV"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmR7anebJEttphuy7hLqqUfXESg5ostnYRPxtMSvw1DHLV: [/ip4/10.0.0.13/tcp/35793 /ip4/127.0.0.1/tcp/35793 /ip4/129.159.229.110/tcp/35793]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "46LyeYi3Tgw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568311159000",
+              "endTimeUnixNano": "1760467568311185625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "sdtOCpRTw/8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568183107000",
+              "endTimeUnixNano": "1760467568311831708",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooW9zfhgPG9zH1xUmxmQynKqGo1s6mpqdA7V5uZhHE6Qduy"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooW9zfhgPG9zH1xUmxmQynKqGo1s6mpqdA7V5uZhHE6Qduy"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmS5kijLC1TeSWVebQKMM2thKbJLu72sxmUWreyaEeUnVc: [/ip4/37.27.109.141/tcp/40663]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWNfXLbW6CXMSMQ4XqK5veBqvRg5AtP27B9LTZFr4RBntZ: [/ip4/45.32.132.120/udp/4001/quic /ip4/45.32.132.120/udp/4001/quic-v1 /ip4/45.32.132.120/udp/4001/quic-v1/webtransport/certhash/uEiCMmKBERDI5VO3t8MSaU5oNrvJu0UfBn8t9qXsxZFSG6g/certhash/uEiA9NmMIhjJG0QRS4Hn_iqzKRtNlvcvY_k6Vo-pzRhTM1A]}"
+                        },
+                        {
+                          "stringValue": "{QmPicqaTtYBL674XqSH9h4ibG5VW43WFh8GiNqsYKqn9UA: [/ip4/154.3.35.122/tcp/41792 /ip4/154.3.35.122/tcp/51690]}"
+                        },
+                        {
+                          "stringValue": "{Qmcfwb5NytdUiMXbTxrubZRiceMLtQwT5X4ptgAgCGxtqj: [/ip4/91.150.160.38/tcp/4190 /ip4/91.150.160.38/tcp/7805]}"
+                        },
+                        {
+                          "stringValue": "{QmdjtxMyervJ1aJq5g71E4hDe1e2SpCEVoNsbkiKFe88JD: [/ip4/154.3.34.94/tcp/55880 /ip4/154.3.34.94/tcp/41342]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWN7GC3WM2tiMHTUvwXcezpyYccR7Snu892TUuWhTzhanS: [/ip4/45.76.27.102/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmdY4vkDV9kdPuFtVMm75Uo43efcCX7yjybiaWJ4kybAkg: [/ip4/194.36.145.239/tcp/33753]}"
+                        },
+                        {
+                          "stringValue": "{QmVbau8xC4fb2dBiw4dvqcd857Jpm1iiYiuvEnQFHNpfTB: [/ip4/34.16.1.64/tcp/38985]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWN6V8aXWs2bXpLBp4ibjxNPJh9CfGRprPPiUDxSamFU2v: [/dns4/95-216-244-113.k51qzi5uqu5dkq9vk6hchj6ubjxgvzlel6gcoq47j97eks2e56wsu5mcu4l18r.libp2p.direct/tcp/4001/tls/ws /ip4/95.216.244.113/udp/4001/quic-v1/webtransport/certhash/uEiDdRp9umGZZWIi3nlCypohSs5nnDThTxZHC0yup9YmuTw/certhash/uEiCQPmZeDkFgBFb1tQshNpWupeYkqH-TR8gO-ZUjpO7mUw /ip4/95.216.244.113/udp/4001/quic-v1 /ip6/2a01:4f9:2b:26a0::2/tcp/4001 /dns6/2a01-4f9-2b-26a0--2.k51qzi5uqu5dkq9vk6hchj6ubjxgvzlel6gcoq47j97eks2e56wsu5mcu4l18r.libp2p.direct/tcp/4001/tls/ws /ip4/95.216.244.113/udp/4001/webrtc-direct/certhash/uEiAtVTzLCyvQV2RjZ2vu76w_6jPXKr5WYkZ159NAfdmz5A /ip6/2a01:4f9:2b:26a0::2/udp/4001/webrtc-direct/certhash/uEiAtVTzLCyvQV2RjZ2vu76w_6jPXKr5WYkZ159NAfdmz5A /ip6/2a01:4f9:2b:26a0::2/udp/4001/quic-v1/webtransport/certhash/uEiDdRp9umGZZWIi3nlCypohSs5nnDThTxZHC0yup9YmuTw/certhash/uEiCQPmZeDkFgBFb1tQshNpWupeYkqH-TR8gO-ZUjpO7mUw /ip6/2a01:4f9:2b:26a0::2/udp/4001/quic-v1 /ip4/95.216.244.113/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmVcJDZBCqXnN6tsx3YVadL3P4yo3WsqH4FrDwWmaxwWzb: [/ip4/43.155.152.67/tcp/45155]}"
+                        },
+                        {
+                          "stringValue": "{QmTva9bcQSC2pAywbBNCSc2EU3xzC27pBxPmTdrtQY3PJa: [/ip4/38.242.136.202/tcp/32969]}"
+                        },
+                        {
+                          "stringValue": "{QmS9g1jYzFGabEarmk9ws5JjK6FTJuxxFNh1YcdzjVEFqN: [/ip4/104.250.129.22/tcp/38285]}"
+                        },
+                        {
+                          "stringValue": "{QmZgufuCMQpCFcqViu5aDuEe7aVMJurfTRsEtM2k6fGRb2: [/ip4/147.124.220.109/tcp/45941]}"
+                        },
+                        {
+                          "stringValue": "{QmTZdMPW26J8nStjWKsPYHWs71K3nG9LaBHCq4ZUGYh411: [/ip4/137.184.114.240/tcp/45003]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWKMLEVc92RMz4hgvYpPiEREecjGmfCGktLnTkigKWXG8y: [/ip4/91.244.71.84/tcp/39401 /ip4/91.244.71.84/udp/39401/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWSPgD3zD7mPjxLBeWQ6XrgD1KwkQywirPHtz8mw6Tv7eA: [/dns4/51-91-18-70.k51qzi5uqu5dmbjvvmd6xd7dvwwb9j91d8s6ctxp2pxfp8jcjd29n8ujjhg8uj.libp2p.direct/tcp/4001/tls/ws /ip4/51.91.18.70/udp/4001/quic-v1 /ip4/51.91.18.70/udp/42528/webrtc-direct/certhash/uEiBJ62Ug35DfNQamtYkLj1lBKXPVl4q5bnpdc1w5kbl1yA /ip4/51.91.18.70/tcp/2520 /ip4/51.91.18.70/udp/42528/quic-v1 /ip4/51.91.18.70/udp/4001/quic-v1/webtransport/certhash/uEiAYzWPfCq1E49EAQ4wLo-mNT30E1URYQx4zSM0jxMTC9g/certhash/uEiA23MHSY9oj5H2DrOYO6tq5ZSKtgE7GlTifOdHx_IAPkQ /ip4/51.91.18.70/udp/4001/webrtc-direct/certhash/uEiBJ62Ug35DfNQamtYkLj1lBKXPVl4q5bnpdc1w5kbl1yA /dns4/51-91-18-70.k51qzi5uqu5dmbjvvmd6xd7dvwwb9j91d8s6ctxp2pxfp8jcjd29n8ujjhg8uj.libp2p.direct/tcp/2520/tls/ws /ip4/51.91.18.70/udp/42528/quic-v1/webtransport/certhash/uEiAYzWPfCq1E49EAQ4wLo-mNT30E1URYQx4zSM0jxMTC9g/certhash/uEiA23MHSY9oj5H2DrOYO6tq5ZSKtgE7GlTifOdHx_IAPkQ /ip4/51.91.18.70/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{Qme9ik1RUSXFGLEuYvhDnweSCih7uu7mh1eegFx57RK74d: [/ip4/5.9.59.210/tcp/38335]}"
+                        },
+                        {
+                          "stringValue": "{QmXF7hcsE8E57apxb6L2ELpAQk1BMVmAbRQHMwBMYEXbZr: [/ip4/65.21.194.241/tcp/44661]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWGM3TG3MzT41CRJJvYqoPVw6u6qjGpdxE3jjweKNJoAmA: [/ip4/99.235.193.82/udp/64450/quic-v1 /ip4/172.33.0.14/tcp/4001 /ip4/99.235.193.82/tcp/4001 /ip4/99.235.193.82/tcp/51426 /ip4/172.33.0.14/udp/4001/quic-v1 /dns4/99-235-193-82.k51qzi5uqu5dilmp7t7fb69ss0nw9efpk72ijiom57uxg5clogqexeaebf3smd.libp2p.direct/tcp/4001/tls/ws /ip4/99.235.193.82/udp/64450/webrtc-direct/certhash/uEiC-2tfGCz4Z15TzKvCOFUeWNX2LXH5ql9CA8lUOMt478Q /ip4/99.235.193.82/udp/64450/quic-v1/webtransport/certhash/uEiCRzGG_mKElJrHkaSAst3Yj9UHOnUvBAvw8L9iS20bZCA/certhash/uEiDms-vyx8rKILLdxzmCkXN4pNtuK_bvqZ-xuHkUsa7VwA /ip4/172.33.0.14/udp/4001/quic-v1/webtransport/certhash/uEiCRzGG_mKElJrHkaSAst3Yj9UHOnUvBAvw8L9iS20bZCA/certhash/uEiDms-vyx8rKILLdxzmCkXN4pNtuK_bvqZ-xuHkUsa7VwA /ip4/172.33.0.14/udp/4001/webrtc-direct/certhash/uEiC-2tfGCz4Z15TzKvCOFUeWNX2LXH5ql9CA8lUOMt478Q]}"
+                        },
+                        {
+                          "stringValue": "{QmPeZVFgZ8YGd2xFFcpZJZ2VuRGECs5PA96euv866udXYD: [/ip4/80.190.82.49/tcp/33077]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooW9zfhgPG9zH1xUmxmQynKqGo1s6mpqdA7V5uZhHE6Qduy: [/ip4/162.120.19.13/tcp/4001 /ip4/127.0.0.1/tcp/4001 /dns4/162-120-19-13.k51qzi5uqu5dg8ygrxjcqy9ssgoqpbgup1nhafve69vvp086pp87y90pms0460.libp2p.direct/tcp/4001/tls/ws /ip4/162.120.19.13/tcp/31197 /dns4/162-120-19-13.k51qzi5uqu5dg8ygrxjcqy9ssgoqpbgup1nhafve69vvp086pp87y90pms0460.libp2p.direct/tcp/31197/tls/ws]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "K0Oj5UBomXE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.GetProviders",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568394133000",
+              "endTimeUnixNano": "1760467568412575208",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "/ltdcp3wl40=",
+              "parentSpanId": "GvjX17Z3P08=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563468403000",
+              "endTimeUnixNano": "1760467568469608708",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmNo9x2CAvSn2X5Tmv9ispBfioKqLPDPXHCmFaYxxUsiqF"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "GvjX17Z3P08=",
+              "parentSpanId": "pcTZiF1RR4I=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563468400000",
+              "endTimeUnixNano": "1760467568469624791",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "B/5TSQrPVUI=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568469728000",
+              "endTimeUnixNano": "1760467568469735417",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmNo9x2CAvSn2X5Tmv9ispBfioKqLPDPXHCmFaYxxUsiqF"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmbcVhJsveF7USzdNjfR2dLRfAD9BNrn16Nk76pM61Pret"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "uklYl1BG1Ec=",
+              "parentSpanId": "2z6ppDU0ty4=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563474676000",
+              "endTimeUnixNano": "1760467568475532917",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmXfNnkEkr9bwGYjovyq4kfv7Z8vhYqxf2mRFbnpj7cFLK"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "2z6ppDU0ty4=",
+              "parentSpanId": "I2qfZkKQ+RM=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563474668000",
+              "endTimeUnixNano": "1760467568475541750",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "aoNRBPaCJxQ=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568475637000",
+              "endTimeUnixNano": "1760467568475648583",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmXfNnkEkr9bwGYjovyq4kfv7Z8vhYqxf2mRFbnpj7cFLK"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmeEhMCoTLC2dkGH2YmSnQdgUPz1TBtYv25JmFmWYdamjp"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "FTCKh0ObbXM=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568549751000",
+              "endTimeUnixNano": "1760467568590549750",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "Qmb1WYghdQu3eWJ7EJrvpMMVDzatxGpUrk9k93QN4nTPG7"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "Qmb1WYghdQu3eWJ7EJrvpMMVDzatxGpUrk9k93QN4nTPG7"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{Qmb1WYghdQu3eWJ7EJrvpMMVDzatxGpUrk9k93QN4nTPG7: [/ip4/127.0.0.1/tcp/39071 /ip4/135.181.183.53/tcp/39071]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "kHnpNrpjY1g=",
+              "parentSpanId": "AGETIqGny4o=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563646232000",
+              "endTimeUnixNano": "1760467568647589167",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmecdLggP6GduDdSF6MMWx5tKc4Ys4S4ciQ54zreb2Mtn2"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "AGETIqGny4o=",
+              "parentSpanId": "ousjJBc9kAY=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563646227000",
+              "endTimeUnixNano": "1760467568647650958",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "lyqV5R390JI=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568647774000",
+              "endTimeUnixNano": "1760467568647787667",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmecdLggP6GduDdSF6MMWx5tKc4Ys4S4ciQ54zreb2Mtn2"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmZatuHCXP1puDoCLPoRsMZs1P12wNkXzmPe1SAXzBR4F9"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "aNtfqj+w2tg=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568633013000",
+              "endTimeUnixNano": "1760467568854977709",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmfFwaJ4jLzizFoiHUowVc18kZasAKKc4RguLSV9PbnKTv"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmfFwaJ4jLzizFoiHUowVc18kZasAKKc4RguLSV9PbnKTv"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmfFwaJ4jLzizFoiHUowVc18kZasAKKc4RguLSV9PbnKTv: [/ip4/10.100.70.6/tcp/60445 /ip4/127.0.0.1/tcp/60445 /ip4/51.75.155.7/tcp/60445]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "I8H9iTDwB6g=",
+              "parentSpanId": "TXEVmyYLROs=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563859286000",
+              "endTimeUnixNano": "1760467568860238541",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmfTdqZrfS4pzsXeQid9V22z9hzPyaawxXLbrhJd76eon2"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "TXEVmyYLROs=",
+              "parentSpanId": "zTGgjsqqPnM=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563859279000",
+              "endTimeUnixNano": "1760467568860257667",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "xI6yav2Rmqk=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568860359000",
+              "endTimeUnixNano": "1760467568860370167",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmfTdqZrfS4pzsXeQid9V22z9hzPyaawxXLbrhJd76eon2"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmYSkQ9vvuWpDFpF3CLd8H6xhe1fWnRiAntSUEBnv4zB1a"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "KCk6sRCqiSs=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568870320000",
+              "endTimeUnixNano": "1760467568870330209",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "FuDyQOnQcLM=",
+              "parentSpanId": "NpwevG8AEnk=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563915182000",
+              "endTimeUnixNano": "1760467568917314333",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmfCpqezn3NokwNiPWeA6Lt3QygndFwR7AJ8tLDy17eFy4"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "NpwevG8AEnk=",
+              "parentSpanId": "a5Rpu56DrYI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563915139000",
+              "endTimeUnixNano": "1760467568917335791",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "xCgqong3W7U=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568917456000",
+              "endTimeUnixNano": "1760467568917467750",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmfCpqezn3NokwNiPWeA6Lt3QygndFwR7AJ8tLDy17eFy4"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmeQcpKKQUDe9M3ZyovLMVfFYb2VAvLESNbbgqzupPLqvM"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "TpCugYRT7YU=",
+              "parentSpanId": "Gh7Y63SHTnY=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563971078000",
+              "endTimeUnixNano": "1760467568976885667",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmZo7wyGMZTfcjWgr41shYx1Qaq5G2V27SwzVfEcABPCbT"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "Gh7Y63SHTnY=",
+              "parentSpanId": "IYk4g2WCPrc=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467563971060000",
+              "endTimeUnixNano": "1760467568976935750",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "keM17ONMypY=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467568983960000",
+              "endTimeUnixNano": "1760467568984004791",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmZo7wyGMZTfcjWgr41shYx1Qaq5G2V27SwzVfEcABPCbT"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmSTEV3dvUKou4W5LFPx1S1NviADaC4h3x91fu7S5Caj1r"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DXa+G6lHNx8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.GetProviders",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569032761000",
+              "endTimeUnixNano": "1760467569041529167",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "6wzoYgFcIYY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569087059000",
+              "endTimeUnixNano": "1760467569087077583",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "IQl13PVbfqc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.GetProviders",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569188259000",
+              "endTimeUnixNano": "1760467569201207000",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "yvm2UHpxnLc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569203244000",
+              "endTimeUnixNano": "1760467569362766500",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp: [/ip4/127.0.0.1/udp/4001/quic-v1 /ip6/::1/udp/4001/quic-v1 /ip6/::1/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA /ip4/143.244.139.173/udp/4001/quic-v1 /ip4/127.0.0.1/tcp/4001 /ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA /ip6/::1/tcp/4001 /ip4/143.244.139.173/tcp/4001 /ip4/143.244.139.173/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "tEr3L6Bh6uc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569121532000",
+              "endTimeUnixNano": "1760467569408760042",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmcAQDA68EaYZJaM7Z2VWCvJK6bV8nb4HrTReVNZT8yJuv"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmcAQDA68EaYZJaM7Z2VWCvJK6bV8nb4HrTReVNZT8yJuv"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmcAQDA68EaYZJaM7Z2VWCvJK6bV8nb4HrTReVNZT8yJuv: [/ip4/127.0.0.1/tcp/49255 /ip4/192.168.1.211/tcp/49255 /ip4/121.32.94.157/tcp/17550 /ip4/192.168.89.1/tcp/49255]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "PtNWw9a6//o=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569425522000",
+              "endTimeUnixNano": "1760467569453607750",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmShGTSTApXceaBDNATwP3AhE3KAkhJUZBjvX7eNFG8GtS"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmShGTSTApXceaBDNATwP3AhE3KAkhJUZBjvX7eNFG8GtS"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmShGTSTApXceaBDNATwP3AhE3KAkhJUZBjvX7eNFG8GtS: [/ip4/94.130.18.182/tcp/45883 /ip4/127.0.0.1/tcp/45883]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "klceMlrcRi0=",
+              "parentSpanId": "wC/B5elvdhA=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564523637000",
+              "endTimeUnixNano": "1760467569526324959",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmPtg6o3e8vJR7h7pJUjpeVu2Gt6MiucT7bd81Go1FHEC1"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "wC/B5elvdhA=",
+              "parentSpanId": "/VHYgtaR13Y=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564523633000",
+              "endTimeUnixNano": "1760467569526360625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "poQnfcZcjSQ=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569526524000",
+              "endTimeUnixNano": "1760467569526542125",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmPtg6o3e8vJR7h7pJUjpeVu2Gt6MiucT7bd81Go1FHEC1"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmTednADXENsGgMuvPoErhsYAjYjQhuCFhy27wQvPcEZ2p"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "+7PJkH70IcM=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569203650000",
+              "endTimeUnixNano": "1760467569552507791",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp: [/ip6/::1/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA /ip4/143.244.139.173/udp/4001/quic-v1 /ip4/127.0.0.1/udp/4001/quic-v1 /ip6/::1/udp/4001/quic-v1 /ip6/::1/tcp/4001 /ip4/143.244.139.173/tcp/4001 /ip4/143.244.139.173/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA /ip4/127.0.0.1/tcp/4001 /ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiCN6EEVebHiXQSP9WuTPqW0dyCcYous9z_BVbzM0DbZQQ/certhash/uEiACi7XA492nsppaiX5JDahJoTthOiSUDnUdyjpQZ03QgA]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "RQIJWSB85ho=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566739344000",
+              "endTimeUnixNano": "1760467569552725792",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWQbD8aqmgqNbevHLNHZgNZGopCJ23GyDMe4V73qLFCM3R"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooWQbD8aqmgqNbevHLNHZgNZGopCJ23GyDMe4V73qLFCM3R"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmbzQXRrTdTk73ZRQ5F4YUKEJpivh4YULeyWJfVthHTFJW: [/ip4/167.71.214.98/tcp/38149]}"
+                        },
+                        {
+                          "stringValue": "{QmZvUL9Fr2xWLGxD1zJHstcETb69N93jmbkyJZFVWPd7sm: [/ip4/37.27.69.195/tcp/37483]}"
+                        },
+                        {
+                          "stringValue": "{QmNmkD4q2E5iGNfs7PmN6bFSSweCG4Uf7xQiGzJjut6vUy: [/ip4/64.188.64.32/tcp/40279]}"
+                        },
+                        {
+                          "stringValue": "{QmdvcuBWP7M4Dq5PpGF6CNu22dFvhQNGs81GSX1VrFKeKV: [/ip4/104.154.92.184/tcp/34127]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWJvscYgqp5csU9MRARBfVSFA9edYqPfvfV7aftm8HXfA1: [/ip4/104.218.49.242/tcp/4001 /ip4/104.218.49.242/udp/4001/quic-v1 /ip4/104.218.49.242/udp/4001/quic-v1/webtransport/certhash/uEiAAyrev88q4Nk_lq4934wpyYiVZovB1876TBMVJL6qTvA/certhash/uEiA5aNVX2CKSlbHf0_I_yH4l60kV4cwlIKJDvLL_AVUakA /ip4/104.218.49.242/udp/4001/webrtc-direct/certhash/uEiBPrI-Zskr8iQr-DISZne9Hi56HpLaIDO0AOAF2C9gWlQ]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWC7a6JoKBLyH6Uu96D2X4PMKTe4Ww2UXbCex7GWothr3M: [/ip4/158.247.215.63/tcp/4001 /ip4/158.247.215.63/udp/4001/quic-v1 /ip4/158.247.215.63/udp/4001/quic]}"
+                        },
+                        {
+                          "stringValue": "{QmT2beSKPoT9TVG6BZvSpvy9DuXzusA9ffhvVwqYe6AZjz: [/ip4/87.120.187.204/tcp/34965]}"
+                        },
+                        {
+                          "stringValue": "{Qmc2LGnUccprPXfGiiTxdnZ8hMEZAzZ2EEwkk2XGvqeUbg: [/ip4/65.21.206.102/tcp/41075]}"
+                        },
+                        {
+                          "stringValue": "{QmUg9ZXdRVeB2qXMJi25wrPNRHyEtxEcpuKSE4SMCVmqrj: [/ip4/95.217.105.122/tcp/35359]}"
+                        },
+                        {
+                          "stringValue": "{QmQrCqoZ3omohDJVSrdkZ42Su1ZJZwTc34t7Y7ESQDtnJf: [/ip4/35.188.57.188/tcp/39409]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWKaejkL6y53NyLiR5LvqgyF5JJ28LDBpaw75LqTr3u5ys: [/ip4/89.115.15.153/udp/4001/quic /ip4/89.115.15.153/tcp/4001 /ip4/89.115.15.153/udp/1031/quic]}"
+                        },
+                        {
+                          "stringValue": "{QmW2W8xbjUBff3QeKLVT7GtwejwB1BiofywZ4Th8SB53oX: [/ip4/180.96.38.196/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWJBFvHYn4rWu1ccNrsKHdgHgo81GkYisntzkyAj6v6Kw5: [/ip4/44.196.57.34/udp/4001/webrtc-direct/certhash/uEiBywoulpw3Bsqr-CPXqMiah8wMnaA-UupIrnVC5Pqnjcw /dns4/44-196-57-34.k51qzi5uqu5dja1lxhfnqf7w203rdzzthstjexwdi2uehwixeshcw7k85mbwg0.libp2p.direct/tcp/4001/tls/ws /ip4/44.196.57.34/udp/4001/quic-v1/webtransport/certhash/uEiAf9SsJ-XI1jc9yOqQEVcf1SmWwIUnLLoufmYiEeImtjg/certhash/uEiA5xfjOBkT9lgWVsmJem-FFYkZaITQUHvH-pO4YdfUzoA /ip4/44.196.57.34/tcp/4001 /ip4/172.15.0.230/tcp/4001 /dns4/172-15-0-230.k51qzi5uqu5dja1lxhfnqf7w203rdzzthstjexwdi2uehwixeshcw7k85mbwg0.libp2p.direct/tcp/4001/tls/ws /ip4/44.196.57.34/udp/4001/quic-v1 /ip4/172.15.0.230/udp/4001/quic-v1 /ip4/172.15.0.230/udp/4001/webrtc-direct/certhash/uEiBywoulpw3Bsqr-CPXqMiah8wMnaA-UupIrnVC5Pqnjcw /ip4/172.15.0.230/udp/4001/quic-v1/webtransport/certhash/uEiAf9SsJ-XI1jc9yOqQEVcf1SmWwIUnLLoufmYiEeImtjg/certhash/uEiA5xfjOBkT9lgWVsmJem-FFYkZaITQUHvH-pO4YdfUzoA]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWFXc3Tht1FgrFVNg7SigUJvWrk15ELYtXvs3hLrDFdtEA: [/ip4/153.120.37.73/udp/4001/quic /ip4/153.120.37.73/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmcvsKHqxJmpm6DZ2RgjbSyuQ1guZr7itRRiahGs1zY5qs: [/ip4/43.156.52.238/tcp/39021]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWFDYtctsFj4W4KNs6Ftudnx61uDcyR1iQeAtNkms3ocPZ: [/ip4/78.137.209.189/tcp/8239]}"
+                        },
+                        {
+                          "stringValue": "{QmbCxSFyhHGoMFFcAFZwnBv2fGD8AMM49RG3sS8n66UbmK: [/ip4/154.21.86.79/tcp/53820 /ip4/154.21.86.79/tcp/35786]}"
+                        },
+                        {
+                          "stringValue": "{QmNSRYJEygcVd3tU58AF57eb8uU4obiAacwpkdfWtpBArg: [/ip4/65.109.21.162/tcp/34233]}"
+                        },
+                        {
+                          "stringValue": "{QmQ1ufaZGhzbkNfWxV7NqfwP3QPJZy3w5uSGD6vXBRKtaE: [/ip4/65.21.72.165/tcp/46081]}"
+                        },
+                        {
+                          "stringValue": "{QmXiFoGwVn2mDjr3qGHvzPWgdT9NWjog5AqrU1PiTzYLV7: [/ip4/217.117.254.67/tcp/37745]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWQbD8aqmgqNbevHLNHZgNZGopCJ23GyDMe4V73qLFCM3R: [/ip4/172.17.0.2/udp/4001/webrtc-direct/certhash/uEiAHBn3fVR2KYkH_o9W7jTynA5gSZvbxzI1tNQaTb4rKyA /ip4/172.17.0.2/udp/4001/quic-v1/webtransport/certhash/uEiDnt25-jjHH13H0feQnkY21CDIC3ERg-s0KCPeedaSD2g/certhash/uEiDLLVElQcCk0edOPOCEg7F5pjx9h64_zBKUOC3LYT3jgg /dns4/82-22-174-78.k51qzi5uqu5dlnjfwor90wqc4cvquj7uxjxcp1hkxlnnndd1y3j2v5qez8jmc4.libp2p.direct/tcp/4001/tls/ws /ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiDnt25-jjHH13H0feQnkY21CDIC3ERg-s0KCPeedaSD2g/certhash/uEiDLLVElQcCk0edOPOCEg7F5pjx9h64_zBKUOC3LYT3jgg /ip4/172.17.0.2/tcp/4001 /ip6/::1/udp/4001/webrtc-direct/certhash/uEiAHBn3fVR2KYkH_o9W7jTynA5gSZvbxzI1tNQaTb4rKyA /ip4/82.22.174.78/tcp/4001 /ip6/::1/udp/4001/quic-v1/webtransport/certhash/uEiDnt25-jjHH13H0feQnkY21CDIC3ERg-s0KCPeedaSD2g/certhash/uEiDLLVElQcCk0edOPOCEg7F5pjx9h64_zBKUOC3LYT3jgg /ip4/82.22.174.78/udp/4001/quic-v1 /ip4/127.0.0.1/udp/4001/webrtc-direct/certhash/uEiAHBn3fVR2KYkH_o9W7jTynA5gSZvbxzI1tNQaTb4rKyA /ip4/172.17.0.2/udp/4001/quic-v1 /ip6/::1/tcp/4001 /ip6/::1/udp/4001/quic-v1 /ip4/82.22.174.78/udp/4001/quic-v1/webtransport/certhash/uEiDnt25-jjHH13H0feQnkY21CDIC3ERg-s0KCPeedaSD2g/certhash/uEiDLLVElQcCk0edOPOCEg7F5pjx9h64_zBKUOC3LYT3jgg /ip4/82.22.174.78/udp/4001/webrtc-direct/certhash/uEiAHBn3fVR2KYkH_o9W7jTynA5gSZvbxzI1tNQaTb4rKyA /ip4/127.0.0.1/tcp/4001 /ip4/127.0.0.1/udp/4001/quic-v1]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "eWFvX0yJgVE=",
+              "parentSpanId": "v5QxrjxF5iQ=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564712377000",
+              "endTimeUnixNano": "1760467569715541917",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "Qmf6ZXGAK4wCEtRPbKzMB5CBgL85wBjTNMVNSkoLJD4xtV"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "v5QxrjxF5iQ=",
+              "parentSpanId": "UAovXejaa90=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564712375000",
+              "endTimeUnixNano": "1760467569715619083",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "jDT+vnTsIfY=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569715758000",
+              "endTimeUnixNano": "1760467569715781167",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "Qmf6ZXGAK4wCEtRPbKzMB5CBgL85wBjTNMVNSkoLJD4xtV"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmfKbdrnNmyaHvBDTFH5iSecyj2abBiuh1HCaWiojpw41H"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "xyVf+TZpQ70=",
+              "parentSpanId": "xJLeBDhUM3c=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569715825000",
+              "endTimeUnixNano": "1760467570116473709",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmfKbdrnNmyaHvBDTFH5iSecyj2abBiuh1HCaWiojpw41H"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "xJLeBDhUM3c=",
+              "parentSpanId": "jDT+vnTsIfY=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569715815000",
+              "endTimeUnixNano": "1760467570116481375",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "4WwpsNA+sF0=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570116532000",
+              "endTimeUnixNano": "1760467570116537625",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmfKbdrnNmyaHvBDTFH5iSecyj2abBiuh1HCaWiojpw41H"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmTjUCPkT62BEfUnX5EqrK73r8Lf3iQJ2gF28G9XFBaZdi"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "2nz+tYeHa/M=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467569972074000",
+              "endTimeUnixNano": "1760467570116549875",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmbPheBohWGyPgWF5SJ1tZPc1nUHxH3RoCD5Cv3rCwkZUe"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmbPheBohWGyPgWF5SJ1tZPc1nUHxH3RoCD5Cv3rCwkZUe"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmbPheBohWGyPgWF5SJ1tZPc1nUHxH3RoCD5Cv3rCwkZUe: [/ip4/10.100.70.34/tcp/51628 /ip4/127.0.0.1/tcp/51628 /ip4/51.68.182.63/tcp/51628]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "E90ZdTv87Eo=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570116549000",
+              "endTimeUnixNano": "1760467570116563250",
+              "status": {}
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "2mQJwTNDQsk=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170211000",
+              "endTimeUnixNano": "1760467570170677208",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "Qmb9eQsD1Jg7Sk2L7r6pU75i9JErJdW4tZsNJQC6RHApke"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial Qmb9eQsD1Jg7Sk2L7r6pU75i9JErJdW4tZsNJQC6RHApke: all dials failed\n  * [/ip4/34.59.152.77/tcp/32979] dial tcp4 0.0.0.0:4001->34.59.152.77:32979: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "hFZKJIXPn4U=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170221000",
+              "endTimeUnixNano": "1760467570170691125",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmfNkqmKjvRJLEWCrfrWkXtEqRSsGnj3YJNEe5KBW2D48r"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmfNkqmKjvRJLEWCrfrWkXtEqRSsGnj3YJNEe5KBW2D48r: all dials failed\n  * [/ip4/116.102.175.41/tcp/45849] dial tcp4 0.0.0.0:4001->116.102.175.41:45849: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "grV7fmRFrqM=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170230000",
+              "endTimeUnixNano": "1760467570170694458",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmbN3w3LHhpJw2Au8ZMpyegNNWPDKt342uh7h5CoJ5aJbQ"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmbN3w3LHhpJw2Au8ZMpyegNNWPDKt342uh7h5CoJ5aJbQ: all dials failed\n  * [/ip4/34.9.57.228/tcp/46489] dial tcp4 0.0.0.0:4001->34.9.57.228:46489: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "aX9e0BUb8Pw=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170164000",
+              "endTimeUnixNano": "1760467570170706125",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmcWtgZoWaxhLsjhMyrjgKV82dSW7dVhmHa4G9ZnTPDRqL"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmcWtgZoWaxhLsjhMyrjgKV82dSW7dVhmHa4G9ZnTPDRqL: all dials failed\n  * [/ip4/65.21.194.249/tcp/32983] dial tcp4 0.0.0.0:4001->65.21.194.249:32983: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "2vwi1yEDtMY=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170157000",
+              "endTimeUnixNano": "1760467570170678125",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmUyAZxHqQzhATfM2ctiEVsXfedk6mbmTSCoKt9m8fihJZ"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmUyAZxHqQzhATfM2ctiEVsXfedk6mbmTSCoKt9m8fihJZ: all dials failed\n  * [/ip4/144.76.152.214/tcp/38989] dial tcp4 0.0.0.0:4001->144.76.152.214:38989: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "WeKEMaNyitI=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170200000",
+              "endTimeUnixNano": "1760467570170719000",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmQaWZ7DDt1NyNN9BGo1Ju9FJfr4aAF6Rr4vnZDp1S1K4D"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmQaWZ7DDt1NyNN9BGo1Ju9FJfr4aAF6Rr4vnZDp1S1K4D: all dials failed\n  * [/ip4/37.27.109.173/tcp/35105] dial tcp4 0.0.0.0:4001->37.27.109.173:35105: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "pR94bIe7hYA=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570201568000",
+              "endTimeUnixNano": "1760467570250046250",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmPjbYc4tUrT92n72XCiXeMhLZVXgow7K29RLnW64qFio3"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmPjbYc4tUrT92n72XCiXeMhLZVXgow7K29RLnW64qFio3"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmPjbYc4tUrT92n72XCiXeMhLZVXgow7K29RLnW64qFio3: [/ip4/65.21.67.149/tcp/38231 /ip4/127.0.0.1/tcp/38231]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "8Ey0A39513I=",
+              "parentSpanId": "+xmrBBJF9Nk=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565363219000",
+              "endTimeUnixNano": "1760467570365085917",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmWWv8yHGetJgNkQkXQUdycQBbjk7DD3L1wQckw1TkkHps"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "+xmrBBJF9Nk=",
+              "parentSpanId": "JQzblRpN/+M=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565363210000",
+              "endTimeUnixNano": "1760467570365103583",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DeL8n+Ys8dU=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570365201000",
+              "endTimeUnixNano": "1760467570365209958",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmWWv8yHGetJgNkQkXQUdycQBbjk7DD3L1wQckw1TkkHps"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmYWyvDxzAKxTVzxfDKxirLE9fMG6YgdwA8gh7zwH21DRW"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "swX/KU4ceoA=",
+              "parentSpanId": "sG1+4C9rTFg=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.DialPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570116561000",
+              "endTimeUnixNano": "1760467570408978417",
+              "attributes": [
+                {
+                  "key": "PeerID",
+                  "value": {
+                    "stringValue": "QmTjUCPkT62BEfUnX5EqrK73r8Lf3iQJ2gF28G9XFBaZdi"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "sG1+4C9rTFg=",
+              "parentSpanId": "4WwpsNA+sF0=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.QueryPeer",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570116556000",
+              "endTimeUnixNano": "1760467570409003292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "5a2ILgaLAIg=",
+              "parentSpanId": "y9GQn5hAvBI=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.SpawnQuery",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570409066000",
+              "endTimeUnixNano": "1760467570409078042",
+              "attributes": [
+                {
+                  "key": "Cause",
+                  "value": {
+                    "stringValue": "QmTjUCPkT62BEfUnX5EqrK73r8Lf3iQJ2gF28G9XFBaZdi"
+                  }
+                },
+                {
+                  "key": "QueryPeer",
+                  "value": {
+                    "stringValue": "QmNSeDNCNNDB2emAZrhXevLquXyo7SbkmEUhokrjcmoqeB"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "I4kymDSCshA=",
+              "parentSpanId": "7gIsxtQBwWE=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467565170198000",
+              "endTimeUnixNano": "1760467570435258167",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmUTLtQE1dLqbxXMLqH8yG5HmtzQRAE1G4QVa2P6oE7SRR"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "CovLVG4fQcqPaPMNVhFGrefsafhuJeu19U5Hgr2vvqLxs4neqLpVBM2GDeCgMuv81kcF2wv"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmUTLtQE1dLqbxXMLqH8yG5HmtzQRAE1G4QVa2P6oE7SRR: all dials failed\n  * [/ip4/114.246.196.81/tcp/46295] dial tcp4 0.0.0.0:4001->114.246.196.81:46295: i/o timeout\n  * [/ip4/114.246.198.216/tcp/46295] dial tcp4 0.0.0.0:4001->114.246.198.216:46295: i/o timeout\n  * [/ip4/114.246.205.30/tcp/46295] dial tcp4 0.0.0.0:4001->114.246.205.30:46295: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "7gIsxtQBwWE=",
+              "parentSpanId": "qrqGMREfs20=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.RunLookupWithFollowup",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564172296000",
+              "endTimeUnixNano": "1760467570435261084",
+              "attributes": [
+                {
+                  "key": "Target",
+                  "value": {
+                    "stringValue": "12D3KooWAb2mZBQBakabMTLz2N6Z65sEmQeqafomj4gtDEzSHkqU"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "hGFkPBT+Js9L+xfZMMzCqw==",
+              "spanId": "qrqGMREfs20=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467564172291000",
+              "endTimeUnixNano": "1760467570435337375",
+              "attributes": [
+                {
+                  "key": "Key",
+                  "value": {
+                    "stringValue": "12D3KooWAb2mZBQBakabMTLz2N6Z65sEmQeqafomj4gtDEzSHkqU"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "HMtXu1wIwfw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570744195000",
+              "endTimeUnixNano": "1760467570778104584",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWK2cNdowmNY8zT1DaZmTd7LFGXNWtjVHoAH8zJHjjPHGg"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooWK2cNdowmNY8zT1DaZmTd7LFGXNWtjVHoAH8zJHjjPHGg"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmTcyWEzEf5dYwn7CCmou5toB469JguNM9YSAAzbth9Jwm: [/ip4/89.34.219.39/tcp/43477]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWCosBxAC8SNJBSacqzN4tn57AaCWWUvwkhz1q4851inVY: [/ip4/172.33.0.14/tcp/4001 /ip4/172.33.0.14/udp/4001/quic-v1 /dns4/108-231-35-246.k51qzi5uqu5dhagwdo5tqh9o4tsfsojo7id795y4za43ymgrceut333rv0o1yr.libp2p.direct/tcp/4001/tls/ws /ip4/108.231.35.246/udp/3612/webrtc-direct/certhash/uEiD87IjhdN02QCETpf6BpvXctvcDXpuWYh9o_fwxl6cX5w /ip4/108.231.35.246/tcp/4001 /ip4/108.231.35.246/udp/3612/quic-v1 /ip4/108.231.35.246/udp/3612/quic-v1/webtransport/certhash/uEiByoHMmktRCwlk4Yod7haVrMVHUKbeTsVrPXDw28N0jGA/certhash/uEiBdJ9tIQ3r2GZ3JLCFLsrMtZ8ZK4jmnwWarqWRRtUiG1Q /ip4/172.33.0.14/udp/4001/quic-v1/webtransport/certhash/uEiByoHMmktRCwlk4Yod7haVrMVHUKbeTsVrPXDw28N0jGA/certhash/uEiBdJ9tIQ3r2GZ3JLCFLsrMtZ8ZK4jmnwWarqWRRtUiG1Q /ip4/172.33.0.14/udp/4001/webrtc-direct/certhash/uEiD87IjhdN02QCETpf6BpvXctvcDXpuWYh9o_fwxl6cX5w /ip4/108.231.35.246/udp/21765/webrtc-direct/certhash/uEiD87IjhdN02QCETpf6BpvXctvcDXpuWYh9o_fwxl6cX5w /ip4/108.231.35.246/udp/21765/quic-v1 /ip4/108.231.35.246/udp/21765/quic-v1/webtransport/certhash/uEiByoHMmktRCwlk4Yod7haVrMVHUKbeTsVrPXDw28N0jGA/certhash/uEiBdJ9tIQ3r2GZ3JLCFLsrMtZ8ZK4jmnwWarqWRRtUiG1Q]}"
+                        },
+                        {
+                          "stringValue": "{QmSB6eW875mznfsPDU256tfyYhY25Ub4rHkdCRD9xjQLWY: [/ip4/46.20.109.116/tcp/44235 /ip4/46.20.109.116/tcp/33271]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWJZhnm5omiLBMm685YFpAU5kBHcQEa6V28wg2j7HU69Xf: [/ip4/213.168.249.83/udp/4001/quic-v1/webtransport/certhash/uEiC85EDNue1JV66P4FAz6zw0dZTLaObPXI5d76VEtGUyUg/certhash/uEiAwgYjWjjzVyINvLYlO90_x-Ms6xkLUDi3PCCMyHchtQQ /ip4/213.168.249.83/tcp/4001 /ip4/213.168.249.83/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWDNw3xvsm3ZYBCgWqN4hC9K18x12xnrumHm23GunLE1AD: [/ip4/77.237.235.63/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmRVdmisaoJq2jvrTJmFP2i4o9sBPokKFByV93r4sSL8gT: [/ip4/87.120.187.227/tcp/39477]}"
+                        },
+                        {
+                          "stringValue": "{Qma7EhNgF9JSgkjYQV6P5daRQb5zUPgDZr9dc5ssf3JUHb: [/ip4/101.47.180.104/tcp/42815]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWL8FwRyrhqLiWVBWafH1JtUiniYauppaxKGHojTJLwj6n: [/ip4/5.189.180.38/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmPS6rYFSyftnt1nQWGiJB7te1CusH1NbYRG61P1hzutCp: [/ip4/117.20.69.69/tcp/48153]}"
+                        },
+                        {
+                          "stringValue": "{QmNbT1NFexpZKK9xBnEcBm1K798NERPa4FaevEppNuFFAr: [/ip4/65.108.71.216/tcp/44735]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWAeMgxuJxbWcnb7cNGtwyynWDgfCmNnuzKGqYnULfTzLs: [/ip4/192.99.243.103/tcp/4001 /ip4/192.99.243.103/udp/4001/quic-v1/webtransport/certhash/uEiDmiHnqFoqf8-hIZZdkxeBSoQfq-1Ktavaos1GZm0k5Ug/certhash/uEiAarzvk0A2keskWLym7zHQa4Ac73cacAOryOSiwTunp8Q /ip4/192.99.243.103/udp/4001/quic-v1 /ip6/2607:5300:203:bdd2::32/udp/4001/quic-v1/webtransport/certhash/uEiDmiHnqFoqf8-hIZZdkxeBSoQfq-1Ktavaos1GZm0k5Ug/certhash/uEiAarzvk0A2keskWLym7zHQa4Ac73cacAOryOSiwTunp8Q /dns6/2607-5300-203-bdd2--32.k51qzi5uqu5dghmc7gks74gkzl3v9sx13qsdduwmjjy2oqb2umo60f354qlzis.libp2p.direct/tcp/4001/tls/ws /dns4/192-99-243-103.k51qzi5uqu5dghmc7gks74gkzl3v9sx13qsdduwmjjy2oqb2umo60f354qlzis.libp2p.direct/tcp/4001/tls/ws /ip6/2607:5300:203:bdd2::32/tcp/4001 /ip6/2607:5300:203:bdd2::32/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{QmSuvVmGHfazniNEWMX9fx72EmdPiunq1Z4GrTJ5LVJq9B: [/ip4/154.12.178.32/tcp/36642 /ip4/154.12.178.32/tcp/39610]}"
+                        },
+                        {
+                          "stringValue": "{Qmby3w5DQB3aDn1JMcnxtLFPNJ2Zkx45pugx7SU2bArCqD: [/ip4/163.5.212.71/tcp/36695]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWMpHyH12k9WfHZj7fvS9kp5wkoxWH6yV5aZcr8zwPpPTH: [/ip4/192.210.232.74/udp/4001/quic /ip4/192.210.232.74/udp/4001/quic-v1 /ip4/192.210.232.74/udp/4001/quic-v1/webtransport/certhash/uEiAjz2FAm0nIGqLq5hp0Avcuw_M8EySiCzF_DP-YoCt_KA/certhash/uEiAi2Rly8SdIPmmldvBB1_U6q7jSNNE-JfAa3QYE6CQWOQ]}"
+                        },
+                        {
+                          "stringValue": "{QmY1N1RD718zcFJ6x7ADeEjYTRz4hcnDQH772jvUrNTWah: [/ip4/219.78.226.27/tcp/37404]}"
+                        },
+                        {
+                          "stringValue": "{QmUthDTWDZ1rETYSF2LFg6bsQBRuxgGJ1VprZex66vvuxD: [/ip4/129.226.94.68/tcp/43325]}"
+                        },
+                        {
+                          "stringValue": "{Qmchi7aaHHEfBJGQLiT2XNQWoAWwHbV4JFebAaX8CoYS2v: [/ip4/171.101.231.99/tcp/1026]}"
+                        },
+                        {
+                          "stringValue": "{QmSQvYbiowL1qJFrUSxzZFerZWQdfc3wEce8Va8AM5YLEz: [/ip4/112.21.56.54/tcp/36272 /ip4/112.21.56.54/tcp/49722]}"
+                        },
+                        {
+                          "stringValue": "{Qme749reQCvrzR4Pe9vNcJGWunzLMjgSsCvBXkrSJct6kt: [/ip4/171.231.8.92/tcp/59537 /ip4/171.231.8.92/tcp/57731]}"
+                        },
+                        {
+                          "stringValue": "{QmZwrbYgtcLoNLXzJg4z4JHjtVoYEcYXzKHyJ8d8wP1K7g: [/ip4/64.20.40.186/tcp/37023]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWK2cNdowmNY8zT1DaZmTd7LFGXNWtjVHoAH8zJHjjPHGg: [/ip6/::1/udp/4001/quic-v1 /ip4/127.0.0.1/tcp/4001 /ip6/::1/tcp/4001 /ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiCgvjxwoD3EyQ0VXhorjS78jcxemYdyKKAFVUZIPlPwug/certhash/uEiD5LWl6oTZRoUkjz1ImLyeXwyN3SmQ8GWzD2YATVstVDQ /ip6/2001:41d0:263:800::/udp/4001/webrtc-direct/certhash/uEiBmxdzuggczNleCbaJCt9ECgoadtvmgKJsmOSPdB1jM9w /ip6/2001:41d0:263:800::/udp/4001/quic-v1/webtransport/certhash/uEiCgvjxwoD3EyQ0VXhorjS78jcxemYdyKKAFVUZIPlPwug/certhash/uEiD5LWl6oTZRoUkjz1ImLyeXwyN3SmQ8GWzD2YATVstVDQ /dns4/217-182-95-8.k51qzi5uqu5djldzr7843ze1mfqyh700ea5m4c264ugr417ynkqzohtoydh76l.libp2p.direct/tcp/4001/tls/ws /ip4/127.0.0.1/udp/4001/webrtc-direct/certhash/uEiBmxdzuggczNleCbaJCt9ECgoadtvmgKJsmOSPdB1jM9w /ip4/217.182.95.8/udp/4001/quic-v1/webtransport/certhash/uEiCgvjxwoD3EyQ0VXhorjS78jcxemYdyKKAFVUZIPlPwug/certhash/uEiD5LWl6oTZRoUkjz1ImLyeXwyN3SmQ8GWzD2YATVstVDQ /ip4/217.182.95.8/tcp/4001 /ip4/217.182.95.8/udp/4001/quic-v1 /ip6/2001:41d0:263:800::/tcp/4001 /ip6/2001:41d0:263:800::/udp/4001/quic-v1 /ip6/::1/udp/4001/quic-v1/webtransport/certhash/uEiCgvjxwoD3EyQ0VXhorjS78jcxemYdyKKAFVUZIPlPwug/certhash/uEiD5LWl6oTZRoUkjz1ImLyeXwyN3SmQ8GWzD2YATVstVDQ /ip4/127.0.0.1/udp/4001/quic-v1 /ip6/::1/udp/4001/webrtc-direct/certhash/uEiBmxdzuggczNleCbaJCt9ECgoadtvmgKJsmOSPdB1jM9w /dns6/2001-41d0-263-800--0.k51qzi5uqu5djldzr7843ze1mfqyh700ea5m4c264ugr417ynkqzohtoydh76l.libp2p.direct/tcp/4001/tls/ws /ip4/217.182.95.8/udp/4001/webrtc-direct/certhash/uEiBmxdzuggczNleCbaJCt9ECgoadtvmgKJsmOSPdB1jM9w]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "mTIKykxG1r4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467570777986000",
+              "endTimeUnixNano": "1760467571034137917",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmZJtKqbsHkLAn1MtK5xRzc8LGMAkYeUf351hz6K2LN15u"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmZJtKqbsHkLAn1MtK5xRzc8LGMAkYeUf351hz6K2LN15u"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmZJtKqbsHkLAn1MtK5xRzc8LGMAkYeUf351hz6K2LN15u: [/ip4/127.0.0.1/tcp/43693 /ip4/172.27.108.23/tcp/43693 /ip4/218.233.81.152/tcp/50481]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "l3Vo/802qdQ=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.GetProviders",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571132411000",
+              "endTimeUnixNano": "1760467571141515042",
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "DTKyG0LRkis=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498215000",
+              "endTimeUnixNano": "1760467571501791875",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVZuw7rZyfZpa3qayqFyVM7dQYJnbSyhnvALtSDtJqSqo"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVZuw7rZyfZpa3qayqFyVM7dQYJnbSyhnvALtSDtJqSqo: all dials failed\n  * [/ip4/124.156.224.73/tcp/41373] dial tcp4 0.0.0.0:4001->124.156.224.73:41373: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "/xSzTQMB8iQ=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498206000",
+              "endTimeUnixNano": "1760467571502011542",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmTjxjCkogfTT4qsqyNg9psV9985nLxL5ay3bDDLoZAYxP"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmTjxjCkogfTT4qsqyNg9psV9985nLxL5ay3bDDLoZAYxP: all dials failed\n  * [/ip4/136.112.197.98/tcp/33137] dial tcp4 0.0.0.0:4001->136.112.197.98:33137: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "B8wVDigZCLU=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498196000",
+              "endTimeUnixNano": "1760467571502085084",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmQcSdx58Zbdp2go4SxQb1d7r4Y8yBWFFsVFd5nLTrsMbz"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmQcSdx58Zbdp2go4SxQb1d7r4Y8yBWFFsVFd5nLTrsMbz: all dials failed\n  * [/ip4/34.68.18.209/tcp/34103] dial tcp4 0.0.0.0:4001->34.68.18.209:34103: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "2H1Xx8EZRe4=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498233000",
+              "endTimeUnixNano": "1760467571502186375",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmWiZQsmoHsNDcJzopYRW8P1otnJUEMLqvCTGhDq4rrPwB"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmWiZQsmoHsNDcJzopYRW8P1otnJUEMLqvCTGhDq4rrPwB: all dials failed\n  * [/ip4/135.181.216.123/tcp/44745] dial tcp4 0.0.0.0:4001->135.181.216.123:44745: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "vFlOpSE4UEo=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498203000",
+              "endTimeUnixNano": "1760467571502429417",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmfAdmJbEuXoSxKMSKts8SvLLbcdEziZUaRuQBKQFi2aq6"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmfAdmJbEuXoSxKMSKts8SvLLbcdEziZUaRuQBKQFi2aq6: all dials failed\n  * [/ip4/135.181.211.242/tcp/37555] dial tcp4 0.0.0.0:4001->135.181.211.242:37555: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "3ea2YRHhYt0=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498220000",
+              "endTimeUnixNano": "1760467571508370834",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmUGT3cKDcqmr3cf9Lz3s9fJ8URGaG2tps9AfL1Fosbguc"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmUGT3cKDcqmr3cf9Lz3s9fJ8URGaG2tps9AfL1Fosbguc: all dials failed\n  * [/ip4/65.21.194.249/tcp/39255] dial tcp4 0.0.0.0:4001->65.21.194.249:39255: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "F4k2OKFSw8o=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498230000",
+              "endTimeUnixNano": "1760467571508458209",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVXsEvyVeaA6B2W8GeNihkt9pR7hFvBDrrkaaUjZHCo2c"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVXsEvyVeaA6B2W8GeNihkt9pR7hFvBDrrkaaUjZHCo2c: all dials failed\n  * [/ip4/65.109.68.82/tcp/38385] dial tcp4 0.0.0.0:4001->65.109.68.82:38385: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "+o4QOWGcbj8=",
+              "parentSpanId": "nkr72cdURo0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467566498192000",
+              "endTimeUnixNano": "1760467571509584417",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "Qmb4tdryGikvLERDwDFXdswvNR9zD1L5zrXfyNeNB93MLu"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial Qmb4tdryGikvLERDwDFXdswvNR9zD1L5zrXfyNeNB93MLu: all dials failed\n  * [/ip4/95.217.105.122/tcp/38947] dial tcp4 0.0.0.0:4001->95.217.105.122:38947: i/o timeout",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "nkr72cdURo0=",
+              "parentSpanId": "/azIJt0JXVY=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.RunLookupWithFollowup",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383930000",
+              "endTimeUnixNano": "1760467571509711250",
+              "attributes": [
+                {
+                  "key": "Target",
+                  "value": {
+                    "stringValue": "zQmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "/azIJt0JXVY=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.IpfsDHT.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383927000",
+              "endTimeUnixNano": "1760467571509847708",
+              "attributes": [
+                {
+                  "key": "Key",
+                  "value": {
+                    "stringValue": "zQmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "WIUQDvqouw4=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571511379000",
+              "endTimeUnixNano": "1760467571511874125",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmP1umGg2LRbwfAJadQ7PD3mv8ebRU1GrpMV5tzWE4QEwu"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmP1umGg2LRbwfAJadQ7PD3mv8ebRU1GrpMV5tzWE4QEwu: all dials failed\n  * [/ip4/185.151.146.15/tcp/45519] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "JF8A/IeGa4E=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512018000",
+              "endTimeUnixNano": "1760467571512165750",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWDk3EEsG78Fi1P9jqYVcLmYWzn5SVncYK2cJkVt5Jm7Q3"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "L8lkPvCZH3A=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512271000",
+              "endTimeUnixNano": "1760467571512311125",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWBtoP5ajAagyjVn8GcmXhZGSozb3DsquXQCXyWu6SdsWH"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "z1kG6+Hcsww=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512350000",
+              "endTimeUnixNano": "1760467571512370250",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWNNRVHcueS4ZJrXpCVyYo2sA8yPiQ6dKeAtfDsMSU2bvp"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "nq8u7z4tOVY=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512407000",
+              "endTimeUnixNano": "1760467571512515834",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmfAdmJbEuXoSxKMSKts8SvLLbcdEziZUaRuQBKQFi2aq6"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmfAdmJbEuXoSxKMSKts8SvLLbcdEziZUaRuQBKQFi2aq6: all dials failed\n  * [/ip4/135.181.211.242/tcp/37555] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "RxgQ/H+y1zA=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512558000",
+              "endTimeUnixNano": "1760467571512578750",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWLYUsTKPa4NRTRpxSNbm1CHAPVsg2utEJFSAaVNZ8ARnY"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "hoOb9fHlpEE=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512613000",
+              "endTimeUnixNano": "1760467571512638958",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmYPzrU97zsfTeLU5anGmB7xgaXyNMXdZdZMCndRSZAaR7"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "ntSVMfz7KsE=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512675000",
+              "endTimeUnixNano": "1760467571512694708",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWDaYDWoAQYwe1mUqMpPmvd8Z1uorf3r6zf9v4ieK5ZGks"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "Xd6HEIrX9Rc=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512731000",
+              "endTimeUnixNano": "1760467571512789167",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmUGT3cKDcqmr3cf9Lz3s9fJ8URGaG2tps9AfL1Fosbguc"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmUGT3cKDcqmr3cf9Lz3s9fJ8URGaG2tps9AfL1Fosbguc: all dials failed\n  * [/ip4/65.21.194.249/tcp/39255] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "3c1KG6iqxY4=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512738000",
+              "endTimeUnixNano": "1760467571512826750",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVXsEvyVeaA6B2W8GeNihkt9pR7hFvBDrrkaaUjZHCo2c"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVXsEvyVeaA6B2W8GeNihkt9pR7hFvBDrrkaaUjZHCo2c: all dials failed\n  * [/ip4/65.109.68.82/tcp/38385] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "+J6nl6THn1U=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512829000",
+              "endTimeUnixNano": "1760467571512867666",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmWBsmb5d8vHvSZfoV2USrU82kQYouJRMixuFGsFBvV2ds"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "uO5+iqzV/DI=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512828000",
+              "endTimeUnixNano": "1760467571512892375",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVD6NhPamt4pA3puQdjShcTs1EQV9Xt5boqEyWqQ3Yws5"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVD6NhPamt4pA3puQdjShcTs1EQV9Xt5boqEyWqQ3Yws5: all dials failed\n  * [/ip4/154.12.177.55/tcp/38424] dial backoff\n  * [/ip4/154.12.177.55/tcp/52846] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "g6HIoiVZo00=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512875000",
+              "endTimeUnixNano": "1760467571512903041",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWP36emBuR66KbLepCRyVQjahT4yL1uh88zRHh7Wd4TEQ5"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "6vXXW5eQd8k=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512942000",
+              "endTimeUnixNano": "1760467571512963666",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWFKzSGcTj9WE9wAbcLxUbGzLHTLysNmhzcwG7DBYaWBsJ"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "+rSaCIsw7+E=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512940000",
+              "endTimeUnixNano": "1760467571513048500",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVZuw7rZyfZpa3qayqFyVM7dQYJnbSyhnvALtSDtJqSqo"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmVZuw7rZyfZpa3qayqFyVM7dQYJnbSyhnvALtSDtJqSqo: all dials failed\n  * [/ip4/124.156.224.73/tcp/41373] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "UKMq2c1k1Bs=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571513006000",
+              "endTimeUnixNano": "1760467571513071083",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmQcSdx58Zbdp2go4SxQb1d7r4Y8yBWFFsVFd5nLTrsMbz"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmQcSdx58Zbdp2go4SxQb1d7r4Y8yBWFFsVFd5nLTrsMbz: all dials failed\n  * [/ip4/34.68.18.209/tcp/34103] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "cC74SlUaRiE=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571513049000",
+              "endTimeUnixNano": "1760467571513080250",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWJ6peGvZyMuCo1hqG6zJkqywsdcWtS6m1GqYCFNwyH673"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "1qiLG6FVH+I=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512856000",
+              "endTimeUnixNano": "1760467571513111416",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmWiZQsmoHsNDcJzopYRW8P1otnJUEMLqvCTGhDq4rrPwB"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmWiZQsmoHsNDcJzopYRW8P1otnJUEMLqvCTGhDq4rrPwB: all dials failed\n  * [/ip4/135.181.216.123/tcp/44745] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "UbgBIb7Yclc=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512903000",
+              "endTimeUnixNano": "1760467571513142917",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmTjxjCkogfTT4qsqyNg9psV9985nLxL5ay3bDDLoZAYxP"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial QmTjxjCkogfTT4qsqyNg9psV9985nLxL5ay3bDDLoZAYxP: all dials failed\n  * [/ip4/136.112.197.98/tcp/33137] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "vbEq4/SEUTc=",
+              "parentSpanId": "q1f6RCGgqr0=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.PutProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571512883000",
+              "endTimeUnixNano": "1760467571513163084",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "Qmb4tdryGikvLERDwDFXdswvNR9zD1L5zrXfyNeNB93MLu"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12202176bf6af57f4a6148780416b12adc3ffc515e6053837a07398b8edd250f115f"
+                  }
+                }
+              ],
+              "status": {
+                "message": "failed to dial: failed to dial Qmb4tdryGikvLERDwDFXdswvNR9zD1L5zrXfyNeNB93MLu: all dials failed\n  * [/ip4/95.217.105.122/tcp/38947] dial backoff",
+                "code": "STATUS_CODE_ERROR"
+              }
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "q1f6RCGgqr0=",
+              "parentSpanId": "8RwBrVNRgzc=",
+              "flags": 256,
+              "name": "IpfsDHT.Provide",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383916000",
+              "endTimeUnixNano": "1760467571513076917",
+              "attributes": [
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "bafkreibbo27wv5l7jjquq6aec2ysvxb77riv4yctqn5aoomlr3oskdyrl4"
+                  }
+                },
+                {
+                  "key": "announce",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "z/U/Fd3IkO4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571564051000",
+              "endTimeUnixNano": "1760467571684674500",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmXnCX9PJTaESsKjjbRURLrZ8WbNxFYGfCdQBNNbwtBD4b"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmXnCX9PJTaESsKjjbRURLrZ8WbNxFYGfCdQBNNbwtBD4b"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmXnCX9PJTaESsKjjbRURLrZ8WbNxFYGfCdQBNNbwtBD4b: [/ip4/127.0.0.1/tcp/41633 /ip4/135.181.182.91/tcp/41633]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "RANpDZsphY4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571806385000",
+              "endTimeUnixNano": "1760467571806404333",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "OmUWVl2dxpU=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572176093000",
+              "endTimeUnixNano": "1760467572176112250",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DMOrD8SMxR8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467571992922000",
+              "endTimeUnixNano": "1760467572178542625",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmYmuE2gPfrivnTYRFqXcLuYRhrq83NXtRZZiH6sMdW6NZ"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmYmuE2gPfrivnTYRFqXcLuYRhrq83NXtRZZiH6sMdW6NZ"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmYmuE2gPfrivnTYRFqXcLuYRhrq83NXtRZZiH6sMdW6NZ: [/ip4/142.127.68.223/tcp/35315 /ip4/127.0.0.1/tcp/35315 /ip4/172.17.0.2/tcp/35315]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "/Vwi5SHawV4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572241590000",
+              "endTimeUnixNano": "1760467572263598667",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmVqebz95ENmo2Ty27t5RRmg6nT3rjDSTxwZPEgj5QutxF"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmVqebz95ENmo2Ty27t5RRmg6nT3rjDSTxwZPEgj5QutxF"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmVqebz95ENmo2Ty27t5RRmg6nT3rjDSTxwZPEgj5QutxF: [/ip4/94.130.18.182/tcp/34243 /ip4/127.0.0.1/tcp/34243]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DB+1iNfTA8g=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572249842000",
+              "endTimeUnixNano": "1760467572288017917",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "QmNMsuF3DPZsRXUkhy6J6MtFh1pfUCGtXdC4QpUS6R9xKu"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "QmNMsuF3DPZsRXUkhy6J6MtFh1pfUCGtXdC4QpUS6R9xKu"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{QmNMsuF3DPZsRXUkhy6J6MtFh1pfUCGtXdC4QpUS6R9xKu: [/ip4/127.0.0.1/tcp/35093 /ip4/65.21.194.249/tcp/35093]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "MryQl09+fg4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291419000",
+              "endTimeUnixNano": "1760467572291513583",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "yuYpRaRa+RA=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291587000",
+              "endTimeUnixNano": "1760467572291608708",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "K5ZPvgfwqh0=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291663000",
+              "endTimeUnixNano": "1760467572291667875",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "fFBqQQOVWfE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291823000",
+              "endTimeUnixNano": "1760467572291834959",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "uePj/vV+4os=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291897000",
+              "endTimeUnixNano": "1760467572291901292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "4WKq06sAVFY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572291973000",
+              "endTimeUnixNano": "1760467572291985833",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "oBM0/uk3ot0=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292040000",
+              "endTimeUnixNano": "1760467572292044125",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "S3RddxJ/M1o=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292135000",
+              "endTimeUnixNano": "1760467572292146166",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "ThqA4NsHlo8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292201000",
+              "endTimeUnixNano": "1760467572292205292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "2l+e6OOTmhI=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292426000",
+              "endTimeUnixNano": "1760467572292500083",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "QjWzYLKvYsA=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292592000",
+              "endTimeUnixNano": "1760467572292597458",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "c6JEbEfKarM=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292699000",
+              "endTimeUnixNano": "1760467572292714125",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "hdOxfdgS6l4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292771000",
+              "endTimeUnixNano": "1760467572292775583",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "h++GBttsSCU=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292829000",
+              "endTimeUnixNano": "1760467572292840833",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "4n38V3fFOqw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572292893000",
+              "endTimeUnixNano": "1760467572292897041",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "zntoFX/tFM4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572293210000",
+              "endTimeUnixNano": "1760467572293221584",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "ne5VDyyRsAc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572293994000",
+              "endTimeUnixNano": "1760467572294005917",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "l1d+xKWl3Mw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572294076000",
+              "endTimeUnixNano": "1760467572294091416",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "6MIYToN5c+k=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572294141000",
+              "endTimeUnixNano": "1760467572294144625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "/TmAyUPJ3lY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572294188000",
+              "endTimeUnixNano": "1760467572294196833",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "jqTvBoLdaRE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572294722000",
+              "endTimeUnixNano": "1760467572294731333",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "XmTGy/phmco=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572295175000",
+              "endTimeUnixNano": "1760467572295190792",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "tUT9tRZH/eo=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572296195000",
+              "endTimeUnixNano": "1760467572296209125",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "+JDnKUdK0SE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572296259000",
+              "endTimeUnixNano": "1760467572296267333",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "Xza4eJFPlhk=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572296315000",
+              "endTimeUnixNano": "1760467572296322625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "R8ATdvDQvnE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572298548000",
+              "endTimeUnixNano": "1760467572298562916",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "66Pnnc8PLag=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572298615000",
+              "endTimeUnixNano": "1760467572298638459",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "WhE2bXMbU7E=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572298760000",
+              "endTimeUnixNano": "1760467572298765750",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "nBZXBADPqLY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572298808000",
+              "endTimeUnixNano": "1760467572298817958",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "hTQIVkVBfW4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572298914000",
+              "endTimeUnixNano": "1760467572298918041",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "UUbFL/TA2Sg=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572300078000",
+              "endTimeUnixNano": "1760467572300128333",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "Gn03Ah/3Dvs=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572300179000",
+              "endTimeUnixNano": "1760467572300196041",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "mcLE+HqGSqU=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572300931000",
+              "endTimeUnixNano": "1760467572300941833",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "oleB2N2YLLo=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572301018000",
+              "endTimeUnixNano": "1760467572301026458",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "5byOJOkpin8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572302078000",
+              "endTimeUnixNano": "1760467572302087333",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "I9ZVZyzmjWc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572304079000",
+              "endTimeUnixNano": "1760467572304095916",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DQ+8BHYT8qU=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572304159000",
+              "endTimeUnixNano": "1760467572304179917",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "8+3lwK3xois=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312345000",
+              "endTimeUnixNano": "1760467572312359709",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "JldAWOurBM0=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312487000",
+              "endTimeUnixNano": "1760467572312505666",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "31oSMDFsdas=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312600000",
+              "endTimeUnixNano": "1760467572312608542",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "yWN6UFsTCIM=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312675000",
+              "endTimeUnixNano": "1760467572312687208",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "tfkWj3K5toI=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312738000",
+              "endTimeUnixNano": "1760467572312745625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "+TnYJsgLEtY=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312794000",
+              "endTimeUnixNano": "1760467572312801208",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "ufEkFNlf6c4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572312849000",
+              "endTimeUnixNano": "1760467572312857084",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "DJync0RWS9k=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572315815000",
+              "endTimeUnixNano": "1760467572315938208",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "EVY+rXhV+TE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572315996000",
+              "endTimeUnixNano": "1760467572316154625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "vv4yzTXWsIo=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572288767000",
+              "endTimeUnixNano": "1760467572316369875",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "12D3KooWHa5f62LGZ9TR1QgzYaDk6p8pMvK9Yy3EGKBcfRpZvZNn"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "12D3KooWHa5f62LGZ9TR1QgzYaDk6p8pMvK9Yy3EGKBcfRpZvZNn"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{12D3KooWHa5f62LGZ9TR1QgzYaDk6p8pMvK9Yy3EGKBcfRpZvZNn: [/ip6/2a01:4f8:272:5564::2/udp/4001/quic-v1 /ip4/23.88.0.69/udp/4001/webrtc-direct/certhash/uEiA2tM3pgG0IizH8mfj0Az1YKVJ7KapPoFiXN0EfFKcNxg /ip4/23.88.0.69/udp/4001/quic-v1/webtransport/certhash/uEiCOASfG3vSOquV7CvTrDlVGuFQAA405LowLu_e6enDXlg/certhash/uEiBYLC_IxCEe-z8a7b9Aq11QTU0VKnP3kjRuZgDrzFyBXw /dns6/2a01-4f8-272-5564--2.k51qzi5uqu5dj1yiyilwrkic1wmqm4i4gsgk6mnofrftjnjvfy0ax99nqyd2xj.libp2p.direct/tcp/4001/tls/ws /ip4/23.88.0.69/tcp/4001 /ip4/127.0.0.1/tcp/4001 /ip4/127.0.0.1/udp/4001/webrtc-direct/certhash/uEiA2tM3pgG0IizH8mfj0Az1YKVJ7KapPoFiXN0EfFKcNxg /ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiCOASfG3vSOquV7CvTrDlVGuFQAA405LowLu_e6enDXlg/certhash/uEiBYLC_IxCEe-z8a7b9Aq11QTU0VKnP3kjRuZgDrzFyBXw /ip6/::1/udp/4001/quic-v1 /ip6/2a01:4f8:272:5564::2/tcp/4001 /ip6/2a01:4f8:272:5564::2/udp/4001/quic-v1/webtransport/certhash/uEiCOASfG3vSOquV7CvTrDlVGuFQAA405LowLu_e6enDXlg/certhash/uEiBYLC_IxCEe-z8a7b9Aq11QTU0VKnP3kjRuZgDrzFyBXw /ip4/23.88.0.69/udp/4001/quic-v1 /ip4/127.0.0.1/udp/4001/quic-v1 /ip6/::1/tcp/4001 /ip6/2a01:4f8:272:5564::2/udp/4001/webrtc-direct/certhash/uEiA2tM3pgG0IizH8mfj0Az1YKVJ7KapPoFiXN0EfFKcNxg /dns4/23-88-0-69.k51qzi5uqu5dj1yiyilwrkic1wmqm4i4gsgk6mnofrftjnjvfy0ax99nqyd2xj.libp2p.direct/tcp/4001/tls/ws /ip6/::1/udp/4001/webrtc-direct/certhash/uEiA2tM3pgG0IizH8mfj0Az1YKVJ7KapPoFiXN0EfFKcNxg /ip6/::1/udp/4001/quic-v1/webtransport/certhash/uEiCOASfG3vSOquV7CvTrDlVGuFQAA405LowLu_e6enDXlg/certhash/uEiBYLC_IxCEe-z8a7b9Aq11QTU0VKnP3kjRuZgDrzFyBXw]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWPPCgo6Yjd6yAedreSGvesSKRAUMCKrHGMY4Spa1sAF7c: [/ip4/23.105.38.159/udp/4001/quic-v1 /ip4/23.105.38.159/udp/4001/webrtc-direct/certhash/uEiAm77tRQm-XzjQrv--Rm4BAgEjgy4igybEuw36g8fFedw /ip4/23.105.38.159/tcp/4001 /ip4/23.105.38.159/udp/4001/quic-v1/webtransport/certhash/uEiCZm6lzE1NRYRhSGy3cGxzm5SytD74UP1uwN8_fSvYkUg/certhash/uEiB_w5myLRhGut-0SSUvZIscG8LerHcTYzCjhuhJLq7jQQ]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWDr1VtoTBD843ufhUz1XJYTXLpprxv4nnfi6EjiZSSCr9: [/ip4/195.26.251.189/tcp/4001 /ip4/195.26.251.189/udp/29038/quic-v1/webtransport/certhash/uEiAsD9sZ1FDJR4w5GHDxe5mBIui9EuBKhsHq-L2T0Dy5Hg/certhash/uEiANzYnvaJqTNo7d_VaxmI9GpsgP9ffqC_MALGElm3BToQ /ip4/195.26.251.189/udp/18401/quic-v1 /ip4/195.26.251.189/tcp/53677 /ip4/195.26.251.189/udp/53287/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{QmZz1LLknXocxt7onNjP5o8Kej3vPrTgjvHYKodoVzzsov: [/ip4/152.53.144.78/tcp/44273]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWNsLnTUVLstsDkEnsuC4FLeJSBAK5ciQdwSbyJHPXaWvw: [/ip4/148.135.34.105/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{QmNRcC1tbXH6U3Et4FAZv9yGUpe83qAmKZ4C2kcJP2TJpm: [/ip4/193.58.121.231/tcp/41585]}"
+                        },
+                        {
+                          "stringValue": "{QmZE4iZGnQnNE8MNnH5UzCLU8Yq6GuzUjcdFLj2EMCuS5s: [/ip4/152.53.152.102/tcp/41757]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWT14hUMfTwPibA6dULzNtjFa4KVJt74RdjiwE9ZKf7fSj: [/ip4/209.159.150.198/tcp/4001 /dns4/209-159-150-198.k51qzi5uqu5dmjopnj1grxwm48278li9xhrp6oxs4ffszryvk5hu2fwk6pei7w.libp2p.direct/tcp/4001/tls/ws]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWCxF1Ep4yMpE4Pp9sqgtonBT2Er5m4EWd8XeLVhsa3eX5: [/ip4/185.250.37.9/tcp/4001 /ip4/185.250.37.9/udp/4001/quic /ip4/185.250.37.9/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWS42PG72Tg6MnugzLAqqTfDnNsxV2AbAed35yqvEHV1jS: [/ip4/209.145.52.114/udp/4001/quic /ip4/209.145.52.114/tcp/4001 /ip4/209.145.52.114/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWFZctqjusrQ4UkRxfzdMvQM9x2VYkkdj53qB75wJaCK6J: [/ip4/144.91.117.191/tcp/4001 /ip4/144.91.117.191/udp/4001/quic /ip4/144.91.117.191/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWMw5SvXDiMEJSCc39bPJ3XWmu8YBMNUiywtGM2h9EKYwR: [/ip4/23.94.133.87/tcp/4001]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWANKfad1V3UJVCrRGXdbS51kCgfJHWDDnpac6KfTR7i33: [/ip4/181.192.80.194/tcp/20851 /ip4/181.192.80.194/udp/19861/webrtc-direct/certhash/uEiDwvkLJKbVrXB7AzUGCBgJ7Tk_lXS4nlHM7QXCD9P1ZDg /ip4/181.192.80.194/udp/19861/quic-v1 /ip4/181.192.80.194/udp/19861/quic-v1/webtransport/certhash/uEiCOLTdYySV1-74y77OogcAfz3RouKOxNo1D39ntgPNiPw/certhash/uEiCrsaso9IygRkhBrAhOqMW4Dh6_PJGqtj8Brwaz8XLxog /ip6/2804:1330:1dd:af00:b4e8:59e0:6002:c660/udp/4001/quic-v1 /dns4/181-192-80-194.k51qzi5uqu5dgdxniq3cx072964jdrwoh4kvtlm9bg5ym9fedrasrk37kd5yzu.libp2p.direct/tcp/20851/tls/ws /ip6/2804:1330:1dd:af00:b4e8:59e0:6002:c660/udp/4001/quic-v1/webtransport/certhash/uEiCOLTdYySV1-74y77OogcAfz3RouKOxNo1D39ntgPNiPw/certhash/uEiCrsaso9IygRkhBrAhOqMW4Dh6_PJGqtj8Brwaz8XLxog /ip6/2804:1330:1dd:af00:b4e8:59e0:6002:c660/udp/4001/webrtc-direct/certhash/uEiDwvkLJKbVrXB7AzUGCBgJ7Tk_lXS4nlHM7QXCD9P1ZDg]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWCPNaGNekZnk772BNpkLM3m642XqgPsAbCxHnx2mRxZCq: [/ip4/193.8.130.180/udp/4001/quic-v1 /ip4/193.8.130.180/udp/4001/quic /ip4/193.8.130.180/udp/4001/quic-v1/webtransport/certhash/uEiDW1TmBGFKDrnLhkBZ84N2E_kNyOGHb2GDS9TnHNKLtew/certhash/uEiAZ0XZ9tc_jc2u_corf5Dl8kaXuyuFeCnNijW06ndtx5g]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWSqc34xoWtwepC3HR7hDrzJ7hoNLCYcgoaeayatZGW2iL: [/ip4/144.126.134.162/udp/4001/quic-v1 /ip4/144.126.134.162/udp/4001/quic /ip4/144.126.134.162/udp/4001/quic-v1/webtransport/certhash/uEiBw6l3DG5UCjrLnow3UKurRxA29nhIiev0DidzsZ83epQ/certhash/uEiC7LYwz01DW9de20gpQe3w8PfajiQlErn0gBfjudIYCPA]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWLFGoEJYPbmVtVrhThbyTbfBViMZZrGreLJSZddkNiKyj: [/ip4/57.128.215.53/udp/4001/webrtc-direct/certhash/uEiDa7zJ1J2kRpeyABiUTnnYxqi6Cs1Su_av0Ixk5AzOXvw /ip4/57.128.215.53/udp/4001/quic-v1/webtransport/certhash/uEiAeFUGa5_kcUgzDzZmDkMyOQHi_XviZ4y1KmYuQ2Pob3Q/certhash/uEiCYVQ0X9w32ocNAOKN2rfDeEZixWzFnE3ED2J-V5Jp3EA /ip4/57.128.215.53/tcp/4001 /ip4/57.128.215.53/udp/4001/quic-v1]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWFktuzCB72r9pvKtRgMwwV7X4kXoZ6QUyi6u45S3sq8Gg: [/ip4/192.210.213.147/udp/4001/quic-v1 /ip4/192.210.213.147/udp/4001/quic-v1/webtransport/certhash/uEiC7C2IXSxImCHBLnCFrRJCysvXz2-fMDqreioQrG6bDpA/certhash/uEiDulIPG6s4-C6KV-5glLWt_EHWTncnkvCV5mEM8upVwiw]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWAEdEHK4F7j39fiUVYZoB4qD7HaactfwH848DWvzamGny: [/ip4/157.230.144.220/udp/4001/webrtc-direct/certhash/uEiC_kdcqYyMuABSJyBV5N4dmFbFJRI-g7uM2oUD3kEdZeQ /ip4/157.230.144.220/tcp/4001 /ip4/157.230.144.220/udp/4001/quic-v1 /ip4/157.230.144.220/udp/4001/quic-v1/webtransport/certhash/uEiCcGscc2Dp0uawmLQhd0P7GFQkGyQgIm3u0NDX2VmK0aQ/certhash/uEiDm0FegKXnmZDzxWa4gHGILmmR7CnOQYFETtHDy9KkpbQ /dns4/157-230-144-220.k51qzi5uqu5dgc5yl003hk8t3k8wckxaw8g4y1tv9cjpmkuxc7q0ltc4pyfuty.libp2p.direct/tcp/4001/tls/ws]}"
+                        },
+                        {
+                          "stringValue": "{12D3KooWG9ymJDKWmtSsz37erCSKPDeyWuicVTZ6yTLrp8hWkLM6: [/ip4/95.98.194.47/tcp/4001 /ip4/95.98.194.47/udp/4001/quic-v1 /ip4/95.98.194.47/udp/4001/quic /ip4/95.98.194.47/udp/4001/quic-v1/webtransport/certhash/uEiDsBmYTP4Dk_X31FM5LDxE7D6nFsQ__HYhsRBSFjTxTcQ/certhash/uEiCChr-hGISxZjB36wt39EBIcjnoKZIz6qbHsKtEF5k-xg]}"
+                        },
+                        {
+                          "stringValue": "{Qmept8KiScGpS2QvxWeFSrVeQyU5oC2J6X1YWeEwhmQVQY: [/ip4/161.97.168.142/tcp/33875]}"
+                        },
+                        {
+                          "stringValue": "{QmRph3x4vBkM7w2FwXbRzewVa5L8oB4FTyCVVgpTTsmhc1: [/ip4/154.3.35.112/tcp/43924]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "/S2av7w/w44=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316558000",
+              "endTimeUnixNano": "1760467572316566291",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "LPaIrw84XFE=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316617000",
+              "endTimeUnixNano": "1760467572316629292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "L2uuMX/+yg4=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316675000",
+              "endTimeUnixNano": "1760467572316683125",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "qz7QoB1TstM=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316726000",
+              "endTimeUnixNano": "1760467572316733417",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "9GwTFgNUEGc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316781000",
+              "endTimeUnixNano": "1760467572316787750",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "m4F0WkC8Jnc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316838000",
+              "endTimeUnixNano": "1760467572316844708",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "gsATJrW/onc=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316893000",
+              "endTimeUnixNano": "1760467572316899292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "q0Qd2zGrX8s=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572316949000",
+              "endTimeUnixNano": "1760467572316955625",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "oddJGTY5Bjw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572317014000",
+              "endTimeUnixNano": "1760467572317020792",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "uLl3BfGgEOU=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572317761000",
+              "endTimeUnixNano": "1760467572317766583",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "hJa3Gum8Ekw=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572317812000",
+              "endTimeUnixNano": "1760467572317823292",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "tgYME5b408E=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.AddProvider",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572317880000",
+              "endTimeUnixNano": "1760467572317885125",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "v6ZrxpN1aN8=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProviderManager.GetProviders",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572509077000",
+              "endTimeUnixNano": "1760467572515826875",
+              "status": {}
+            },
+            {
+              "traceId": "6qJPMlONT5qH7LRKAQfa9A==",
+              "spanId": "YfcuJuyYl94=",
+              "parentSpanId": "RqCaa3CLc8Y=",
+              "flags": 256,
+              "name": "KademliaDHT.ProtocolMessenger.GetClosestPeers",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467572710022000",
+              "endTimeUnixNano": "1760467572753286458",
+              "attributes": [
+                {
+                  "key": "to",
+                  "value": {
+                    "stringValue": "Qma7zkWGhsF9EEttNWnBNBqxf5V6KM7zX7BdaBXjvtJVg6"
+                  }
+                },
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "Qma7zkWGhsF9EEttNWnBNBqxf5V6KM7zX7BdaBXjvtJVg6"
+                  }
+                },
+                {
+                  "key": "peers",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "{Qma7zkWGhsF9EEttNWnBNBqxf5V6KM7zX7BdaBXjvtJVg6: [/ip4/127.0.0.1/tcp/45545 /ip4/172.20.0.2/tcp/45545 /ip4/176.38.58.171/tcp/45545 /ip4/176.38.58.171/tcp/49883]}"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "go-libp2p-kad-dht/dual"
+          },
+          "spans": [
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "8RwBrVNRgzc=",
+              "parentSpanId": "evnVol0VrM8=",
+              "flags": 256,
+              "name": "Dual.Provide",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383907000",
+              "endTimeUnixNano": "1760467571513079584",
+              "attributes": [
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "bafkreibbo27wv5l7jjquq6aec2ysvxb77riv4yctqn5aoomlr3oskdyrl4"
+                  }
+                },
+                {
+                  "key": "announce",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "go-libp2p-routing-helpers"
+          },
+          "spans": [
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "evnVol0VrM8=",
+              "parentSpanId": "j+tQBgmtq/4=",
+              "flags": 256,
+              "name": "ComposableParallel.Provide",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383893000",
+              "endTimeUnixNano": "1760467571513088916",
+              "attributes": [
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "bafkreibbo27wv5l7jjquq6aec2ysvxb77riv4yctqn5aoomlr3oskdyrl4"
+                  }
+                },
+                {
+                  "key": "announce",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "vTVFv+qJLkkZxfR2vl75Pg==",
+              "spanId": "j+tQBgmtq/4=",
+              "flags": 256,
+              "name": "ComposableParallel.Provide",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1760467560383876000",
+              "endTimeUnixNano": "1760467571513095667",
+              "attributes": [
+                {
+                  "key": "key",
+                  "value": {
+                    "stringValue": "bafkreibbo27wv5l7jjquq6aec2ysvxb77riv4yctqn5aoomlr3oskdyrl4"
+                  }
+                },
+                {
+                  "key": "announce",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        }
+      ],
+      "schemaUrl": "https://opentelemetry.io/schemas/1.37.0"
+    }
+  ]
+}

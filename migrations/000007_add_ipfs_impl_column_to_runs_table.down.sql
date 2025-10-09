@@ -1,6 +1,0 @@
-BEGIN;
-
-ALTER TABLE runs
-    DROP COLUMN ipfs_impl;
-
-COMMIT;

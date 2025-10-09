@@ -1,0 +1,28 @@
+version: "3.9"
+name: tiros
+services:
+  kubo:
+    image: ipfs/kubo:v0.38.0
+    # in our measurement setup we require the `roots` provide strategy to make
+    # sure to have predictable results. Here we set this strategy explicitly
+    # during startup. However, for this we need to reset the entrypoint, init
+    # kubo ourselves, explicitly listen on 0.0.0.0 (127.0.0.1 is not enough
+    # because we want to access it from the host), set the `roots` provide
+    # strategy and finally start the daemon.
+    entrypoint: []
+    command: ["/bin/sh", "-c", "ipfs init; ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001; ipfs config Provide.Strategy roots; ipfs daemon --migrate=true --agent-version-suffix=docker"]
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4317 # send traces back to the host
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=kubo
+      - OTEL_TRACES_EXPORTER=otlp
+      - IPFS_TELEMETRY=off
+    ports:
+      - "0.0.0.0:4001:4001/tcp"
+      - "0.0.0.0:4001:4001/udp"
+      - "0.0.0.0:5001:5001"
+    # untested, but the two lines below should enable Linux compatibility for
+    # this test. By default, host.docker.internal is not available on Linux (according to Claude).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

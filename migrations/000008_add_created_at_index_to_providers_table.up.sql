@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS idx_providers_created_at ON providers (created_at);
