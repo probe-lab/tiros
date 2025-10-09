@@ -12,7 +12,14 @@ import (
 
 var probeConfig = struct {
 	DryRun bool
-	DB     struct {
+	CH     struct {
+		Host string
+		Port int64
+		User string
+		Pass string
+		SSL  bool
+	}
+	DB struct {
 		Host     string
 		Port     int
 		Name     string
@@ -32,6 +39,19 @@ var probeConfig = struct {
 	}
 }{
 	DryRun: false,
+	CH: struct {
+		Host string
+		Port int64
+		User string
+		Pass string
+		SSL  bool
+	}{
+		Host: "localhost",
+		Port: 9440,
+		User: "",
+		Pass: "",
+		SSL:  false,
+	},
 	DB: struct {
 		Host     string
 		Port     int
@@ -42,10 +62,10 @@ var probeConfig = struct {
 	}{
 		Host:     "localhost",
 		Port:     5432,
-		Name:     "tiros",
-		User:     "tiros",
+		Name:     "tiros_test",
+		User:     "tiros_test",
 		SSLMode:  "disable",
-		Password: "",
+		Password: "password",
 	},
 	IPFS: struct {
 		Host           string

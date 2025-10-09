@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,6 +24,23 @@ var probeUploadConfig = struct {
 }{
 	Interval:    time.Minute,
 	FileSizeMiB: 100,
+}
+
+type firstByteReader struct {
+	r             io.Reader
+	firstByteTime time.Time
+	once          sync.Once
+}
+
+func (f *firstByteReader) Read(p []byte) (n int, err error) {
+	f.once.Do(func() {
+		f.firstByteTime = time.Now()
+	})
+	return f.r.Read(p)
+}
+
+func (f *firstByteReader) FirstByteTime() time.Time {
+	return f.firstByteTime
 }
 
 var probeUploadCmd = &cli.Command{
@@ -67,6 +86,57 @@ func probeUploadAction(c *cli.Context) error {
 		return fmt.Errorf("init database client: %w", err)
 	}
 	tracer := rootConfig.tracerProvider.Tracer("tiros")
+
+	ciid := cid.MustParse("bafkreiazuufr5jxea3gjf5s325owta7ndsufy7neywsy7jqkh5hzrwk7lu")
+	p := path.FromCid(ciid)
+
+	pers, err := ipfs.Swarm().Peers(c.Context)
+	if err != nil {
+		return err
+	}
+	fmt.Println(pers)
+
+	ctx, cancel := context.WithTimeout(c.Context, 15*time.Second)
+	defer cancel()
+	rootCtx, rootSpan := tracer.Start(ctx, "download")
+	defer rootSpan.End()
+
+	start := time.Now()
+	catCtx, catSpan := tracer.Start(rootCtx, "cat")
+	defer catSpan.End()
+	req := ipfs.Request("cat", p.String())
+
+	reqCtx, reqCancel := context.WithTimeout(catCtx, 15*time.Second)
+	defer reqCancel()
+	resp, err := req.Send(reqCtx)
+	if err != nil {
+		return err
+	} else if resp.Error != nil {
+		return resp.Error
+	}
+	catSpan.RecordError(err)
+	fmt.Println("send return", time.Since(start))
+
+	var buf [1]byte
+	_, readSpan := tracer.Start(catCtx, "read.file")
+	_, err = resp.Output.Read(buf[:])
+	if err != nil {
+		return err
+	}
+	fmt.Println("ttfb", time.Since(start))
+	readSpan.AddEvent("ttfb")
+	defer readSpan.End()
+
+	data, err := io.ReadAll(resp.Output)
+	if err != nil {
+		return err
+	}
+	fmt.Println("done", time.Since(start))
+	resp.Output.Close()
+	reqCancel()
+	data = append(data, buf[:]...)
+
+	return nil
 
 	iteration := 0
 
