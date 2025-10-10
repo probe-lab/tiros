@@ -21,6 +21,7 @@ import (
 
 type Kubo struct {
 	*kuboclient.HttpApi
+	addr string
 }
 
 func NewKubo(host string, port int) (*Kubo, error) {
@@ -40,7 +41,7 @@ func NewKubo(host string, port int) (*Kubo, error) {
 		return nil, fmt.Errorf("init kubo client: %w", err)
 	}
 
-	return &Kubo{HttpApi: kuboClient}, nil
+	return &Kubo{HttpApi: kuboClient, addr: kuboAddr}, nil
 }
 
 func (k *Kubo) WaitAvailable(ctx context.Context, timeout time.Duration) error {
@@ -54,7 +55,7 @@ func (k *Kubo) WaitAvailable(ctx context.Context, timeout time.Duration) error {
 			}
 			return ctx.Err()
 		case <-time.After(time.Second):
-			slog.Info("Testing Kubo availability...")
+			slog.With("addr", k.addr).Info("Testing Kubo availability...")
 			v, err := k.Version(ctx)
 			if err != nil {
 				continue

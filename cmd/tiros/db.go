@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
+	"os"
+	"path"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -78,6 +82,7 @@ type NoopClient struct{}
 var _ DBClient = (*NoopClient)(nil)
 
 func NewNoopClient() *NoopClient {
+	slog.Info("Skipping database interactions.")
 	return &NoopClient{}
 }
 
@@ -102,15 +107,34 @@ func (n *LogClient) InsertUpload(ctx context.Context, upload *UploadModel) error
 	panic("not implemented")
 }
 
-type JSONClient struct{}
+type JSONClient struct {
+	uploadsFile *os.File
+}
 
 var _ DBClient = (*JSONClient)(nil)
 
-func (n *JSONClient) Close() error {
-	// TODO implement me
-	panic("implement me")
+func NewJSONClient(dir string) (*JSONClient, error) {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return nil, err
+	}
+
+	prefix := time.Now().Format("2006-01-02T1504")
+	uploadsFile, err := os.Create(path.Join(dir, prefix+"_uploads.ndjson"))
+	if err != nil {
+		return nil, err
+	}
+
+	slog.Info("Writing uploads to " + uploadsFile.Name())
+	return &JSONClient{
+		uploadsFile: uploadsFile,
+	}, nil
 }
 
-func (n *JSONClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
-	panic("not implemented")
+func (c *JSONClient) Close() error {
+	return c.uploadsFile.Close()
+}
+
+func (c *JSONClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
+	enc := json.NewEncoder(c.uploadsFile)
+	return enc.Encode(upload)
 }

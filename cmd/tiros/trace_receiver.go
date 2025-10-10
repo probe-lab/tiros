@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"sync"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	plgrpc "github.com/probe-lab/go-commons/grpc"
+	"go.opentelemetry.io/otel/trace"
 	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc/codes"
@@ -56,6 +58,11 @@ func NewTraceReceiver(host string, port int) (*TraceReceiver, error) {
 	return tr, nil
 }
 
+func (tr *TraceReceiver) Shutdown() {
+	close(tr.traceMatchChan)
+	tr.server.Shutdown()
+}
+
 func (tr *TraceReceiver) Reset() {
 	tr.matchersMu.Lock()
 	defer tr.matchersMu.Unlock()
@@ -92,4 +99,19 @@ func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTrace
 	}
 
 	return resp, nil
+}
+
+func traceIDMatcher(traceID trace.TraceID) TraceMatcher {
+	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
+		return bytes.Equal(span.TraceId, traceID[:])
+	}
+}
+
+func strAttrMatcher(k, v string) TraceMatcher {
+	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
+		for _, a := range span.Attributes {
+			return a.Key == k && a.Value.GetStringValue() == v
+		}
+		return false
+	}
 }

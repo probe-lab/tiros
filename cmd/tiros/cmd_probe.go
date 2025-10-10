@@ -13,10 +13,12 @@ import (
 
 var probeConfig = struct {
 	DryRun     bool
+	JSONOut    string
 	Clickhouse *pldb.ClickHouseConfig
 	Migrations *pldb.ClickHouseMigrationsConfig
 }{
 	DryRun:     false,
+	JSONOut:    "",
 	Clickhouse: pldb.DefaultClickHouseConfig("tiros"),
 	Migrations: pldb.DefaultClickHouseMigrationsConfig(),
 }
@@ -25,6 +27,7 @@ var probeCmd = &cli.Command{
 	Name:  "probe",
 	Usage: "Start probing Kubo",
 	Flags: slices.Concat(
+		probeFlags,
 		plcli.ClickHouseFlags("TIROS_PROBE_", probeConfig.Clickhouse),
 		plcli.ClickHouseMigrationsFlags("TIROS_PROBE_", probeConfig.Migrations),
 	),
@@ -42,6 +45,13 @@ var probeFlags = []cli.Flag{
 		Sources:     cli.EnvVars("TIROS_PROBE_DRY_RUN"),
 		Value:       probeConfig.DryRun,
 		Destination: &probeConfig.DryRun,
+	},
+	&cli.StringFlag{
+		Name:        "json-out",
+		Usage:       "Write measurements to JSON files in the given directory",
+		Sources:     cli.EnvVars("TIROS_PROBE_JSON_OUT"),
+		Value:       probeConfig.JSONOut,
+		Destination: &probeConfig.JSONOut,
 	},
 }
 

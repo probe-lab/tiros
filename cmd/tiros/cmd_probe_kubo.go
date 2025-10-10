@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"embed"
 	"fmt"
+	"io"
 	"log/slog"
-	"math"
 	"math/rand"
 	"time"
 
@@ -19,27 +18,28 @@ import (
 	"github.com/urfave/cli/v3"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
-	coltracepb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	p "golang.org/x/exp/apidiff/testdata"
 )
 
 //go:embed migrations
 var migrations embed.FS
 
 var probeKuboConfig = struct {
-	FileSizeMiB  int
-	Interval     time.Duration
-	KuboHost     string
-	KuboAPIPort  int
-	TraceRecHost string
-	TraceRecPort int
+	FileSizeMiB   int
+	Interval      time.Duration
+	KuboHost      string
+	KuboAPIPort   int
+	TraceRecHost  string
+	TraceRecPort  int
+	MaxIterations int
 }{
-	FileSizeMiB:  100,
-	Interval:     time.Minute,
-	KuboHost:     "127.0.0.1",
-	KuboAPIPort:  5001,
-	TraceRecHost: "127.0.0.1",
-	TraceRecPort: 4317,
+	FileSizeMiB:   100,
+	Interval:      time.Minute,
+	KuboHost:      "127.0.0.1",
+	KuboAPIPort:   5001,
+	TraceRecHost:  "127.0.0.1",
+	TraceRecPort:  4317,
+	MaxIterations: 0,
 }
 
 var probeKuboFlags = []cli.Flag{
@@ -85,6 +85,13 @@ var probeKuboFlags = []cli.Flag{
 		Value:       probeKuboConfig.TraceRecPort,
 		Destination: &probeKuboConfig.TraceRecPort,
 	},
+	&cli.IntFlag{
+		Name:        "maxIterations",
+		Usage:       "TODO",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_MAX_ITERATIONS"),
+		Value:       probeKuboConfig.MaxIterations,
+		Destination: &probeKuboConfig.MaxIterations,
+	},
 }
 
 var probeKuboCmd = &cli.Command{
@@ -103,6 +110,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	if err != nil {
 		return fmt.Errorf("creating trace receiver gRPC server: %w", err)
 	}
+	defer tr.Shutdown()
 
 	// start to listen for incoming gRPC requests in a separate goroutine
 	go func() {
@@ -118,13 +126,18 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	var dbClient DBClient
 	if probeConfig.DryRun {
 		dbClient = NewNoopClient()
+	} else if probeConfig.JSONOut != "" {
+		dbClient, err = NewJSONClient(probeConfig.JSONOut)
+		if err != nil {
+			return fmt.Errorf("connecting to json client: %w", err)
+		}
 	} else {
 		dbClient, err = NewClickhouseClient(ctx, probeConfig.Clickhouse, probeConfig.Migrations)
 		if err != nil {
 			return fmt.Errorf("connecting to clickhouse: %w", err)
 		}
-		defer pllog.Defer(dbClient.Close, "Failed closing clickhouse client")
 	}
+	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
 	kubo, err := NewKubo(probeKuboConfig.KuboHost, probeKuboConfig.KuboAPIPort)
 	if err != nil {
@@ -149,7 +162,9 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	// start of the respective iteration
 	iterationStart := time.Now()
 
-	for i := 0; true; i++ {
+	maxIter := probeKuboConfig.MaxIterations
+	for i := 0; maxIter == 0 || i < maxIter; i++ {
+		slog.Info("")
 
 		// remove all pins and run a repo garbage collection
 		kubo.Reset(ctx)
@@ -176,13 +191,13 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		data := make([]byte, size)
 		rand.Read(data)
 
-		uploadCtx, uploadcancel := context.WithTimeout(ctx, time.Minute)
+		uploadCtx, uploadCancel := context.WithTimeout(ctx, time.Minute)
 
-		uploadCtx, span := tracer.Start(uploadCtx, "Upload")
+		uploadCtx, uploadSpan := tracer.Start(uploadCtx, "Upload")
 		logEntry := slog.With(
 			"iteration", i,
 			"size", size,
-			"traceID", span.SpanContext().TraceID().String(),
+			"traceID", uploadSpan.SpanContext().TraceID().String(),
 		)
 
 		// take the trace receiver lock before uploading the file
@@ -196,9 +211,9 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 			options.Unixfs.Pin(true, uuid.NewString()),
 			options.Unixfs.FsCache(false),
 		)
-		span.RecordError(err)
-		span.End()
-		uploadcancel()
+		uploadSpan.RecordError(err)
+		uploadSpan.End()
+		uploadCancel()
 		logEntry = logEntry.With("cid", imPath.RootCid().String())
 		logEntry.Info("Done adding file to Kubo")
 
@@ -206,7 +221,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 
 		rawCID := cid.NewCidV1(uint64(multicodec.Raw), imPath.RootCid().Hash())
 		tr.traceMatchers = []TraceMatcher{
-			traceIDMatcher(span.SpanContext().TraceID()),
+			traceIDMatcher(uploadSpan.SpanContext().TraceID()),
 			strAttrMatcher("key", rawCID.String()),
 		}
 		tr.matchersMu.Unlock()
@@ -283,97 +298,47 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 			return fmt.Errorf("inserting upload into database: %w", err)
 		}
 
+		////////////////// DOWNLOAD ///////////////////////////
+		download(ctx, kubo, tracer, tr)
+
 	}
+
 	return nil
 }
 
-type ipfsAddMetrics struct {
-	duration time.Duration
-	start    time.Time
-	end      time.Time
-}
+type downloadData struct{}
 
-func parseIPFSAddTrace(req *coltracepb.ExportTraceServiceRequest) *ipfsAddMetrics {
-	var traceStartUnixNano int64 = math.MaxInt64
-	var traceEndUnixNano int64 = 0
+func download(ctx context.Context, kubo *Kubo, tracer trace.Tracer, tr *TraceReceiver) error {
+	ctx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
 
-	addBlockSpans := make([]*v1.Span, 0)
-	for _, rspan := range req.GetResourceSpans() {
-		for _, sspan := range rspan.GetScopeSpans() {
-			for _, span := range sspan.GetSpans() {
-				if span.StartTimeUnixNano < math.MaxInt64 && int64(span.StartTimeUnixNano) < traceStartUnixNano {
-					traceStartUnixNano = int64(span.StartTimeUnixNano)
-				}
+	ctx, downloadSpan := tracer.Start(ctx, "Download")
+	defer downloadSpan.End()
 
-				if span.EndTimeUnixNano < math.MaxInt64 && int64(span.EndTimeUnixNano) > traceEndUnixNano {
-					traceEndUnixNano = int64(span.EndTimeUnixNano)
-				}
+	tr.matchersMu.Lock()
+	tr.traceMatchers = []TraceMatcher{traceIDMatcher(downloadSpan.SpanContext().TraceID())}
+	tr.matchersMu.Unlock()
 
-				if span.Name == "Blockservice.blockService.AddBlocks" {
-					addBlockSpans = append(addBlockSpans, span)
-				}
-			}
-		}
+	downloadStart := time.Now()
+	resp, err := kubo.Request("cat", p.String()).Send(ctx)
+	if err != nil {
+		return err
+	}
+	defer pllog.Defer(resp.Output.Close, "Failed closing response output")
+
+	var buf [1]byte
+	_, err = resp.Output.Read(buf[:])
+	if err != nil {
+		return err
+	}
+	downloadTTFB := time.Since(downloadStart)
+
+	data, err := io.ReadAll(resp.Output)
+	if err != nil {
+		return err
 	}
 
-	if len(addBlockSpans) == 0 || traceStartUnixNano == math.MaxInt64 || traceEndUnixNano == 0 {
-		return nil
-	}
+	data = append(data, buf[:]...)
 
-	return &ipfsAddMetrics{
-		start:    time.Unix(0, traceStartUnixNano),
-		end:      time.Unix(0, traceEndUnixNano),
-		duration: time.Duration(traceEndUnixNano - traceStartUnixNano),
-	}
-}
-
-type provideMetrics struct {
-	duration time.Duration
-	start    time.Time
-	end      time.Time
-}
-
-func parseProvideTrace(req *coltracepb.ExportTraceServiceRequest) *provideMetrics {
-	var traceStartUnixNano int64 = math.MaxInt64
-	var traceEndUnixNano int64 = 0
-
-	for _, rspan := range req.GetResourceSpans() {
-		for _, sspan := range rspan.GetScopeSpans() {
-			for _, span := range sspan.GetSpans() {
-				if span.StartTimeUnixNano < math.MaxInt64 && int64(span.StartTimeUnixNano) < traceStartUnixNano {
-					traceStartUnixNano = int64(span.StartTimeUnixNano)
-				}
-
-				if span.EndTimeUnixNano < math.MaxInt64 && int64(span.EndTimeUnixNano) > traceEndUnixNano {
-					traceEndUnixNano = int64(span.EndTimeUnixNano)
-				}
-
-			}
-		}
-	}
-
-	if traceStartUnixNano == math.MaxInt64 || traceEndUnixNano == 0 {
-		return nil
-	}
-
-	return &provideMetrics{
-		start:    time.Unix(0, traceStartUnixNano),
-		end:      time.Unix(0, traceEndUnixNano),
-		duration: time.Duration(traceEndUnixNano - traceStartUnixNano),
-	}
-}
-
-func traceIDMatcher(traceID trace.TraceID) TraceMatcher {
-	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
-		return bytes.Equal(span.TraceId, traceID[:])
-	}
-}
-
-func strAttrMatcher(k, v string) TraceMatcher {
-	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
-		for _, a := range span.Attributes {
-			return a.Key == k && a.Value.GetStringValue() == v
-		}
-		return false
-	}
+	return nil
 }

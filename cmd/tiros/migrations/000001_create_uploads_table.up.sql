@@ -12,3 +12,4 @@ CREATE TABLE uploads
     upload_duration_ms   Int32
 ) ENGINE = ReplicatedMergeTree
       PRIMARY KEY (ipfs_add_start, region, kubo_version)
+      PARTITION BY toStartOfMonth(ipfs_add_start);
