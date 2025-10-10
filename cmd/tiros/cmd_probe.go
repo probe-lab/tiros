@@ -12,9 +12,11 @@ import (
 )
 
 var probeConfig = struct {
+	DryRun     bool
 	Clickhouse *pldb.ClickHouseConfig
 	Migrations *pldb.ClickHouseMigrationsConfig
 }{
+	DryRun:     false,
 	Clickhouse: pldb.DefaultClickHouseConfig("tiros"),
 	Migrations: pldb.DefaultClickHouseMigrationsConfig(),
 }
@@ -30,6 +32,16 @@ var probeCmd = &cli.Command{
 	After:  probeAfter,
 	Commands: []*cli.Command{
 		probeKuboCmd,
+	},
+}
+
+var probeFlags = []cli.Flag{
+	&cli.BoolFlag{
+		Name:        "dry-run",
+		Usage:       "Whether to skip DB interactions",
+		Sources:     cli.EnvVars("TIROS_PROBE_DRY_RUN"),
+		Value:       probeConfig.DryRun,
+		Destination: &probeConfig.DryRun,
 	},
 }
 

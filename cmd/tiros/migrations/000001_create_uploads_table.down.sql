@@ -1,1 +1,1 @@
-DROP TABLE crawls;
+DROP TABLE IF EXISTS uploads;

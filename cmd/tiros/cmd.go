@@ -8,15 +8,20 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var rootCmd, rootConfig = plcli.NewRootCommand(&cli.Command{
-	Name: "tiros",
-	Commands: []*cli.Command{
-		probeCmd,
-		plcli.NewHealthCommand(),
-	},
-})
+var (
+	rootCmd    *plcli.RootCommand
+	rootConfig *plcli.RootCommandConfig
+)
 
 func main() {
+	rootCmd, rootConfig = plcli.NewRootCommand(&cli.Command{
+		Name: "tiros",
+		Commands: []*cli.Command{
+			probeCmd,
+			plcli.NewHealthCommand(),
+		},
+	})
+
 	if err := rootCmd.Run(); err != nil {
 		slog.Error("terminated abnormally", "err", err)
 		os.Exit(1)

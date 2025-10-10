@@ -138,17 +138,13 @@ func probeUploadAction(c *cli.Context) error {
 
 	return nil
 
-	iteration := 0
-
 	ticker := time.NewTimer(0)
 	iterationStart := time.Now()
 	var previousPath *path.ImmutablePath
-	for {
-		iteration += 1
-
+	for i := 0; true; i++ {
 		waitTime := time.Until(iterationStart.Add(probeUploadConfig.Interval)).Truncate(time.Second)
 		if waitTime > 0 {
-			log.WithField("iteration", iteration).Infof("Waiting %s until the next iteration...", waitTime)
+			log.WithField("iteration", i).Infof("Waiting %s until the next iteration...", waitTime)
 		}
 
 		select {
@@ -179,7 +175,7 @@ func probeUploadAction(c *cli.Context) error {
 		ctx, cancel := context.WithTimeout(c.Context, time.Minute)
 		ctx, span := tracer.Start(ctx, "upload")
 		logEntry := log.WithFields(log.Fields{
-			"iteration": iteration,
+			"iteration": i,
 			"size":      size,
 			"traceID":   span.SpanContext().TraceID().String(),
 		})
