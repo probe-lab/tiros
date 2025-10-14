@@ -7,25 +7,45 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math/rand"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/ipfs/boxo/files"
+	"github.com/ipfs/go-cid"
 	ipfs "github.com/ipfs/kubo"
 	kuboclient "github.com/ipfs/kubo/client/rpc"
 	iface "github.com/ipfs/kubo/core/coreiface"
+	"github.com/ipfs/kubo/core/coreiface/options"
+	"github.com/multiformats/go-multicodec"
+	pllog "github.com/probe-lab/go-commons/log"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/propagation"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
+	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
+
+type KuboConfig struct {
+	Host string
+	Port int
+}
 
 type Kubo struct {
 	*kuboclient.HttpApi
-	addr string
+	cfg      *KuboConfig
+	addr     string
+	receiver *TraceReceiver
+	tracer   trace.Tracer
 }
 
-func NewKubo(host string, port int) (*Kubo, error) {
-	// ....
+func NewKubo(receiver *TraceReceiver, cfg *KuboConfig) (*Kubo, error) {
+	provider := sdktrace.NewTracerProvider()
+	tracer := provider.Tracer("Tiros")
+
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 	httpClient := &http.Client{
 		Transport: otelhttp.NewTransport(
@@ -35,13 +55,13 @@ func NewKubo(host string, port int) (*Kubo, error) {
 	}
 
 	// initializing the kubo client
-	kuboAddr := net.JoinHostPort(host, strconv.Itoa(port))
+	kuboAddr := net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.Port))
 	kuboClient, err := kuboclient.NewURLApiWithClient(kuboAddr, httpClient)
 	if err != nil {
 		return nil, fmt.Errorf("init kubo client: %w", err)
 	}
 
-	return &Kubo{HttpApi: kuboClient, addr: kuboAddr}, nil
+	return &Kubo{HttpApi: kuboClient, addr: kuboAddr, receiver: receiver, tracer: tracer}, nil
 }
 
 func (k *Kubo) WaitAvailable(ctx context.Context, timeout time.Duration) error {
@@ -106,4 +126,173 @@ func (k *Kubo) Reset(ctx context.Context) {
 	if _, err := k.Request("repo/gc").Send(ctx); err != nil {
 		slog.With("err", err).Warn("Error running ipfs gc")
 	}
+}
+
+func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, error) {
+	// Generate random data
+	size := probeKuboConfig.FileSizeMiB * 1024 * 1024
+	data := make([]byte, size)
+	rand.Read(data)
+
+	uploadCtx, uploadCancel := context.WithTimeout(ctx, time.Minute)
+	uploadCtx, uploadSpan := k.tracer.Start(uploadCtx, "Upload")
+	logEntry := slog.With(
+		"size", size,
+		"traceID", uploadSpan.SpanContext().TraceID().String(),
+	)
+
+	// take the trace receiver lock before uploading the file
+	// so that we won't miss any trace data
+	k.receiver.mu.Lock()
+
+	logEntry.Info("Adding file to Kubo")
+	imPath, err := k.Unixfs().Add(
+		uploadCtx,
+		files.NewBytesFile(data),
+		options.Unixfs.Pin(true, uuid.NewString()),
+		options.Unixfs.FsCache(false),
+	)
+	uploadSpan.RecordError(err)
+	uploadSpan.End()
+	uploadCancel()
+	logEntry = logEntry.With("cid", imPath.RootCid().String())
+	logEntry.Info("Done adding file to Kubo")
+
+	// register trace ID as well as the CID of the uploaded file
+
+	rawCID := cid.NewCidV1(uint64(multicodec.Raw), imPath.RootCid().Hash())
+	k.receiver.traceMatchers = []TraceMatcher{
+		traceIDMatcher(uploadSpan.SpanContext().TraceID()),
+		strAttrMatcher("key", rawCID.String()),
+	}
+	k.receiver.mu.Unlock()
+
+	// if an error occurred, log it and continue with the next iteration
+	if err != nil {
+		return nil, fmt.Errorf("add file to kubo: %w", err)
+	}
+
+	result := &UploadResult{
+		CID:            imPath.RootCid(),
+		RawCID:         rawCID,
+		IPFSAddTraceID: uploadSpan.SpanContext().TraceID(),
+		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	logEntry.Info("Waiting for trace data...")
+	parseTimeout := time.NewTimer(time.Minute)
+loop:
+	for {
+		select {
+		case <-parseTimeout.C:
+			break loop
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case req, more := <-k.receiver.traceMatchChan:
+			if !more {
+				return nil, errors.New("trace receiver closed")
+			}
+			result.parse(req)
+			if result.isPopulated() {
+				break loop
+			}
+		}
+	}
+	parseTimeout.Stop()
+
+	k.receiver.Reset()
+
+	return result, nil
+}
+
+func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error) {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	ctx, downloadSpan := k.tracer.Start(ctx, "Download")
+	defer downloadSpan.End()
+
+	traceID := downloadSpan.SpanContext().TraceID()
+
+	logEntry := slog.With(
+		"cid", c.String(),
+		"traceID", traceID.String(),
+	)
+
+	k.receiver.mu.Lock()
+	k.receiver.traceMatchers = []TraceMatcher{
+		traceIDMatcher(traceID),
+		nameMatcher("ProviderQueryManager.FindProvidersAsync"),
+		nameMatcher("DelegatedHTTPClient.FindProviders"),
+	}
+	k.receiver.mu.Unlock()
+	defer k.receiver.Reset()
+
+	result := &DownloadResult{
+		CID:            c,
+		IPFSCatTraceID: traceID,
+		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	parseTimeout := time.NewTimer(time.Minute)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		logEntry.Info("Subscribing to trace data...")
+		for {
+			select {
+			case <-parseTimeout.C:
+				return
+			case <-ctx.Done():
+				return
+			case req, more := <-k.receiver.traceMatchChan:
+				if !more {
+					return
+				}
+				result.parse(req)
+				if result.isPopulated() {
+					return
+				}
+			}
+		}
+	}()
+
+	logEntry.Info("Downloading file from Kubo")
+	downloadStart := time.Now()
+	resp, err := k.Request("cat", c.String()).Send(ctx)
+	if err != nil {
+		return nil, err
+	} else if resp.Error != nil {
+		return nil, resp.Error
+	}
+
+	defer pllog.Defer(resp.Output.Close, "Failed closing response output")
+
+	var buf [1]byte
+	_, err = resp.Output.Read(buf[:])
+	if err != nil {
+		return nil, err
+	}
+	logEntry.Info("Read first byte")
+	ttfb := time.Since(downloadStart)
+
+	r := io.LimitReader(resp.Output, 100*1024*1024) // read at most 20 MiB
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	data = append(data, buf[:]...)
+	downloadSpan.End()
+
+	logEntry.With("size", len(data)).Info("Read all data")
+
+	logEntry.Info("Waiting for trace data...")
+	parseTimeout.Reset(12 * time.Second) // traces are submitted every 10 seconds, we wait a little longer
+
+	<-done // will be closed when context is canceled
+
+	result.TTFB = ttfb
+	result.FileSize = len(data)
+
+	return result, nil
 }

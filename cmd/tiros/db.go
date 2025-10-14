@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	"github.com/ipfs/go-cid"
 	pldb "github.com/probe-lab/go-commons/db"
 	pllog "github.com/probe-lab/go-commons/log"
 )
@@ -31,7 +32,10 @@ type UploadModel struct {
 type DBClient interface {
 	io.Closer
 	InsertUpload(ctx context.Context, upload *UploadModel) error
+	SelectCID(ctx context.Context) (cid.Cid, error)
 }
+
+var defaultCid = cid.MustParse("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
 
 type ClickhouseClient struct {
 	conn driver.Conn
@@ -77,6 +81,10 @@ func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel
 	return b.Send()
 }
 
+func (c *ClickhouseClient) SelectCID(ctx context.Context) (cid.Cid, error) {
+	return defaultCid, nil
+}
+
 type NoopClient struct{}
 
 var _ DBClient = (*NoopClient)(nil)
@@ -86,32 +94,63 @@ func NewNoopClient() *NoopClient {
 	return &NoopClient{}
 }
 
-func (n NoopClient) Close() error {
+func (c *NoopClient) Close() error {
 	return nil
 }
 
-func (n NoopClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
+func (c *NoopClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
 	return nil
+}
+
+func (c *NoopClient) SelectCID(ctx context.Context) (cid.Cid, error) {
+	return cid.MustParse(""), nil
 }
 
 type LogClient struct{}
 
 var _ DBClient = (*LogClient)(nil)
 
-func (n *LogClient) Close() error {
-	// TODO implement me
-	panic("implement me")
+func (c *LogClient) Close() error {
+	return nil
 }
 
-func (n *LogClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
+func (c *LogClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
 	panic("not implemented")
+}
+
+func (c *LogClient) SelectCID(ctx context.Context) (cid.Cid, error) {
+	return defaultCid, nil
 }
 
 type JSONClient struct {
 	uploadsFile *os.File
+	testCIDs    []cid.Cid
+	testCIDIdx  int
 }
 
 var _ DBClient = (*JSONClient)(nil)
+
+var testCIDStrs = []string{
+	"bafkreigmes4fo2xnpixfk4syb5m27iok7rusrh6yziod4y5kunfhb6mf5e",
+	"QmPrRV2DJHJCneS6Xyjg4y1FkoGidzAbSQxkwjcXi5rpiu",
+	"bafkreihaa5hixintqqa2hdkgcoiczlpmv7dl4yammrg5f2ixovwkjc7peu",
+	"bafybeiaprerug3p76ozy772iudrr5sqecs7wpxyrtwqzxmlyu7ri3unqae",
+	"bafybeic27gdcv7pkv3qt2x5t6goae7fmux2lnpm76ydi6icfzrs2fqxpky",
+	"bafybeibyu4xhr7gqvczqe53yrxrfzd5jz6kqtcunjpfytyo5xlbuos4wfi",
+	"bafkreigemrgrxezrzyvt2jq7kj2v5m3aajjdyuemwkhgfuizbuudasrf6e",
+	"bafkreie3trdds4kskfyxw3hzyxzjpwogwwbjpuja5l24avqrf4scwlusri",
+	"bafybeiawuyyxivuxnaqe6iztn4op555flezzfug3h6zf4j2z3vdbit5vue",
+	"bafkreia2gwddcggdprkn5t6wu4j5a3gv77ftgum7mdid53a6phxzpba5f4",
+	"bafkreibon5tv5zuu4lt2re6yfhkuo3ojtfbfdn6t5zna4excyewazmofca",
+	"bafkreiha5ukwhn6ytl73w4tp3v7h2zayvnpoe64uobhb3f3gf36ng3aa4q",
+	"bafkreias4o6xfoitigzponn5zb7oqifj4fysmk6fjtogp5zmrizr7ijeja",
+	"bafkreig2ltiutlf35ioab6cceorgbjbfu7pkvfdoduhugrvwl5by5yw2di",
+	"bafkreia73jrngvxgmanbyozjmln5f6roqbjzt6yugqzja3s4exqrmwvvkq",
+	"bafkreihtf7ckw7kapkwkcp6vh7vsnqxdxii5gi5fodj3k5rxbithfvxfem",
+	"bafkreifxturkxlmfanavfv2amr63dowtrhegkqpxqposigda2uono2bvyy",
+	"bafkreihnyskm5bpa47xsi2wde3vephyewfupawrqebraqmnm3bhk673caa",
+	"bafkreibocixhj5ln3k37anfdwqp4rfxqlf2ffs7em2kokptq2pgvmohr2a",
+}
 
 func NewJSONClient(dir string) (*JSONClient, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -124,9 +163,18 @@ func NewJSONClient(dir string) (*JSONClient, error) {
 		return nil, err
 	}
 
+	testCIDs := make([]cid.Cid, 0, len(testCIDStrs))
+	for _, c := range testCIDStrs {
+		parse := cid.MustParse(c)
+		testCIDs = append(testCIDs, parse)
+
+	}
+
 	slog.Info("Writing uploads to " + uploadsFile.Name())
 	return &JSONClient{
 		uploadsFile: uploadsFile,
+		testCIDs:    testCIDs,
+		testCIDIdx:  0,
 	}, nil
 }
 
@@ -137,4 +185,11 @@ func (c *JSONClient) Close() error {
 func (c *JSONClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
 	enc := json.NewEncoder(c.uploadsFile)
 	return enc.Encode(upload)
+}
+
+func (c *JSONClient) SelectCID(ctx context.Context) (cid.Cid, error) {
+	testCID := c.testCIDs[c.testCIDIdx]
+	c.testCIDIdx += 1
+	c.testCIDIdx %= len(c.testCIDs)
+	return testCID, nil
 }

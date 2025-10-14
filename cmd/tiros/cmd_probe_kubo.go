@@ -3,22 +3,14 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
-	"io"
 	"log/slog"
-	"math/rand"
+	"strings"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/ipfs/boxo/files"
-	"github.com/ipfs/go-cid"
-	"github.com/ipfs/kubo/core/coreiface/options"
-	"github.com/multiformats/go-multicodec"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/urfave/cli/v3"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
-	p "golang.org/x/exp/apidiff/testdata"
 )
 
 //go:embed migrations
@@ -32,14 +24,16 @@ var probeKuboConfig = struct {
 	TraceRecHost  string
 	TraceRecPort  int
 	MaxIterations int
+	TracesOut     string
 }{
 	FileSizeMiB:   100,
-	Interval:      time.Minute,
+	Interval:      10 * time.Second, // time.Minute,
 	KuboHost:      "127.0.0.1",
 	KuboAPIPort:   5001,
 	TraceRecHost:  "127.0.0.1",
 	TraceRecPort:  4317,
 	MaxIterations: 0,
+	TracesOut:     "",
 }
 
 var probeKuboFlags = []cli.Flag{
@@ -92,6 +86,13 @@ var probeKuboFlags = []cli.Flag{
 		Value:       probeKuboConfig.MaxIterations,
 		Destination: &probeKuboConfig.MaxIterations,
 	},
+	&cli.StringFlag{
+		Name:        "traces.out",
+		Usage:       "If set, where to write the traces to.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_OUT"),
+		Value:       probeKuboConfig.TracesOut,
+		Destination: &probeKuboConfig.TracesOut,
+	},
 }
 
 var probeKuboCmd = &cli.Command{
@@ -106,7 +107,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	defer cancel()
 
 	// initializing the trace receiver
-	tr, err := NewTraceReceiver(probeKuboConfig.TraceRecHost, probeKuboConfig.TraceRecPort)
+	tr, err := NewTraceReceiver(probeKuboConfig.TraceRecHost, probeKuboConfig.TraceRecPort, probeKuboConfig.TracesOut)
 	if err != nil {
 		return fmt.Errorf("creating trace receiver gRPC server: %w", err)
 	}
@@ -139,7 +140,11 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	}
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
-	kubo, err := NewKubo(probeKuboConfig.KuboHost, probeKuboConfig.KuboAPIPort)
+	kuboCfg := &KuboConfig{
+		Host: probeKuboConfig.KuboHost,
+		Port: probeKuboConfig.KuboAPIPort,
+	}
+	kubo, err := NewKubo(tr, kuboCfg)
 	if err != nil {
 		return fmt.Errorf("creating kubo client: %w", err)
 	}
@@ -153,9 +158,6 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	provider := sdktrace.NewTracerProvider()
-	tracer := provider.Tracer("Tiros")
-
 	// ticker to control the interval between iterations
 	ticker := time.NewTimer(0)
 
@@ -164,15 +166,18 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 
 	maxIter := probeKuboConfig.MaxIterations
 	for i := 0; maxIter == 0 || i < maxIter; i++ {
-		slog.Info("")
+		slog.Info(strings.Repeat("-", 40))
 
 		// remove all pins and run a repo garbage collection
 		kubo.Reset(ctx)
 
 		// log the time until the next iteration
 		waitTime := time.Until(iterationStart.Add(probeKuboConfig.Interval)).Truncate(time.Second)
-		if i > 0 && waitTime > 0 {
-			slog.With("iteration", i).Info(fmt.Sprintf("Waiting %s until the next iteration...", waitTime))
+		if i > 0 {
+			ticker.Reset(waitTime)
+			if waitTime > 0 {
+				slog.With("iteration", i).Info(fmt.Sprintf("Waiting %s until the next iteration...", waitTime))
+			}
 		}
 
 		// wait for the next iteration
@@ -180,117 +185,38 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			// continue
+			// pass
 		}
 
 		// start of the respective iteration and keep track of the start timestamp
 		iterationStart = time.Now()
 
-		// Generate random data
-		size := probeKuboConfig.FileSizeMiB * 1024 * 1024
-		data := make([]byte, size)
-		rand.Read(data)
-
-		uploadCtx, uploadCancel := context.WithTimeout(ctx, time.Minute)
-
-		uploadCtx, uploadSpan := tracer.Start(uploadCtx, "Upload")
-		logEntry := slog.With(
-			"iteration", i,
-			"size", size,
-			"traceID", uploadSpan.SpanContext().TraceID().String(),
-		)
-
-		// take the trace receiver lock before uploading the file
-		// so that we won't miss any trace data
-		tr.matchersMu.Lock()
-
-		logEntry.Info("Adding file to Kubo")
-		imPath, err := kubo.Unixfs().Add(
-			uploadCtx,
-			files.NewBytesFile(data),
-			options.Unixfs.Pin(true, uuid.NewString()),
-			options.Unixfs.FsCache(false),
-		)
-		uploadSpan.RecordError(err)
-		uploadSpan.End()
-		uploadCancel()
-		logEntry = logEntry.With("cid", imPath.RootCid().String())
-		logEntry.Info("Done adding file to Kubo")
-
-		// register trace ID as well as the CID of the uploaded file
-
-		rawCID := cid.NewCidV1(uint64(multicodec.Raw), imPath.RootCid().Hash())
-		tr.traceMatchers = []TraceMatcher{
-			traceIDMatcher(uploadSpan.SpanContext().TraceID()),
-			strAttrMatcher("key", rawCID.String()),
+		ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
+		if errors.Is(err, context.Canceled) {
+			return err
+		} else if err != nil {
+			slog.With("err", err).Warn("Error uploading file to Kubo")
+			continue
 		}
-		tr.matchersMu.Unlock()
 
 		// reset ticker interval after operation
-		ticker.Reset(probeKuboConfig.Interval)
 
-		// if an error occurred, log it and continue with the next iteration
-		if err != nil {
-			logEntry.With("err", err).Warn("Error adding file to Kubo")
-			continue
-		}
+		slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
 
-		var (
-			ipfsAddMetrics *ipfsAddMetrics
-			provideMetrics *provideMetrics
-		)
-
-		logEntry.Info("Waiting for trace data...")
-		parseTimeout := time.NewTimer(time.Minute)
-	loop:
-		for {
-			var matchRes *TraceMatch
-			select {
-			case <-parseTimeout.C:
-				break loop
-			case <-ctx.Done():
-				return nil
-			case matchRes = <-tr.traceMatchChan:
-				// continue
-			}
-
-			if matchRes.matcherIdx == 0 {
-				logEntry.Info("Received `ipfs add` trace data")
-				ipfsAddMetrics = parseIPFSAddTrace(matchRes.req)
-			} else if matchRes.matcherIdx == 1 {
-				logEntry.Info("Received provide trace data")
-				provideMetrics = parseProvideTrace(matchRes.req)
-			} else {
-				panic("invalid matcher index")
-			}
-
-			if ipfsAddMetrics != nil && provideMetrics != nil {
-				break
-			}
-		}
-		parseTimeout.Stop()
-
-		tr.Reset()
-
-		if ipfsAddMetrics == nil && provideMetrics == nil {
-			logEntry.Warn("Failed to parse trace data")
-			continue
-		}
-
-		logEntry.Info(fmt.Sprintf("Upload finished in %s", provideMetrics.end.Sub(ipfsAddMetrics.start)))
-
-		provideDelay := provideMetrics.start.Sub(ipfsAddMetrics.end)
-		uploadDuration := provideMetrics.end.Sub(ipfsAddMetrics.start)
+		ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
+		provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
+		provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
+		uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
 
 		dbUpload := &UploadModel{
 			Region:            rootConfig.AWSRegion,
 			TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
 			KuboVersion:       kuboVersion.Version,
 			FileSizeMiB:       int32(probeKuboConfig.FileSizeMiB),
-			IPFSAddStart:      ipfsAddMetrics.start,
-			IPFSAddDurationMs: int32(ipfsAddMetrics.duration.Milliseconds()),
-			ProvideStart:      provideMetrics.start,
-			ProvideDurationMs: int32(provideMetrics.duration.Milliseconds()),
+			IPFSAddStart:      ur.IPFSAddStart,
+			IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
+			ProvideStart:      ur.ProvideStart,
+			ProvideDurationMs: int32(provideDuration.Milliseconds()),
 			ProvideDelayMs:    int32(provideDelay.Milliseconds()),
 			UploadDurationMs:  int32(uploadDuration.Milliseconds()),
 		}
@@ -299,46 +225,25 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		}
 
 		////////////////// DOWNLOAD ///////////////////////////
-		download(ctx, kubo, tracer, tr)
+		//download(ctx, kubo, tracer, tr)
+
+		//ciid, err := dbClient.SelectCID(ctx)
+		//if err != nil {
+		//	return fmt.Errorf("selecting cid from database: %w", err)
+		//}
+		//
+		//res, err := kubo.Download(ctx, ciid)
+		//if err != nil {
+		//	slog.With("err", err).Warn("Error downloading file from Kubo")
+		//	continue
+		//}
+		//
+		//slog.With(
+		//	"fileSizeMiB", res.fileSize/1024.0/1024.0,
+		//	"ipniStatusCode", res.clientMetrics,
+		//).Info("Download Successful")
 
 	}
-
-	return nil
-}
-
-type downloadData struct{}
-
-func download(ctx context.Context, kubo *Kubo, tracer trace.Tracer, tr *TraceReceiver) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Minute)
-	defer cancel()
-
-	ctx, downloadSpan := tracer.Start(ctx, "Download")
-	defer downloadSpan.End()
-
-	tr.matchersMu.Lock()
-	tr.traceMatchers = []TraceMatcher{traceIDMatcher(downloadSpan.SpanContext().TraceID())}
-	tr.matchersMu.Unlock()
-
-	downloadStart := time.Now()
-	resp, err := kubo.Request("cat", p.String()).Send(ctx)
-	if err != nil {
-		return err
-	}
-	defer pllog.Defer(resp.Output.Close, "Failed closing response output")
-
-	var buf [1]byte
-	_, err = resp.Output.Read(buf[:])
-	if err != nil {
-		return err
-	}
-	downloadTTFB := time.Since(downloadStart)
-
-	data, err := io.ReadAll(resp.Output)
-	if err != nil {
-		return err
-	}
-
-	data = append(data, buf[:]...)
 
 	return nil
 }

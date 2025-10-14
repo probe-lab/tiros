@@ -40,14 +40,14 @@ var probeCmd = &cli.Command{
 
 var probeFlags = []cli.Flag{
 	&cli.BoolFlag{
-		Name:        "dry-run",
+		Name:        "dryRun",
 		Usage:       "Whether to skip DB interactions",
 		Sources:     cli.EnvVars("TIROS_PROBE_DRY_RUN"),
 		Value:       probeConfig.DryRun,
 		Destination: &probeConfig.DryRun,
 	},
 	&cli.StringFlag{
-		Name:        "json-out",
+		Name:        "jsonOut",
 		Usage:       "Write measurements to JSON files in the given directory",
 		Sources:     cli.EnvVars("TIROS_PROBE_JSON_OUT"),
 		Value:       probeConfig.JSONOut,
