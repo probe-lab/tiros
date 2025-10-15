@@ -53,7 +53,6 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 		Port: cfg.Port,
 		LogOpts: []logging.Option{
 			logging.WithLevels(func(code codes.Code) logging.Level {
-				return logging.LevelInfo
 				if code == codes.OK {
 					return logging.LevelDebug
 				}

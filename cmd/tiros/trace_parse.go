@@ -80,6 +80,7 @@ type DownloadResult struct {
 	ConnectedProvidersCount       int
 	FirstConnectedProviderFoundAt time.Time
 	FirstProviderConnectedAt      time.Time
+	FirstConnectedProviderPeerID  string
 
 	IPNIStart  time.Time
 	IPNIEnd    time.Time
@@ -139,11 +140,15 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 			}
 		}
 
-		connectedProviderFoundAt := time.Unix(0, math.MaxInt64)
-		connectedProviderAt := time.Unix(0, math.MaxInt64)
+		var (
+			firstConnectedProvider   string
+			connectedProviderFoundAt time.Time
+			connectedProviderAt      time.Time
+		)
 		for peerID, connAt := range providersConnAt {
-			if connAt.Before(connectedProviderAt) {
+			if connAt.Before(connectedProviderAt) || connectedProviderAt.IsZero() {
 				connectedProviderAt = connAt
+				firstConnectedProvider = peerID
 				if foundAt, ok := providersFoundAt[peerID]; ok {
 					connectedProviderFoundAt = foundAt
 				}
@@ -154,6 +159,7 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 		r.ConnectedProvidersCount = len(providersConnAt)
 		r.FirstConnectedProviderFoundAt = connectedProviderFoundAt
 		r.FirstProviderConnectedAt = connectedProviderAt
+		r.FirstConnectedProviderPeerID = firstConnectedProvider
 	}
 
 	if spans, found := r.spansByTraceID[r.FindProvTraceID]; found && r.IPNIStart.IsZero() {
@@ -182,7 +188,10 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 			case span.Name == "Bitswap.Client.Getter.SyncGetBlock":
 				for _, evt := range span.Events {
 					if evt.Name == "IdleBroadcast" {
-						r.IdleBroadcastStartedAt = time.Unix(0, int64(evt.TimeUnixNano))
+						newIdleBroadcast := time.Unix(0, int64(evt.TimeUnixNano))
+						if newIdleBroadcast.Before(r.IdleBroadcastStartedAt) || r.IdleBroadcastStartedAt.IsZero() {
+							r.IdleBroadcastStartedAt = newIdleBroadcast
+						}
 					}
 				}
 			case span.Name == "Bitswap.Client.Getter.handleIncoming":

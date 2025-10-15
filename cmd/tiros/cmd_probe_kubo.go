@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"embed"
-	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -195,6 +194,12 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	}
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
+	var cidProvider CIDProvider
+	cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
+	if err != nil {
+		return fmt.Errorf("creating cid provider: %w", err)
+	}
+
 	kuboCfg := &KuboConfig{
 		Host: probeKuboConfig.KuboHost,
 		Port: probeKuboConfig.KuboAPIPort,
@@ -226,7 +231,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 
 	maxIter := probeKuboConfig.MaxIterations
 	for i := 0; maxIter == 0 || i < maxIter; i++ {
-		slog.Info(strings.Repeat("-", 40))
+		slog.Info(strings.Repeat("-", 80))
 
 		// remove all pins and run a repo garbage collection
 		kubo.Reset(ctx)
@@ -253,82 +258,106 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 
 		if !probeKuboConfig.DownloadOnly {
 			slog.Info("Starting upload measurement")
+
+			var (
+				uploadStart = time.Now()
+				errStr      string
+			)
 			ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
-			if errors.Is(err, context.Canceled) {
-				return err
-			} else if err != nil {
+			if err != nil {
+				errStr = err.Error()
 				slog.With("err", err).Warn("Error uploading file to Kubo")
-				continue
-			}
 
-			// reset ticker interval after operation
+				dbUpload := &UploadModel{
+					Region:       rootConfig.AWSRegion,
+					TirosVersion: rootConfig.BuildInfo.ShortCommit(),
+					KuboVersion:  kuboVersion.Version,
+					KuboPeerID:   kuboID.ID,
+					FileSizeB:    int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
+					CID:          ur.CID.String(),
+					IPFSAddStart: uploadStart,
+					Error:        errStr,
+				}
+				if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
+					return fmt.Errorf("inserting upload into database: %w", err)
+				}
+			} else {
+				slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
 
-			slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
+				ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
+				provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
+				provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
+				uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
 
-			ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
-			provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
-			provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
-			uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
-
-			dbUpload := &UploadModel{
-				Region:            rootConfig.AWSRegion,
-				TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
-				KuboVersion:       kuboVersion.Version,
-				KuboPeerID:        kuboID.ID,
-				FileSizeMiB:       int32(probeKuboConfig.FileSizeMiB),
-				CID:               ur.CID.String(),
-				IPFSAddStart:      ur.IPFSAddStart,
-				IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
-				ProvideStart:      ur.ProvideStart,
-				ProvideDurationMs: int32(provideDuration.Milliseconds()),
-				ProvideDelayMs:    int32(provideDelay.Milliseconds()),
-				UploadDurationMs:  int32(uploadDuration.Milliseconds()),
-			}
-			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
-				return fmt.Errorf("inserting upload into database: %w", err)
+				dbUpload := &UploadModel{
+					Region:            rootConfig.AWSRegion,
+					TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
+					KuboVersion:       kuboVersion.Version,
+					KuboPeerID:        kuboID.ID,
+					FileSizeB:         int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
+					CID:               ur.CID.String(),
+					IPFSAddStart:      ur.IPFSAddStart,
+					IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
+					ProvideStart:      ur.ProvideStart,
+					ProvideDurationMs: int32(provideDuration.Milliseconds()),
+					ProvideDelayMs:    int32(provideDelay.Milliseconds()),
+					UploadDurationMs:  int32(uploadDuration.Milliseconds()),
+					Error:             errStr,
+				}
+				if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
+					return fmt.Errorf("inserting upload into database: %w", err)
+				}
 			}
 		}
 
 		if !probeKuboConfig.UploadOnly {
-			slog.Info("Starting download measurement")
-			ciid, err := dbClient.SelectCID(ctx)
-			if err != nil {
-				return fmt.Errorf("selecting cid from database: %w", err)
-			}
+			for _, origin := range []string{"bitswap", "dht"} {
+				slog.Info(strings.Repeat("-", 80))
 
-			dr, err := kubo.Download(ctx, ciid)
-			if err != nil {
-				slog.With("err", err).Warn("Error downloading file from Kubo")
-				continue
-			}
+				slog.With("origin", origin).Info("Starting download measurement")
+				ciid, err := cidProvider.SelectCID(ctx, origin)
+				if err != nil {
+					return fmt.Errorf("selecting cid from database: %w", err)
+				}
 
-			slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
+				var errStr string
+				dr, err := kubo.Download(ctx, ciid)
+				if err != nil {
+					errStr = err.Error()
+					slog.With("err", err).Warn("Error downloading file from Kubo")
+				} else {
+					slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
+				}
 
-			ipfsCatDuration := dr.IPFSCatEnd.Sub(dr.IPFSCatStart)
-			ipniDuration := dr.IPNIEnd.Sub(dr.IPNIStart)
-			dbDownload := &DownloadModel{
-				Region:               rootConfig.AWSRegion,
-				TirosVersion:         rootConfig.BuildInfo.ShortCommit(),
-				KuboVersion:          kuboVersion.Version,
-				KuboPeerID:           kuboID.ID,
-				FileSizeMiB:          int32(dr.FileSize),
-				CID:                  dr.CID.String(),
-				IPFSCatStart:         dr.IPFSCatStart,
-				IPFSCatTTFBMs:        int32(dr.IPFSCatTTFB.Milliseconds()),
-				IPFSCatDurationMs:    int32(ipfsCatDuration.Milliseconds()),
-				IdleBroadcastStart:   dr.IdleBroadcastStartedAt,
-				FoundProvCount:       dr.FoundProvidersCount,
-				ConnProvCount:        dr.ConnectedProvidersCount,
-				FirstConnProvFoundAt: dr.FirstConnectedProviderFoundAt,
-				FirstProvConnAt:      dr.FirstProviderConnectedAt,
-				IPNIStart:            dr.IPNIStart,
-				IPNIDurationMs:       int32(ipniDuration.Milliseconds()),
-				IPNIStatus:           dr.IPNIStatus,
-				FirstBlockReceivedAt: dr.FirstBlockReceivedAt,
-				DiscoveryMethod:      dr.DiscoveryMethod,
-			}
-			if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
-				return fmt.Errorf("inserting upload into database: %w", err)
+				ipfsCatDuration := dr.IPFSCatEnd.Sub(dr.IPFSCatStart)
+				ipniDuration := dr.IPNIEnd.Sub(dr.IPNIStart)
+
+				dbDownload := &DownloadModel{
+					Region:               rootConfig.AWSRegion,
+					TirosVersion:         rootConfig.BuildInfo.ShortCommit(),
+					KuboVersion:          kuboVersion.Version,
+					KuboPeerID:           kuboID.ID,
+					FileSizeB:            int32(dr.FileSize),
+					CID:                  ciid.String(),
+					IPFSCatStart:         dr.IPFSCatStart,
+					IPFSCatTTFBMs:        int32(dr.IPFSCatTTFB.Milliseconds()),
+					IPFSCatDurationMs:    int32(ipfsCatDuration.Milliseconds()),
+					IdleBroadcastStart:   dr.IdleBroadcastStartedAt,
+					FoundProvCount:       dr.FoundProvidersCount,
+					ConnProvCount:        dr.ConnectedProvidersCount,
+					FirstConnProvFoundAt: dr.FirstConnectedProviderFoundAt,
+					FirstProvConnAt:      dr.FirstProviderConnectedAt,
+					FirstProvPeerID:      dr.FirstConnectedProviderPeerID,
+					IPNIStart:            dr.IPNIStart,
+					IPNIDurationMs:       int32(ipniDuration.Milliseconds()),
+					IPNIStatus:           dr.IPNIStatus,
+					FirstBlockReceivedAt: dr.FirstBlockReceivedAt,
+					DiscoveryMethod:      dr.DiscoveryMethod,
+					Error:                errStr,
+				}
+				if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
+					return fmt.Errorf("inserting upload into database: %w", err)
+				}
 			}
 		}
 

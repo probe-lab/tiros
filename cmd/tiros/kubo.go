@@ -216,7 +216,6 @@ loop:
 
 func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error) {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
 
 	ctx, downloadSpan := k.tracer.Start(ctx, "Download")
 	defer downloadSpan.End()
@@ -239,15 +238,16 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 
 	result := &DownloadResult{
 		CID:            c,
+		IPFSCatStart:   time.Now(),
 		IPFSCatTraceID: traceID,
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
-	parseTimeout := time.NewTimer(time.Minute)
+	parseTimeout := time.NewTimer(45 * time.Second)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		logEntry.Info("Subscribing to trace data...")
+		logEntry.With("timeout", 45*time.Second).Info("Subscribing to trace data...")
 		for {
 			select {
 			case <-parseTimeout.C:
@@ -266,13 +266,20 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 		}
 	}()
 
+	defer func() {
+		cancel()
+		<-done
+		if result.IPFSCatEnd.IsZero() {
+			result.IPFSCatEnd = time.Now()
+		}
+	}()
+
 	logEntry.Info("Downloading file from Kubo")
-	downloadStart := time.Now()
 	resp, err := k.Request("cat", c.String()).Send(ctx)
 	if err != nil {
-		return nil, err
+		return result, err
 	} else if resp.Error != nil {
-		return nil, resp.Error
+		return result, resp.Error
 	}
 
 	defer pllog.Defer(resp.Output.Close, "Failed closing response output")
@@ -280,10 +287,10 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	var buf [1]byte
 	_, err = resp.Output.Read(buf[:])
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 	logEntry.Info("Read first byte")
-	ttfb := time.Since(downloadStart)
+	ttfb := time.Since(result.IPFSCatStart)
 
 	r := io.LimitReader(resp.Output, 100*1024*1024) // read at most 20 MiB
 	data, err := io.ReadAll(r)
@@ -300,9 +307,8 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	logEntry.Info("Waiting for trace data...")
 	parseTimeout.Reset(12 * time.Second) // traces are submitted every 10 seconds, we wait a little longer
 
-	<-done // will be closed when context is canceled
+	<-done // will be closed when context is canceled or timeout is reached
 
-	result.IPFSCatStart = downloadStart
 	result.IPFSCatEnd = downloadEnd
 	result.IPFSCatTTFB = ttfb
 	result.FileSize = len(data)
