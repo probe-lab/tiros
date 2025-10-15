@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"iter"
 	"log/slog"
+	"net"
 	"os"
 	"path"
 	"sync"
@@ -21,6 +22,14 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+type TraceReceiverConfig struct {
+	Host        string
+	Port        int
+	TraceOut    string
+	ForwardHost string
+	ForwardPort int
+}
 
 // TraceReceiver implements the OTLP gRPC service
 type TraceReceiver struct {
@@ -38,10 +47,10 @@ type TraceReceiver struct {
 
 type TraceMatcher func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool
 
-func NewTraceReceiver(host string, port int, traceOut string) (*TraceReceiver, error) {
+func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 	server, err := plgrpc.NewServer(&plgrpc.ServerConfig{
-		Host: host,
-		Port: port,
+		Host: cfg.Host,
+		Port: cfg.Port,
 		LogOpts: []logging.Option{
 			logging.WithLevels(func(code codes.Code) logging.Level {
 				return logging.LevelInfo
@@ -56,8 +65,8 @@ func NewTraceReceiver(host string, port int, traceOut string) (*TraceReceiver, e
 		return nil, err
 	}
 
-	if traceOut != "" {
-		if err := os.MkdirAll(traceOut, 0o755); err != nil {
+	if cfg.TraceOut != "" {
+		if err := os.MkdirAll(cfg.TraceOut, 0o755); err != nil {
 			return nil, fmt.Errorf("create trace directory: %w", err)
 		}
 	}
@@ -66,23 +75,25 @@ func NewTraceReceiver(host string, port int, traceOut string) (*TraceReceiver, e
 		server:         server,
 		traceMatchChan: make(chan *ExportTraceServiceRequest),
 		traceMatchers:  make([]TraceMatcher, 0),
-		traceOut:       traceOut,
+		traceOut:       cfg.TraceOut,
 		traceCounter:   0,
 	}
 
 	coltracepb.RegisterTraceServiceServer(server, tr)
 
-	conn, err := grpc.Dial(
-		"localhost:55680",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-		grpc.WithTimeout(5*time.Second),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to downstream: %w", err)
-	}
+	if cfg.ForwardHost != "" && cfg.ForwardPort != 0 {
+		conn, err := grpc.Dial(
+			net.JoinHostPort(cfg.ForwardHost, fmt.Sprintf("%d", cfg.ForwardPort)),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithBlock(),
+			grpc.WithTimeout(5*time.Second),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to downstream: %w", err)
+		}
 
-	tr.forwardClient = coltracepb.NewTraceServiceClient(conn)
+		tr.forwardClient = coltracepb.NewTraceServiceClient(conn)
+	}
 
 	return tr, nil
 }
@@ -136,8 +147,11 @@ func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTrace
 			ErrorMessage:  "",
 		},
 	}
-	if _, err := tr.forwardClient.Export(ctx, req); err != nil {
-		slog.Warn(err.Error())
+
+	if tr.forwardClient != nil {
+		if _, err := tr.forwardClient.Export(ctx, req); err != nil {
+			slog.Warn(err.Error())
+		}
 	}
 
 	if len(tr.traceMatchers) == 0 {

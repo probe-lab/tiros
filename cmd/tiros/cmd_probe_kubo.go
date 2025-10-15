@@ -21,19 +21,28 @@ var probeKuboConfig = struct {
 	Interval      time.Duration
 	KuboHost      string
 	KuboAPIPort   int
-	TraceRecHost  string
-	TraceRecPort  int
+	TracesRecHost string
+	TracesRecPort int
 	MaxIterations int
 	TracesOut     string
+	DownloadOnly  bool
+	UploadOnly    bool
+
+	TracesForwardHost string
+	TracesForwardPort int
 }{
-	FileSizeMiB:   100,
-	Interval:      10 * time.Second, // time.Minute,
-	KuboHost:      "127.0.0.1",
-	KuboAPIPort:   5001,
-	TraceRecHost:  "127.0.0.1",
-	TraceRecPort:  4317,
-	MaxIterations: 0,
-	TracesOut:     "",
+	FileSizeMiB:       100,
+	Interval:          10 * time.Second, // time.Minute,
+	KuboHost:          "127.0.0.1",
+	KuboAPIPort:       5001,
+	TracesRecHost:     "127.0.0.1",
+	TracesRecPort:     4317,
+	MaxIterations:     0,
+	TracesOut:         "",
+	TracesForwardHost: "",
+	TracesForwardPort: 0,
+	DownloadOnly:      false,
+	UploadOnly:        false,
 }
 
 var probeKuboFlags = []cli.Flag{
@@ -65,26 +74,26 @@ var probeKuboFlags = []cli.Flag{
 		Value:       probeKuboConfig.KuboAPIPort,
 		Destination: &probeKuboConfig.KuboAPIPort,
 	},
-	&cli.StringFlag{
-		Name:        "traceReceiver.host",
-		Usage:       "TODO",
-		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACE_RECEIVER_HOST"),
-		Value:       probeKuboConfig.TraceRecHost,
-		Destination: &probeKuboConfig.TraceRecHost,
-	},
-	&cli.IntFlag{
-		Name:        "traceReceiver.port",
-		Usage:       "TODO",
-		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACE_RECEIVER_PORT"),
-		Value:       probeKuboConfig.TraceRecPort,
-		Destination: &probeKuboConfig.TraceRecPort,
-	},
 	&cli.IntFlag{
 		Name:        "maxIterations",
-		Usage:       "TODO",
+		Usage:       "The number of iterations to run. 0 means infinite.",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_MAX_ITERATIONS"),
 		Value:       probeKuboConfig.MaxIterations,
 		Destination: &probeKuboConfig.MaxIterations,
+	},
+	&cli.StringFlag{
+		Name:        "traces.receiver.host",
+		Usage:       "TODO",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_RECEIVER_HOST"),
+		Value:       probeKuboConfig.TracesRecHost,
+		Destination: &probeKuboConfig.TracesRecHost,
+	},
+	&cli.IntFlag{
+		Name:        "traces.receiver.port",
+		Usage:       "TODO",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_RECEIVER_PORT"),
+		Value:       probeKuboConfig.TracesRecPort,
+		Destination: &probeKuboConfig.TracesRecPort,
 	},
 	&cli.StringFlag{
 		Name:        "traces.out",
@@ -93,21 +102,67 @@ var probeKuboFlags = []cli.Flag{
 		Value:       probeKuboConfig.TracesOut,
 		Destination: &probeKuboConfig.TracesOut,
 	},
+	&cli.StringFlag{
+		Name:        "traces.forward.host",
+		Usage:       "The host to forward Kubo's traces to.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_FORWARD_HOST"),
+		Value:       probeKuboConfig.TracesForwardHost,
+		Destination: &probeKuboConfig.TracesForwardHost,
+	},
+	&cli.IntFlag{
+		Name:        "traces.forward.port",
+		Usage:       "The port to forward Kubo's traces to.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_FORWARD_PORT"),
+		Value:       probeKuboConfig.TracesForwardPort,
+		Destination: &probeKuboConfig.TracesForwardPort,
+	},
+}
+
+var probeKuboMuExFlags = []cli.MutuallyExclusiveFlags{
+	{
+		Flags: [][]cli.Flag{
+			{
+				&cli.BoolFlag{
+					Name:        "download.only",
+					Usage:       "Only download the file from Kubo",
+					Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_ONLY"),
+					Value:       probeKuboConfig.DownloadOnly,
+					Destination: &probeKuboConfig.DownloadOnly,
+				},
+				&cli.BoolFlag{
+					Name:        "upload.only",
+					Usage:       "Only download the file from Kubo",
+					Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_ONLY"),
+					Value:       probeKuboConfig.DownloadOnly,
+					Destination: &probeKuboConfig.DownloadOnly,
+				},
+			},
+		},
+	},
 }
 
 var probeKuboCmd = &cli.Command{
-	Name:   "kubo",
-	Usage:  "Start probing Kubo",
-	Flags:  probeKuboFlags,
-	Action: probeKuboAction,
+	Name:                   "kubo",
+	Usage:                  "Start probing Kubo",
+	Flags:                  probeKuboFlags,
+	MutuallyExclusiveFlags: probeKuboMuExFlags,
+	Action:                 probeKuboAction,
 }
 
 func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	trCfg := &TraceReceiverConfig{
+		Host:        probeKuboConfig.TracesRecHost,
+		Port:        probeKuboConfig.TracesRecPort,
+		TraceOut:    probeKuboConfig.TracesOut,
+		ForwardHost: probeKuboConfig.TracesForwardHost,
+		ForwardPort: probeKuboConfig.TracesForwardPort,
+	}
+
 	// initializing the trace receiver
-	tr, err := NewTraceReceiver(probeKuboConfig.TraceRecHost, probeKuboConfig.TraceRecPort, probeKuboConfig.TracesOut)
+	tr, err := NewTraceReceiver(trCfg)
 	if err != nil {
 		return fmt.Errorf("creating trace receiver gRPC server: %w", err)
 	}
@@ -191,57 +246,57 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		// start of the respective iteration and keep track of the start timestamp
 		iterationStart = time.Now()
 
-		ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
-		if errors.Is(err, context.Canceled) {
-			return err
-		} else if err != nil {
-			slog.With("err", err).Warn("Error uploading file to Kubo")
-			continue
+		if !probeKuboConfig.DownloadOnly {
+			slog.Info("Starting upload measurement")
+			ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
+			if errors.Is(err, context.Canceled) {
+				return err
+			} else if err != nil {
+				slog.With("err", err).Warn("Error uploading file to Kubo")
+				continue
+			}
+
+			// reset ticker interval after operation
+
+			slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
+
+			ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
+			provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
+			provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
+			uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
+
+			dbUpload := &UploadModel{
+				Region:            rootConfig.AWSRegion,
+				TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
+				KuboVersion:       kuboVersion.Version,
+				FileSizeMiB:       int32(probeKuboConfig.FileSizeMiB),
+				IPFSAddStart:      ur.IPFSAddStart,
+				IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
+				ProvideStart:      ur.ProvideStart,
+				ProvideDurationMs: int32(provideDuration.Milliseconds()),
+				ProvideDelayMs:    int32(provideDelay.Milliseconds()),
+				UploadDurationMs:  int32(uploadDuration.Milliseconds()),
+			}
+			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
+				return fmt.Errorf("inserting upload into database: %w", err)
+			}
 		}
 
-		// reset ticker interval after operation
+		if !probeKuboConfig.UploadOnly {
+			slog.Info("Starting download measurement")
+			ciid, err := dbClient.SelectCID(ctx)
+			if err != nil {
+				return fmt.Errorf("selecting cid from database: %w", err)
+			}
 
-		slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
+			res, err := kubo.Download(ctx, ciid)
+			if err != nil {
+				slog.With("err", err).Warn("Error downloading file from Kubo")
+				continue
+			}
 
-		ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
-		provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
-		provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
-		uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
-
-		dbUpload := &UploadModel{
-			Region:            rootConfig.AWSRegion,
-			TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
-			KuboVersion:       kuboVersion.Version,
-			FileSizeMiB:       int32(probeKuboConfig.FileSizeMiB),
-			IPFSAddStart:      ur.IPFSAddStart,
-			IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
-			ProvideStart:      ur.ProvideStart,
-			ProvideDurationMs: int32(provideDuration.Milliseconds()),
-			ProvideDelayMs:    int32(provideDelay.Milliseconds()),
-			UploadDurationMs:  int32(uploadDuration.Milliseconds()),
+			slog.With("fileSizeMiB", res.FileSize/1024.0/1024.0).Info("Download Successful")
 		}
-		if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
-			return fmt.Errorf("inserting upload into database: %w", err)
-		}
-
-		////////////////// DOWNLOAD ///////////////////////////
-		//download(ctx, kubo, tracer, tr)
-
-		//ciid, err := dbClient.SelectCID(ctx)
-		//if err != nil {
-		//	return fmt.Errorf("selecting cid from database: %w", err)
-		//}
-		//
-		//res, err := kubo.Download(ctx, ciid)
-		//if err != nil {
-		//	slog.With("err", err).Warn("Error downloading file from Kubo")
-		//	continue
-		//}
-		//
-		//slog.With(
-		//	"fileSizeMiB", res.fileSize/1024.0/1024.0,
-		//	"ipniStatusCode", res.clientMetrics,
-		//).Info("Download Successful")
 
 	}
 

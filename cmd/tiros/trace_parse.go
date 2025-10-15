@@ -120,7 +120,7 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 	if findProvSpan != nil {
 		providersFoundAt := map[string]time.Time{}
 		providersConnAt := map[string]time.Time{}
-		for _, evt := range findProvSpan.GetEvents() {
+		for _, evt := range findProvSpan.Events {
 			if evt.Name == "FoundProvider" {
 				for _, attr := range evt.Attributes {
 					if attr.Key == "peer" {
@@ -183,13 +183,13 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 					}
 				}
 			case span.Name == "Bitswap.Client.Getter.handleIncoming":
-				for _, attr := range span.GetAttributes() {
-					if attr.Key != "received block" {
+				for _, evt := range span.Events {
+					if evt.Name != "received block" {
 						continue
 					}
 
-					blockReceivedAt := time.Unix(0, int64(span.StartTimeUnixNano))
-					if blockReceivedAt.Before(r.FirstBlockReceivedAt) {
+					blockReceivedAt := time.Unix(0, int64(evt.TimeUnixNano))
+					if blockReceivedAt.Before(r.FirstBlockReceivedAt) || r.FirstBlockReceivedAt.IsZero() {
 						r.FirstBlockReceivedAt = blockReceivedAt
 					}
 				}
@@ -197,7 +197,7 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 		}
 	}
 
-	if r.FirstBlockReceivedAt.Before(r.FirstProviderConnectedAt) {
+	if !r.FirstBlockReceivedAt.IsZero() && r.FirstBlockReceivedAt.Before(r.FirstProviderConnectedAt) {
 		r.DiscoveryVia = "bitswap"
 	} else if r.IPNIStatus == 200 {
 		r.DiscoveryVia = "ipni"
