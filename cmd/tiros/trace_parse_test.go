@@ -178,3 +178,33 @@ func Test_parseDownload2Trace(t *testing.T) {
 	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1760509585080692000))
 	assert.True(t, res.cmdHandlerDone)
 }
+
+func Test_parseDownload3Trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("c2854351ed71daffd44c6191144faa51")
+	require.NoError(t, err)
+
+	res := DownloadResult{
+		CID:            cid.MustParse("QmfAxJ75ePH87jxh6K364P7ce2EFtz3KnU3xzLMmrv3eMN"),
+		IPFSCatTraceID: trace.TraceID(tid),
+		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	for i := 0; i < 1; i++ {
+		trace := loadTrace(t, fmt.Sprintf("./testdata/download_3/trace-%d.proto.json", i))
+		res.parse(trace)
+	}
+
+	assert.False(t, res.FindProvTraceID.IsValid())
+	assert.True(t, res.isPopulated())
+	assert.Equal(t, res.DiscoveryVia, "bitswap")
+	assert.Zero(t, res.FoundProvidersCount)
+	assert.Zero(t, res.ConnectedProvidersCount)
+	assert.True(t, res.IdleBroadcastStartedAt.IsZero())
+	assert.True(t, res.FirstConnectedProviderFoundAt.IsZero())
+	assert.True(t, res.FirstProviderConnectedAt.IsZero())
+	assert.True(t, res.IPNIStart.IsZero())
+	assert.True(t, res.IPNIEnd.IsZero())
+	assert.Zero(t, res.IPNIStatus)
+	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1760510095230803000))
+	assert.True(t, res.cmdHandlerDone)
+}

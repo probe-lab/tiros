@@ -197,12 +197,14 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 		}
 	}
 
-	if !r.FirstBlockReceivedAt.IsZero() && r.FirstBlockReceivedAt.Before(r.FirstProviderConnectedAt) {
+	if !r.FirstBlockReceivedAt.IsZero() && (r.FirstBlockReceivedAt.Before(r.FirstProviderConnectedAt) || r.FirstProviderConnectedAt.IsZero()) {
 		r.DiscoveryVia = "bitswap"
 	} else if r.IPNIStatus == 200 {
 		r.DiscoveryVia = "ipni"
 	} else if !r.IdleBroadcastStartedAt.IsZero() {
 		r.DiscoveryVia = "dht"
+	} else {
+		r.DiscoveryVia = "unknown"
 	}
 }
 
