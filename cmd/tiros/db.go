@@ -14,13 +14,16 @@ import (
 	"github.com/ipfs/go-cid"
 	pldb "github.com/probe-lab/go-commons/db"
 	pllog "github.com/probe-lab/go-commons/log"
+	"golang.org/x/sync/errgroup"
 )
 
 type UploadModel struct {
 	Region            string    `ch:"region"`
 	TirosVersion      string    `ch:"tiros_version"`
 	KuboVersion       string    `ch:"kubo_version"`
+	KuboPeerID        string    `ch:"kubo_peer_id"`
 	FileSizeMiB       int32     `ch:"file_size_mib"`
+	CID               string    `ch:"cid"`
 	IPFSAddStart      time.Time `ch:"ipfs_add_start"`
 	IPFSAddDurationMs int32     `ch:"ipfs_add_duration_ms"`
 	ProvideStart      time.Time `ch:"provide_start"`
@@ -29,9 +32,32 @@ type UploadModel struct {
 	UploadDurationMs  int32     `ch:"upload_duration_ms"`
 }
 
+type DownloadModel struct {
+	Region               string    `ch:"region"`
+	TirosVersion         string    `ch:"tiros_version"`
+	KuboVersion          string    `ch:"kubo_version"`
+	KuboPeerID           string    `ch:"kubo_peer_id"`
+	FileSizeMiB          int32     `ch:"file_size_mib"`
+	CID                  string    `ch:"cid"`
+	IPFSCatStart         time.Time `ch:"ipfs_cat_start"`
+	IPFSCatTTFBMs        int32     `ch:"ipfs_cat_ttfb_ms"`
+	IPFSCatDurationMs    int32     `ch:"ipfs_cat_duration_ms"`
+	IdleBroadcastStart   time.Time `ch:"idle_broadcast_start"`
+	FoundProvCount       int       `ch:"found_prov_count"`
+	ConnProvCount        int       `ch:"conn_prov_count"`
+	FirstConnProvFoundAt time.Time `ch:"first_conn_prov_found_at"`
+	FirstProvConnAt      time.Time `ch:"first_prov_conn_at"`
+	IPNIStart            time.Time `ch:"ipni_start"`
+	IPNIDurationMs       int32     `ch:"ipni_duration_ms"`
+	IPNIStatus           int       `ch:"ipni_status"`
+	FirstBlockReceivedAt time.Time `ch:"first_block_rec_at"`
+	DiscoveryMethod      string    `ch:"discovery_method"`
+}
+
 type DBClient interface {
 	io.Closer
 	InsertUpload(ctx context.Context, upload *UploadModel) error
+	InsertDownload(ctx context.Context, download *DownloadModel) error
 	SelectCID(ctx context.Context) (cid.Cid, error)
 }
 
@@ -81,6 +107,20 @@ func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel
 	return b.Send()
 }
 
+func (c *ClickhouseClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
+	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO downloads")
+	if err != nil {
+		return fmt.Errorf("preparer batch: %w", err)
+	}
+	defer pllog.Defer(b.Close, "Failed closing batch")
+
+	if err := b.AppendStruct(download); err != nil {
+		return fmt.Errorf("append struct: %w", err)
+	}
+
+	return b.Send()
+}
+
 func (c *ClickhouseClient) SelectCID(ctx context.Context) (cid.Cid, error) {
 	return defaultCid, nil
 }
@@ -102,6 +142,10 @@ func (c *NoopClient) InsertUpload(ctx context.Context, upload *UploadModel) erro
 	return nil
 }
 
+func (c *NoopClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
+	return nil
+}
+
 func (c *NoopClient) SelectCID(ctx context.Context) (cid.Cid, error) {
 	return cid.MustParse(""), nil
 }
@@ -118,14 +162,19 @@ func (c *LogClient) InsertUpload(ctx context.Context, upload *UploadModel) error
 	panic("not implemented")
 }
 
+func (c *LogClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
+	panic("not implemented")
+}
+
 func (c *LogClient) SelectCID(ctx context.Context) (cid.Cid, error) {
 	return defaultCid, nil
 }
 
 type JSONClient struct {
-	uploadsFile *os.File
-	testCIDs    []cid.Cid
-	testCIDIdx  int
+	uploadsFile   *os.File
+	downloadsFile *os.File
+	testCIDs      []cid.Cid
+	testCIDIdx    int
 }
 
 var _ DBClient = (*JSONClient)(nil)
@@ -163,6 +212,11 @@ func NewJSONClient(dir string) (*JSONClient, error) {
 		return nil, err
 	}
 
+	downloadsFile, err := os.Create(path.Join(dir, prefix+"_downloads.ndjson"))
+	if err != nil {
+		return nil, err
+	}
+
 	testCIDs := make([]cid.Cid, 0, len(testCIDStrs))
 	for _, c := range testCIDStrs {
 		parse := cid.MustParse(c)
@@ -172,19 +226,28 @@ func NewJSONClient(dir string) (*JSONClient, error) {
 
 	slog.Info("Writing uploads to " + uploadsFile.Name())
 	return &JSONClient{
-		uploadsFile: uploadsFile,
-		testCIDs:    testCIDs,
-		testCIDIdx:  0,
+		uploadsFile:   uploadsFile,
+		downloadsFile: downloadsFile,
+		testCIDs:      testCIDs,
+		testCIDIdx:    0,
 	}, nil
 }
 
 func (c *JSONClient) Close() error {
-	return c.uploadsFile.Close()
+	errg := errgroup.Group{}
+	errg.Go(c.downloadsFile.Close)
+	errg.Go(c.uploadsFile.Close)
+	return errg.Wait()
 }
 
 func (c *JSONClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
 	enc := json.NewEncoder(c.uploadsFile)
 	return enc.Encode(upload)
+}
+
+func (c *JSONClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
+	enc := json.NewEncoder(c.downloadsFile)
+	return enc.Encode(download)
 }
 
 func (c *JSONClient) SelectCID(ctx context.Context) (cid.Cid, error) {

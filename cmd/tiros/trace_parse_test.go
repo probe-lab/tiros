@@ -102,7 +102,7 @@ func Test_parseDownload0Trace(t *testing.T) {
 
 	assert.True(t, bytes.Equal(res.FindProvTraceID[:], provTraceID[:]))
 	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryVia, "ipni")
+	assert.Equal(t, res.DiscoveryMethod, "ipni")
 	assert.Equal(t, res.FoundProvidersCount, 3)
 	assert.Equal(t, res.ConnectedProvidersCount, 2)
 	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1760508129371719000))
@@ -134,7 +134,7 @@ func Test_parseDownload1Trace(t *testing.T) {
 
 	assert.True(t, bytes.Equal(res.FindProvTraceID[:], provTraceID[:]))
 	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryVia, "ipni")
+	assert.Equal(t, res.DiscoveryMethod, "ipni")
 	assert.Equal(t, res.FoundProvidersCount, 3)
 	assert.Equal(t, res.ConnectedProvidersCount, 3)
 	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1760509237899424000))
@@ -166,7 +166,7 @@ func Test_parseDownload2Trace(t *testing.T) {
 
 	assert.True(t, bytes.Equal(res.FindProvTraceID[:], provTraceID[:]))
 	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryVia, "dht")
+	assert.Equal(t, res.DiscoveryMethod, "dht")
 	assert.Equal(t, res.FoundProvidersCount, 1)
 	assert.Equal(t, res.ConnectedProvidersCount, 1)
 	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1760509584753207000))
@@ -196,7 +196,7 @@ func Test_parseDownload3Trace(t *testing.T) {
 
 	assert.False(t, res.FindProvTraceID.IsValid())
 	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryVia, "bitswap")
+	assert.Equal(t, res.DiscoveryMethod, "bitswap")
 	assert.Zero(t, res.FoundProvidersCount)
 	assert.Zero(t, res.ConnectedProvidersCount)
 	assert.True(t, res.IdleBroadcastStartedAt.IsZero())

@@ -69,8 +69,11 @@ type DownloadResult struct {
 	CID             cid.Cid
 	IPFSCatTraceID  trace.TraceID
 	FindProvTraceID trace.TraceID
-	TTFB            time.Duration
-	FileSize        int
+
+	IPFSCatStart time.Time
+	IPFSCatEnd   time.Time
+	IPFSCatTTFB  time.Duration
+	FileSize     int
 
 	IdleBroadcastStartedAt        time.Time
 	FoundProvidersCount           int
@@ -83,7 +86,7 @@ type DownloadResult struct {
 	IPNIStatus int
 
 	FirstBlockReceivedAt time.Time
-	DiscoveryVia         string
+	DiscoveryMethod      string
 
 	spansByTraceID map[trace.TraceID][]*v1.Span
 	cmdHandlerDone bool
@@ -198,13 +201,13 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 	}
 
 	if !r.FirstBlockReceivedAt.IsZero() && (r.FirstBlockReceivedAt.Before(r.FirstProviderConnectedAt) || r.FirstProviderConnectedAt.IsZero()) {
-		r.DiscoveryVia = "bitswap"
+		r.DiscoveryMethod = "bitswap"
 	} else if r.IPNIStatus == 200 {
-		r.DiscoveryVia = "ipni"
+		r.DiscoveryMethod = "ipni"
 	} else if !r.IdleBroadcastStartedAt.IsZero() {
-		r.DiscoveryVia = "dht"
+		r.DiscoveryMethod = "dht"
 	} else {
-		r.DiscoveryVia = "unknown"
+		r.DiscoveryMethod = "unknown"
 	}
 }
 

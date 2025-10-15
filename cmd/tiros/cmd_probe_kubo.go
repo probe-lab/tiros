@@ -213,6 +213,11 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
+	kuboID, err := kubo.ID(ctx)
+	if err != nil {
+		return err
+	}
+
 	// ticker to control the interval between iterations
 	ticker := time.NewTimer(0)
 
@@ -269,7 +274,9 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 				Region:            rootConfig.AWSRegion,
 				TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
 				KuboVersion:       kuboVersion.Version,
+				KuboPeerID:        kuboID.ID,
 				FileSizeMiB:       int32(probeKuboConfig.FileSizeMiB),
+				CID:               ur.CID.String(),
 				IPFSAddStart:      ur.IPFSAddStart,
 				IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
 				ProvideStart:      ur.ProvideStart,
@@ -289,13 +296,40 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 				return fmt.Errorf("selecting cid from database: %w", err)
 			}
 
-			res, err := kubo.Download(ctx, ciid)
+			dr, err := kubo.Download(ctx, ciid)
 			if err != nil {
 				slog.With("err", err).Warn("Error downloading file from Kubo")
 				continue
 			}
 
-			slog.With("fileSizeMiB", res.FileSize/1024.0/1024.0).Info("Download Successful")
+			slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
+
+			ipfsCatDuration := dr.IPFSCatEnd.Sub(dr.IPFSCatStart)
+			ipniDuration := dr.IPNIEnd.Sub(dr.IPNIStart)
+			dbDownload := &DownloadModel{
+				Region:               rootConfig.AWSRegion,
+				TirosVersion:         rootConfig.BuildInfo.ShortCommit(),
+				KuboVersion:          kuboVersion.Version,
+				KuboPeerID:           kuboID.ID,
+				FileSizeMiB:          int32(dr.FileSize),
+				CID:                  dr.CID.String(),
+				IPFSCatStart:         dr.IPFSCatStart,
+				IPFSCatTTFBMs:        int32(dr.IPFSCatTTFB.Milliseconds()),
+				IPFSCatDurationMs:    int32(ipfsCatDuration.Milliseconds()),
+				IdleBroadcastStart:   dr.IdleBroadcastStartedAt,
+				FoundProvCount:       dr.FoundProvidersCount,
+				ConnProvCount:        dr.ConnectedProvidersCount,
+				FirstConnProvFoundAt: dr.FirstConnectedProviderFoundAt,
+				FirstProvConnAt:      dr.FirstProviderConnectedAt,
+				IPNIStart:            dr.IPNIStart,
+				IPNIDurationMs:       int32(ipniDuration.Milliseconds()),
+				IPNIStatus:           dr.IPNIStatus,
+				FirstBlockReceivedAt: dr.FirstBlockReceivedAt,
+				DiscoveryMethod:      dr.DiscoveryMethod,
+			}
+			if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
+				return fmt.Errorf("inserting upload into database: %w", err)
+			}
 		}
 
 	}

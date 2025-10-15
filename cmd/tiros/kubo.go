@@ -18,6 +18,7 @@ import (
 	"github.com/ipfs/go-cid"
 	ipfs "github.com/ipfs/kubo"
 	kuboclient "github.com/ipfs/kubo/client/rpc"
+	"github.com/ipfs/kubo/core/commands"
 	iface "github.com/ipfs/kubo/core/coreiface"
 	"github.com/ipfs/kubo/core/coreiface/options"
 	"github.com/multiformats/go-multicodec"
@@ -100,6 +101,14 @@ func (k *Kubo) Version(ctx context.Context) (*ipfs.VersionInfo, error) {
 
 	info := &ipfs.VersionInfo{}
 	return info, json.Unmarshal(data, info)
+}
+
+func (k *Kubo) ID(ctx context.Context) (*commands.IdOutput, error) {
+	var out commands.IdOutput
+	if err := k.Request("id").Exec(ctx, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (k *Kubo) Reset(ctx context.Context) {
@@ -281,6 +290,8 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	if err != nil {
 		return nil, err
 	}
+	downloadEnd := time.Now()
+
 	data = append(data, buf[:]...)
 	downloadSpan.End()
 
@@ -291,7 +302,9 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 
 	<-done // will be closed when context is canceled
 
-	result.TTFB = ttfb
+	result.IPFSCatStart = downloadStart
+	result.IPFSCatEnd = downloadEnd
+	result.IPFSCatTTFB = ttfb
 	result.FileSize = len(data)
 
 	return result, nil
