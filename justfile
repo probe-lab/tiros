@@ -46,6 +46,7 @@ run: dev-up
 clean:
     rm -f tiros
     rm -r tests/upload/tmp.* || true
+    rm -r tests/download/tmp.* || true
 
 # Format Go code
 fmt:

@@ -58,7 +58,14 @@ assert_not_empty() {
 
 # Assertions on fields
 echo "Asserting..."
+assert_not_empty "RunID"
 assert_eq "KuboVersion" "0.38.0"
+#assert_not_empty "TirosVersion"
+assert_not_empty "KuboPeerID"
+assert_gt "FileSizeB" "0" "Filesize is not greater than 0"
+assert_not_empty "CID"
+assert_not_empty "IPFSCatStart"
+assert_gt "IPFSCatDurationS" "0"
 
 # Success message
 echo "All validations passed successfully!"
