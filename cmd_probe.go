@@ -38,6 +38,7 @@ var probeCmd = &cli.Command{
 	After:  probeAfter,
 	Commands: []*cli.Command{
 		probeKuboCmd,
+		probeWebsitesCmd,
 	},
 }
 

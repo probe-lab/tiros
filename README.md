@@ -2,7 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement tool. It is intended to run on AWS ECS in multiple regions.
+Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement tool.
 
 ## Table of Contents
 
@@ -11,12 +11,17 @@ Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement to
 * [Tiros](#tiros)
   * [Table of Contents](#table-of-contents)
   * [Measurement Methodology](#measurement-methodology)
+    * [Content Routing Performance](#content-routing-performance)
+      * [Run](#run)
     * [Website Performance](#website-performance)
     * [Measurement Metrics](#measurement-metrics)
-    * [Run](#run)
-  * [Upload Perforamnce](#upload-perforamnce)
-  * [Development](#development)
+    * [Execution](#execution)
+      * [Global Configuration](#global-configuration)
+      * [Probe Configuration](#probe-configuration)
+      * [Website Configuration](#website-configuration)
+      * [Content Routing Performance Configuration](#content-routing-performance-configuration)
     * [Migrations](#migrations)
+  * [Testing](#testing)
   * [Alternative IPFS Implementation](#alternative-ipfs-implementation)
   * [Maintainers](#maintainers)
   * [Contributing](#contributing)
@@ -25,17 +30,89 @@ Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement to
 
 ## Measurement Methodology
 
-We, [ProbeLab](https://probelab.io), are running Tiros as a scheduled AWS ECS task in four different AWS regions. These regions are:
+There are two measurement modes to Tiros:
+
+1. Content routing performance measurements
+2. Website performance measurements
+
+
+
+We, [ProbeLab](https://probelab.io), are running Tiros on AWS ECS task in four different AWS regions. These regions are:
 
 - `eu-central-1`
 - `us-east-2`
 - `us-west-1`
 - `ap-southeast-2`
 
-There are different types of experiments that Tiros can execute. We have the following types of experiments:
+### Content Routing Performance
 
-- Website performance
-- Upload performance
+The content routing performance measurements are also split into the "upload" and "download" parts.
+
+First, you cannot _upload_ anything to IPFS. Instead, what Tiros does is,
+it generates random data, calls `ipfs add` and then waits until the provider
+record for the root CID was added to the DHT.
+
+The instrumentation itself works by configuring Kubo to emit OpenTelemetry
+traces to Tiros itself. So, Tiros interacts with Kubo via the regular RPC API
+and all traces then flow back to Tiros. In Tiros, the traces are then captured
+and parsed. Irrelevant traces are discarded.
+
+The alternative setup was to pipe the traces to Grafana Cloud (via Alloy for example),
+query them from there and analyze them. However, there were three challenges with that:
+
+1. The number of traces was so high that we ran out of our free tier allowance
+2. Individual traces were rejected from Grafana Cloud because they were too large
+3. Testing the whole pipeline was cumbersome and slow, having everything self-contained simplified e2e testing
+
+However, this setup comes with a few disadvantages as well. First, we're mixing
+data collection with data analysis. Raw data will be discarded and we cannot 
+extract additional metrics from past collected traces. Second, parsing traces
+in Go is not as simple as in Python imo.
+
+#### Run
+
+To run the content routing performance measurement you could do the following:
+
+Terminal 1:
+```shell
+docker compose -f e2e/docker-compose.kubo.yml up 
+```
+
+Terminal 2:
+```shell
+go run . probe --json.out out kubo --iterations.max 1 --traces.receiver.host 0.0.0.0 --download.cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+```
+
+The `--json.out` flag instructs Tiros to write the output to newline-delimited
+JSON files in the given directory. In this case `out`. In production, this would
+be written to a Clickhouse database.
+
+You can also forward Kubo's traces to, e.g., Jaeger. First start Jaeger:
+
+```text
+docker run -d --rm --name jaeger
+ -e COLLECTOR_OTLP_ENABLED=true \ 
+ -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
+ -p 5775:5775/udp \
+ -p 6831:6831/udp \
+ -p 6832:6832/udp \
+ -p 5778:5778 \
+ -p 16686:16686 \
+ -p 14250:14250 \
+ -p 14268:14268 \
+ -p 14269:14269 \
+ -p 55680:4317 \
+ -p 4318:4318 \
+ -p 9411:9411 \
+ jaegertracing/all-in-one
+```
+
+Then pass the following flags to the above Tiros command:
+```
+---traces.forward.host 127.0.0.1 --traces.forward.port 55680
+```
+
+That way you can inspect the traces that Tiros caught in Jaeger.
 
 ### Website Performance
 
@@ -265,112 +342,142 @@ We could instead define `domContentLoaded` as the time difference between `start
 
 You need to provide many configuration parameters to `tiros`. See this help page:
 
+#### Global Configuration
+
 ```text
 NAME:
-   tiros probe
+   tiros - A new cli application
 
 USAGE:
-   tiros probe [command options]
+   tiros [global options] [command [command options]]
 
 COMMANDS:
-   websites  
-   upload    
-   help, h   Shows a list of commands or help for one command
+   probe    Start probing Kubo
+   health   Checks the health of the provided endpoint
+   help, h  Shows a list of commands or help for one command
 
-OPTIONS:
-   --dry-run                    Whether to skip DB interactions (default: false) [$TIROS_PROBE_DRY_RUN]
-   --db-host value              On which host address can this clustertest reach the database (default: "localhost") [$TIROS_PROBE_DATABASE_HOST]
-   --db-port value              On which port can this clustertest reach the database (default: 5432) [$TIROS_PROBE_DATABASE_PORT]
-   --db-name value              The name of the database to use (default: "tiros") [$TIROS_PROBE_DATABASE_NAME]
-   --db-password value          The password for the database to use [$TIROS_PROBE_DATABASE_PASSWORD]
-   --db-user value              The user with which to access the database to use (default: "tiros") [$TIROS_PROBE_DATABASE_USER]
-   --db-sslmode value           The sslmode to use when connecting the the database (default: "disable") [$TIROS_PROBE_DATABASE_SSL_MODE]
-   --ipfs-host value            host at which to reach the IPFS Gateway (default: "127.0.0.1") [$TIROS_PROBE_IPFS_HOST]
-   --ipfs-api-port value        port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_IPFS_API_PORT]
-   --ipfs-gateway-port value    port to reach the IPFS Gateway (default: 8080) [$TIROS_PROBE_IPFS_GATEWAY_PORT]
-   --chrome-cdp-host value      host at which the Chrome DevTools Protocol is reachable (default: "localhost") [$TIROS_PROBE_CHROME_CDP_HOST]
-   --chrome-cdp-port value      port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_CHROME_CDP_PORT]
-   --ipfs-implementation value  Which implementation are we testing (KUBO, HELIA) (default: "KUBO") [$TIROS_PROBE_IPFS_IMPLEMENTATION]
-   --help, -h                   show help
+GLOBAL OPTIONS:
+   --help, -h  show help
+
+   Logging Configuration:
+
+   --log.format string  Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.level string   Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.source         Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+
+   Telemetry Configuration:
+
+   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
 ```
+
+#### Probe Configuration
 
 ```text
 NAME:
-   tiros probe websites
+   tiros probe - Start probing Kubo
 
 USAGE:
-   tiros probe websites [command options]
+   tiros probe [command [command options]]
+
+COMMANDS:
+   kubo      Start probing Kubo publication and retrieval performance
+   websites  Start probing website performance.
 
 OPTIONS:
-   --websites value [ --websites value ]          Websites to test against. Example: 'ipfs.io' or 'filecoin.io [$TIROS_PROBE_WEBSITES_WEBSITES]
-   --settle-times value [ --settle-times value ]  a list of times to settle in seconds (default: 0, 0) [$TIROS_PROBE_WEBSITES_SETTLE_TIMES]
-   --times value                                  number of times to test each URL (default: 3) [$TIROS_PROBE_WEBSITES_TIMES]
-   --lookup-providers                             Whether to lookup website providers (default: true) [$TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS]
-   --timeout value                                The maximum allowed time for this experiment to run (0 no timeout) (default: 0s) [$TIROS_PROBE_WEBSITES_TIMEOUT]
-   --help, -h                                     show help
+   --dry.run           Whether to skip DB interactions (default: false) [$TIROS_PROBE_DRY_RUN]
+   --help, -h          show help
+   --json.out string   Write measurements to JSON files in the given directory [$TIROS_PROBE_JSON_OUT]
+   --timeout duration  The maximum allowed time for this experiment to run (0 no timeout) (default: 0s) [$TIROS_PROBE_TIMEOUT]
+
+   Database Configuration:
+
+   --clickhouse.cluster string                        The cluster name of the Clickhouse service. [$TIROS_PROBE_CLICKHOUSE_CLUSTER]
+   --clickhouse.database string                       The ClickHouse database name to connect to (default: "tiros") [$TIROS_PROBE_CLICKHOUSE_DATABASE]
+   --clickhouse.host string                           The address where ClickHouse is hosted (default: "127.0.0.1") [$TIROS_PROBE_CLICKHOUSE_HOST]
+   --clickhouse.migrations.multiStatement             Whether to use multi-statement mode when applying migrations. (default: false) [$TIROS_PROBE_CLICKHOUSE_MIGRATIONS_MULTI_STATEMENT]
+   --clickhouse.migrations.multiStatementMaxSize int  The maximum size of a multi-statement. (default: 10485760) [$TIROS_PROBE_CLICKHOUSE_MIGRATIONS_MULTI_STATEMENT_MAX_SIZE]
+   --clickhouse.migrations.replicatedTableEngines     Whether to use replicated table engines. (default: false) [$TIROS_PROBE_CLICKHOUSE_MIGRATIONS_REPLICATED_TABLE_ENGINES]
+   --clickhouse.migrationsTable string                The name of the migrations table. (default: "schema_migrations") [$TIROS_PROBE_CLICKHOUSE_MIGRATIONS_TABLE]
+   --clickhouse.migrationsTableEngine string          The engine of the migrations table. (default: "TinyLog") [$TIROS_PROBE_CLICKHOUSE_MIGRATIONS_TABLE_ENGINE]
+   --clickhouse.password string                       The password for the ClickHouse user (default: "password") [$TIROS_PROBE_CLICKHOUSE_PASSWORD]
+   --clickhouse.port int                              Port at which the ClickHouse database is accessible (default: 9000) [$TIROS_PROBE_CLICKHOUSE_PORT]
+   --clickhouse.ssl                                   Whether to use SSL to connect to ClickHouse (default: false) [$TIROS_PROBE_CLICKHOUSE_SSL]
+   --clickhouse.user string                           The ClickHouse user that has the right privileges (default: "tiros") [$TIROS_PROBE_CLICKHOUSE_USER]
 ```
 
-## Upload Performance
+#### Website Configuration
 
-Each ECS task consists of two containers:
+```text
+NAME:
+   tiros probe websites - Start probing website performance.
 
-1. `scheduler` (this repository)
-2. `kubo` - [ipfs/kubo](https://hub.docker.com/r/ipfs/kubo/)
-3. `alloy` - [grafana/alloy](https://github.com/grafana/alloy)
+USAGE:
+   tiros probe websites [options]
 
-In this configuration, the scheduler generates a configurable amount of random data
-and adds it to kubo. Kubo then transmits traces covering the internals to alloy
-which will then be forwarded to an OpenTelemetry collector.
+OPTIONS:
+   --probes int                             number of times to probe each URL (default: 3) [$TIROS_PROBE_WEBSITES_PROBES]
+   --websites string [ --websites string ]  list of websites to probe [$TIROS_PROBE_WEBSITES_WEBSITES]
+   --lookup.providers                       Whether to lookup website providers (default: true) [$TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS]
+   --kubo.host string                       Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_KUBO_HOST]
+   --kubo.api.port int                      port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_WEBSITES_KUBO_API_PORT]
+   --kubo.gateway.port int                  port at which to reach Kubo's HTTP gateway (default: 8080) [$TIROS_PROBE_WEBSITES_KUBO_GATEWAY_PORT]
+   --chrome.cdp.host string                 host at which the Chrome DevTools Protocol is reachable (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_CHROME_CDP_HOST]
+   --chrome.cdp.port int                    port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_WEBSITES_CHROME_CDP_PORT]
+   --chrome.kubo.host string                the kubo host from Chrome's perspective. This may be different from Tiros, especially if Chrome and Kubo are run with docker. (default: --kubo.host) [$TIROS_PROBE_WEBSITES_CHROME_KUBO_HOST]
+   --help, -h                               show help
 
-## Development
-
-To test the tool locally, you need to start a database, kubo node, and headless chrome. You can do all of this by running:
-
-```shell
-docker compose up -d
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
 ```
 
-Then you need to point `tiros` to your local deployment. You can do this by
-_sourcing_ the included [`.env.local`](./.env.local) file:
+#### Content Routing Performance Configuration
 
-```shell
-source .env.local
-```
+```text
+NAME:
+   tiros probe kubo - Start probing Kubo publication and retrieval performance
 
-Finally, run `tiros` via:
+USAGE:
+   tiros probe kubo [options]
 
-```shell
-go build -o tiros .
-./tiros run
+OPTIONS:
+   --filesize int                                     File size in MiB to upload to kubo (default: 100) [$TIROS_PROBE_KUBO_UPLOAD_FILE_SIZE_MIB]
+   --interval duration                                How long to wait between each upload (default: 10s) [$TIROS_PROBE_KUBO_UPLOAD_INTERVAL]
+   --kubo.host string                                 Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_KUBO_KUBO_HOST]
+   --kubo.api.port int                                port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_KUBO_KUBO_API_PORT]
+   --iterations.max int                               The number of iterations to run. 0 means infinite. (default: 0) [$TIROS_PROBE_KUBO_ITERATIONS_MAX]
+   --traces.receiver.host string                      The host that the trace receiver is binding to (this is where Kubo should send the traces to) (default: "127.0.0.1") [$TIROS_PROBE_KUBO_TRACES_RECEIVER_HOST]
+   --traces.receiver.port int                         The port on which the trace receiver should listen on (this is where Kubo should send the traces to) (default: 4317) [$TIROS_PROBE_KUBO_TRACES_RECEIVER_PORT]
+   --traces.out string                                If set, where to write the traces to. [$TIROS_PROBE_KUBO_TRACES_OUT]
+   --traces.forward.host string                       The host to forward Kubo's traces to. [$TIROS_PROBE_KUBO_TRACES_FORWARD_HOST]
+   --traces.forward.port int                          The port to forward Kubo's traces to. (default: 0) [$TIROS_PROBE_KUBO_TRACES_FORWARD_PORT]
+   --download.cids string [ --download.cids string ]  A static list of CIDs to download from Kubo. [$TIROS_PROBE_KUBO_DOWNLOAD_CIDS]
+   --help, -h                                         show help
+   --download.only                                    Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_DOWNLOAD_ONLY]
+   --upload.only                                      Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_UPLOAD_ONLY]
 
-# OR
-
-go run . run
-```
-
-After the run has finished, you can check the local database for the measurement data. Run:
-
-```shell
-docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
-```
-
-to connect to the local database. If prompted for a password enter `password` or
-whatever is set in the [`.env.local`](./.env.local) file for the `TIROS_RUN_DATABASE_PASSWORD` environment variable.
-
-Example output:
-
-```
-$ docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test                                                                                                                                                                                                                                                                                                                                  3s 
-psql (14.6 (Debian 14.6-1.pgdg110+1))
-Type "help" for help.
-
-tiros_test=# select * from runs;
- id | region |   websites    |    version     | times | cpu | memory |          updated_at           |          created_at           |          finished_at          | ipfs_impl 
-----+--------+---------------+----------------+-------+-----+--------+-------------------------------+-------------------------------+-------------------------------+-----------
-  1 | local  | {filecoin.io} | 0.19.0-1963219 |     1 |   2 |   4096 | 2024-03-26 09:26:07.948483+00 | 2024-03-26 09:25:30.600963+00 | 2024-03-26 09:26:07.948482+00 | KUBO
-  2 | local  | {filecoin.io} | 0.19.0-1963219 |     1 |   2 |   4096 | 2024-03-26 09:32:05.247122+00 | 2024-03-26 09:31:28.844582+00 | 2024-03-26 09:32:05.247122+00 | KUBO
-(2 rows)
-
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
 ```
 
 ### Migrations
@@ -378,13 +485,23 @@ tiros_test=# select * from runs;
 To create a new migration run:
 
 ```shell
-migrate create -ext sql -dir migrations -seq create_measurements_table
+migrate create -dir migrations -ext sql -seq create_website_measurements_table
 ```
 
-To create the database models
+Apply migrations by running:
 
 ```shell
-just models
+migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path cmd/tiros/migrations up
+```
+
+## Testing
+
+Tiros has a few end-to-end tests that can be run with:
+
+```shell
+just e2e website
+just e2e upload
+just e2e download
 ```
 
 ## Alternative IPFS Implementation
@@ -393,7 +510,8 @@ An alternative IPFS implementation needs to support a couple of things:
 
 1. The [`/api/v0/repo/gc`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-repo-gc) endpoint
 2. The [`/api/v0/version`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-version) endpoint
-3. Expose a [rudimentary IPFS Gateway](https://docs.ipfs.tech/reference/http/gateway/) that at least supports resolving IPNS links
+3. The [`/api/v0/id`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-id) endpoint
+4. Expose a [rudimentary IPFS Gateway](https://docs.ipfs.tech/reference/http/gateway/) that at least supports resolving IPNS links
 
 ## Maintainers
 
@@ -406,18 +524,3 @@ Feel free to dive in! [Open an issue](https://github.com/RichardLitt/standard-re
 ## License
 
 [MIT](LICENSE) © Dennis Trautwein
-
-
-
----
-
-create migration:
-
-```
-migrate create -dir migrations -ext sql -seq create_website_measurements_table
-```
-
-- use Float32  
-At 1 second, smallest step  0.1 µs (fine!)
-
-At 1000 seconds (~17 minutes), smallest step ≈ 0.1 ms

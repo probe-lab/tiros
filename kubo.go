@@ -36,10 +36,11 @@ import (
 )
 
 type KuboConfig struct {
-	Host     string
-	APIPort  int
-	GWPort   int
-	Receiver *TraceReceiver
+	Host           string
+	APIPort        int
+	GWPort         int
+	Receiver       *TraceReceiver
+	ChromeKuboHost string
 }
 
 type Kubo struct {
@@ -482,7 +483,7 @@ func (k *Kubo) findProviders(ctx context.Context, website string, results chan<-
 func (k *Kubo) websiteURL(website string, protocol WebsiteProbeProtocol) string {
 	switch protocol {
 	case WebsiteProbeProtocolIPFS:
-		return fmt.Sprintf("http://%s:%d/ipns/%s", k.cfg.Host, k.cfg.GWPort, website)
+		return fmt.Sprintf("http://%s:%d/ipns/%s", k.cfg.ChromeKuboHost, k.cfg.GWPort, website)
 	case WebsiteProbeProtocolHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:

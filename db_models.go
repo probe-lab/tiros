@@ -66,11 +66,11 @@ type WebsiteProbeModel struct {
 	Protocol     string          `ch:"protocol"`
 	IPFSImpl     string          `ch:"ipfs_impl"`
 	Try          int             `ch:"try"`
-	TTFBS        *float64        `ch:"ttfb_s"`
-	FCPS         *float64        `ch:"fcp_s"`
-	LCPS         *float64        `ch:"lcp_s"`
-	TTIS         *float64        `ch:"tti_s"`
-	CLSS         *float64        `ch:"cls_s"`
+	TTFB         *float64        `ch:"ttfb_s"`
+	FCP          *float64        `ch:"fcp_s"`
+	LCP          *float64        `ch:"lcp_s"`
+	TTI          *float64        `ch:"tti_s"`
+	CLS          *float64        `ch:"cls_s"`
 	TTFBRating   *string         `ch:"ttfb_rating"`
 	CLSRating    *string         `ch:"cls_rating"`
 	FCPRating    *string         `ch:"fcp_rating"`
@@ -83,19 +83,17 @@ type WebsiteProbeModel struct {
 }
 
 type ProviderModel struct {
-	RunID string `ch:"run_id"`
-	// ID             int               `boil:"id" json:"id" toml:"id" yaml:"id"`
-	// RunID          int               `boil:"run_id" json:"run_id" toml:"run_id" yaml:"run_id"`
-	// Website        string            `boil:"website" json:"website" toml:"website" yaml:"website"`
-	// Path           string            `boil:"path" json:"path" toml:"path" yaml:"path"`
-	// PeerID         string            `boil:"peer_id" json:"peer_id" toml:"peer_id" yaml:"peer_id"`
-	// AgentVersion   null.String       `boil:"agent_version" json:"agent_version,omitempty" toml:"agent_version" yaml:"agent_version,omitempty"`
-	// MultiAddresses types.StringArray `boil:"multi_addresses" json:"multi_addresses,omitempty" toml:"multi_addresses" yaml:"multi_addresses,omitempty"`
-	// IsRelayed      null.Bool         `boil:"is_relayed" json:"is_relayed,omitempty" toml:"is_relayed" yaml:"is_relayed,omitempty"`
-	// Country        null.String       `boil:"country" json:"country,omitempty" toml:"country" yaml:"country,omitempty"`
-	// Continent      null.String       `boil:"continent" json:"continent,omitempty" toml:"continent" yaml:"continent,omitempty"`
-	// Asn            null.Int          `boil:"asn" json:"asn,omitempty" toml:"asn" yaml:"asn,omitempty"`
-	// DatacenterID   null.Int          `boil:"datacenter_id" json:"datacenter_id,omitempty" toml:"datacenter_id" yaml:"datacenter_id,omitempty"`
-	// Error          null.String       `boil:"error" json:"error,omitempty" toml:"error" yaml:"error,omitempty"`
-	// CreatedAt      time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	RunID          string    `ch:"run_id"`
+	Region         string    `ch:"region"`
+	TirosVersion   string    `ch:"tiros_version"`
+	KuboVersion    string    `ch:"kubo_version"`
+	KuboPeerID     string    `ch:"kubo_peer_id"`
+	Website        string    `ch:"website"`
+	Path           string    `ch:"path"`
+	ProviderID     string    `ch:"provider_id"`
+	AgentVersion   *string   `ch:"agent_version"`
+	MultiAddresses []string  `ch:"multi_addresses"`
+	IsRelayed      *bool     `ch:"is_relayed"`
+	Error          error     `ch:"error"`
+	CreatedAt      time.Time `ch:"created_at"`
 }

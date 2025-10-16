@@ -463,4 +463,6 @@ db.toml
 data-alloy
 json
 
-tmp.*
+**/tmp.*
+
+results

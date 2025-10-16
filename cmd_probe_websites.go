@@ -15,7 +15,7 @@ import (
 )
 
 var probeWebsitesConfig = struct {
-	Websites        *cli.StringSlice
+	Websites        []string
 	Probes          int
 	LookupProviders bool
 	KuboHost        string
@@ -23,8 +23,9 @@ var probeWebsitesConfig = struct {
 	KuboGatewayPort int
 	ChromeCDPHost   string
 	ChromeCDPPort   int
+	ChromeKuboHost  string
 }{
-	Websites:        cli.NewStringSlice(),
+	Websites:        []string{},
 	Probes:          3,
 	LookupProviders: true,
 	KuboHost:        "127.0.0.1",
@@ -32,10 +33,12 @@ var probeWebsitesConfig = struct {
 	KuboGatewayPort: 8080,
 	ChromeCDPHost:   "127.0.0.1",
 	ChromeCDPPort:   3000,
+	ChromeKuboHost:  "",
 }
 
 var probeWebsitesCmd = &cli.Command{
-	Name: "websites",
+	Name:  "websites",
+	Usage: "Start probing website performance.",
 	Flags: []cli.Flag{
 		&cli.IntFlag{
 			Name:        "probes",
@@ -43,6 +46,13 @@ var probeWebsitesCmd = &cli.Command{
 			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_PROBES"),
 			Value:       probeWebsitesConfig.Probes,
 			Destination: &probeWebsitesConfig.Probes,
+		},
+		&cli.StringSliceFlag{
+			Name:        "websites",
+			Usage:       "list of websites to probe",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_WEBSITES"),
+			Value:       probeWebsitesConfig.Websites,
+			Destination: &probeWebsitesConfig.Websites,
 		},
 		&cli.BoolFlag{
 			Name:        "lookup.providers",
@@ -86,11 +96,19 @@ var probeWebsitesCmd = &cli.Command{
 			Value:       probeWebsitesConfig.ChromeCDPPort,
 			Destination: &probeWebsitesConfig.ChromeCDPPort,
 		},
+		&cli.StringFlag{
+			Name:        "chrome.kubo.host",
+			Usage:       "the kubo host from Chrome's perspective. This may be different from Tiros, especially if Chrome and Kubo are run with docker.",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_CHROME_KUBO_HOST"),
+			Value:       probeWebsitesConfig.ChromeKuboHost,
+			Destination: &probeWebsitesConfig.ChromeKuboHost,
+			DefaultText: "--kubo.host",
+		},
 	},
 	Action: RunAction,
 }
 
-func RunAction(ctx context.Context, c *cli.Command) error {
+func RunAction(ctx context.Context, cmd *cli.Command) error {
 	runID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("creating run id: %w", err)
@@ -103,9 +121,15 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 	}
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
+	if probeWebsitesConfig.ChromeKuboHost == "" {
+		probeWebsitesConfig.ChromeKuboHost = probeWebsitesConfig.KuboHost
+	}
+
 	kuboCfg := &KuboConfig{
-		Host:    probeKuboConfig.KuboHost,
-		APIPort: probeKuboConfig.KuboAPIPort,
+		Host:           probeWebsitesConfig.KuboHost,
+		APIPort:        probeWebsitesConfig.KuboAPIPort,
+		GWPort:         probeWebsitesConfig.KuboGatewayPort,
+		ChromeKuboHost: probeWebsitesConfig.ChromeKuboHost,
 	}
 	kubo, err := NewKubo(kuboCfg)
 	if err != nil {
@@ -126,9 +150,14 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	websites, err := dbClient.Websites(ctx)
-	if err != nil {
-		return fmt.Errorf("getting websites from database: %w", err)
+	var websites []string
+	if len(probeWebsitesConfig.Websites) == 0 {
+		if websites, err = dbClient.Websites(ctx); err != nil {
+			return fmt.Errorf("getting websites from database: %w", err)
+		}
+	} else {
+		slog.Info("Using static list of websites.")
+		websites = probeWebsitesConfig.Websites
 	}
 
 	// shuffle websites, so that we have a different order in which we request the websites.
@@ -173,7 +202,7 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 				wpm := &WebsiteProbeModel{
 					RunID:        runID.String(),
 					Region:       rootConfig.AWSRegion,
-					TirosVersion: rootConfig.BuildInfo.ShortCommit(),
+					TirosVersion: cmd.Root().Version,
 					KuboVersion:  kuboVersion.Version,
 					KuboPeerID:   kuboID.ID,
 					Website:      pr.website,
@@ -181,11 +210,11 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 					Protocol:     string(pr.protocol),
 					IPFSImpl:     "KUBO",
 					Try:          pr.try,
-					TTFBS:        pr.ttfb,
-					FCPS:         pr.fcp,
-					LCPS:         pr.lcp,
-					TTIS:         pr.tti,
-					CLSS:         pr.cls,
+					TTFB:         pr.ttfb,
+					FCP:          pr.fcp,
+					LCP:          pr.lcp,
+					TTI:          pr.tti,
+					CLS:          pr.cls,
 					TTFBRating:   pr.ttfbRating,
 					CLSRating:    pr.clsRating,
 					FCPRating:    pr.fcpRating,
@@ -194,7 +223,7 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 					Body:         pr.httpBody,
 					Metrics:      metricsJSON,
 					Error:        toPtr(errStr),
-					CreatedAt:    time.Time{},
+					CreatedAt:    time.Now(),
 				}
 				if err = dbClient.InsertWebsiteProbe(ctx, wpm); err != nil {
 					return fmt.Errorf("save measurement: %w", err)
@@ -213,7 +242,27 @@ func RunAction(ctx context.Context, c *cli.Command) error {
 					With("peerID", pr.id.String()[:16]).
 					With("website", pr.website).
 					Info("Handling provider result")
-				pm := &ProviderModel{}
+
+				maddrs := make([]string, 0, len(pr.addrs))
+				for _, addr := range pr.addrs {
+					maddrs = append(maddrs, addr.String())
+				}
+
+				pm := &ProviderModel{
+					RunID:          runID.String(),
+					Region:         rootConfig.AWSRegion,
+					TirosVersion:   cmd.Root().Version,
+					KuboVersion:    kuboVersion.Version,
+					KuboPeerID:     kuboID.ID,
+					Website:        pr.website,
+					Path:           pr.path,
+					ProviderID:     pr.id.String(),
+					AgentVersion:   pr.agent,
+					MultiAddresses: maddrs,
+					IsRelayed:      pr.isRelayed,
+					Error:          pr.err,
+					CreatedAt:      time.Now(),
+				}
 				if err = dbClient.InsertProvider(ctx, pm); err != nil {
 					return fmt.Errorf("save provider: %w", err)
 				}

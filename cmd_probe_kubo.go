@@ -154,13 +154,13 @@ var probeKuboMuExFlags = []cli.MutuallyExclusiveFlags{
 
 var probeKuboCmd = &cli.Command{
 	Name:                   "kubo",
-	Usage:                  "Start probing Kubo",
+	Usage:                  "Start probing Kubo publication and retrieval performance",
 	Flags:                  probeKuboFlags,
 	MutuallyExclusiveFlags: probeKuboMuExFlags,
 	Action:                 probeKuboAction,
 }
 
-func probeKuboAction(ctx context.Context, c *cli.Command) error {
+func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -288,7 +288,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 			dbUpload := &UploadModel{
 				RunID:            runID.String(),
 				Region:           rootConfig.AWSRegion,
-				TirosVersion:     rootConfig.BuildInfo.ShortCommit(),
+				TirosVersion:     cmd.Root().Version,
 				KuboVersion:      kuboVersion.Version,
 				KuboPeerID:       kuboID.ID,
 				FileSizeB:        toPtr(uint32(probeKuboConfig.FileSizeMiB * 1024 * 1024)),
@@ -329,7 +329,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 				dbDownload := &DownloadModel{
 					RunID:                runID.String(),
 					Region:               rootConfig.AWSRegion,
-					TirosVersion:         rootConfig.BuildInfo.ShortCommit(),
+					TirosVersion:         cmd.Root().Version,
 					KuboVersion:          kuboVersion.Version,
 					KuboPeerID:           kuboID.ID,
 					FileSizeB:            int32(dr.FileSize),
