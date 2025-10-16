@@ -270,7 +270,7 @@ func measureWebsites(ctx context.Context, k *Kubo, websites []string, results ch
 					"tti", p2f(pr.tti),
 					"status", pr.httpStatus,
 					"err", pr.err,
-				).Info("Probed website", website)
+				).Info("Probed website " + website)
 
 				results <- pr
 

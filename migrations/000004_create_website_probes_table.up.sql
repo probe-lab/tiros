@@ -16,7 +16,7 @@ CREATE TABLE website_probes
     -- the protocol used to load the website (HTTP or IPFS)
     protocol      LowCardinality(String),
     -- if the protocol is IPFS, which IPFS implementation was used? Kubo, Helia?
-    ipfs_impl     Nullable(LowCardinality(String)),
+    ipfs_impl     LowCardinality(String),
     -- which retry was this?
     try           Nullable(Int8),
     -- the time to first byte metric in milliseconds
@@ -30,13 +30,13 @@ CREATE TABLE website_probes
     -- the cumulative layout shift metric in milliseconds
     cls_ms        Nullable(Int32),
     -- the time to first byte web vitals rating (GOOD, NEEDS_IMPROVEMENT, POOR)
-    ttfb_rating   Nullable(LowCardinality(String)),
+    ttfb_rating   LowCardinality(String),
     -- the cumulative layout shift web vitals rating (GOOD, NEEDS_IMPROVEMENT, POOR)
-    cls_rating    Nullable(LowCardinality(String)),
+    cls_rating    LowCardinality(String),
     -- the first contentful paint web vitals rating (GOOD, NEEDS_IMPROVEMENT, POOR)
-    fcp_rating    Nullable(LowCardinality(String)),
+    fcp_rating    LowCardinality(String),
     -- the largest contentful paint web vitals rating (GOOD, NEEDS_IMPROVEMENT, POOR)
-    lcp_rating    Nullable(LowCardinality(String)),
+    lcp_rating    LowCardinality(String),
     -- the status code from Kubo when loading the website
     status_code   Int32,
     -- the complete HTML body of the website in case of an error

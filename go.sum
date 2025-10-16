@@ -728,6 +728,8 @@ github.com/polydawn/refmt v0.89.0 h1:ADJTApkvkeBZsN0tBTx8QjpD9JkmxbKp0cxfr9qszm4
 github.com/polydawn/refmt v0.89.0/go.mod h1:/zvteZs/GwLtCgZ4BL6CBsk9IKIlexP43ObX9AxTqTw=
 github.com/probe-lab/ecs-exporter v0.0.0-20251009122906-1f6d80d91fa1 h1:bURq64M74+dytWUyZOTBvl6Eri17jGFYm0pFT8uI03w=
 github.com/probe-lab/ecs-exporter v0.0.0-20251009122906-1f6d80d91fa1/go.mod h1:/6nmlQ7eosCdPvxMgzsh7NWyLc7wsC0j+Wsg7PFq40E=
+github.com/probe-lab/go-commons v0.0.0-20251013091215-758be286e6da h1:75ml13nQH7V/rRJg/i49wCbPIMhK1SgmetXwMCIIqdM=
+github.com/probe-lab/go-commons v0.0.0-20251013091215-758be286e6da/go.mod h1:fZKSbeMSnRRudG4ol1zepepWYbX01aY7/P7jedZ5VBE=
 github.com/prometheus/client_golang v0.8.0/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.23.2 h1:Je96obch5RDVy3FDMndoUsjAhG5Edi49h0RJWRi/o0o=
 github.com/prometheus/client_golang v1.23.2/go.mod h1:Tb1a6LWHB3/SPIzCoaDXI4I8UHKeFTEQ1YCr+0Gyqmg=

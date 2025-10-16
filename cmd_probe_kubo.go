@@ -271,7 +271,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 				TirosVersion:     rootConfig.BuildInfo.ShortCommit(),
 				KuboVersion:      kuboVersion.Version,
 				KuboPeerID:       kuboID.ID,
-				FileSizeB:        int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
+				FileSizeB:        toPtr(uint32(probeKuboConfig.FileSizeMiB * 1024 * 1024)),
 				CID:              toPtr(cidStr),
 				IPFSAddStart:     ur.IPFSAddStart,
 				IPFSAddDurationS: ur.IPFSAddEnd.Sub(ur.IPFSAddStart).Seconds(),
@@ -318,21 +318,29 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 					IPFSCatDurationS:     dr.IPFSCatEnd.Sub(dr.IPFSCatStart).Seconds(),
 					IPFSCatTTFBS:         toPtr(dr.IPFSCatTTFB.Seconds()),
 					IdleBroadcastStart:   toPtr(dr.IdleBroadcastStartedAt),
-					FoundProvCount:       dr.FoundProvidersCount,
-					ConnProvCount:        dr.ConnectedProvidersCount,
+					FoundProvCount:       int32(dr.FoundProvidersCount),
+					ConnProvCount:        int32(dr.ConnectedProvidersCount),
 					FirstConnProvFoundAt: toPtr(dr.FirstConnectedProviderFoundAt),
 					FirstProvConnAt:      toPtr(dr.FirstProviderConnectedAt),
 					FirstProvPeerID:      toPtr(dr.FirstConnectedProviderPeerID),
 					IPNIStart:            toPtr(dr.IPNIStart),
 					IPNIDurationS:        toPtr(dr.IPNIEnd.Sub(dr.IPNIStart).Seconds()),
-					IPNIStatus:           toPtr(dr.IPNIStatus),
+					IPNIStatus:           toPtr(int32(dr.IPNIStatus)),
 					FirstBlockReceivedAt: toPtr(dr.FirstBlockReceivedAt),
 					DiscoveryMethod:      toPtr(dr.DiscoveryMethod),
 					CIDSource:            "bitsniffer_" + origin,
 				}
 				if err != nil {
 					slog.With("err", err).Warn("Error downloading file from Kubo")
-					dbDownload.Error = toPtr(err.Error())
+					if errors.Is(err, context.Canceled) {
+						// only take the cancellation error
+						dbDownload.Error = toPtr(context.Canceled.Error())
+					} else if errors.Is(err, context.DeadlineExceeded) {
+						// only take the deadline error
+						dbDownload.Error = toPtr(context.DeadlineExceeded.Error())
+					} else {
+						dbDownload.Error = toPtr(err.Error())
+					}
 				} else {
 					slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
 				}

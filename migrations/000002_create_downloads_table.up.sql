@@ -9,7 +9,7 @@ CREATE TABLE downloads
     -- the Peer ID of the Kubo instance that produced this download measurement
     kubo_peer_id             String,
     -- the file size of the downloaded file in bytes
-    file_size_b              UInt32,
+    file_size_b              Nullable(UInt32),
     -- the CID of the downloaded file
     cid                      String,
     -- the timestamp at which the download was started
@@ -42,7 +42,7 @@ CREATE TABLE downloads
     -- the timestamp at which Kubo received the first block from the provider
     first_block_rec_at       Nullable(DateTime64(3, 'UTC')),
     -- a derived field that indicates which routing subsystem resolved the CID (bitswap, dht, ipni)
-    discovery_method         Nullable(LowCardinality(String)),
+    discovery_method         Nullable(String),
     -- a key that indicates where the CID that was downloaded came from
     cid_source               LowCardinality(String),
     -- the error message if the download failed

@@ -11,7 +11,7 @@ type UploadModel struct {
 	TirosVersion     string     `ch:"tiros_version"`
 	KuboVersion      string     `ch:"kubo_version"`
 	KuboPeerID       string     `ch:"kubo_peer_id"`
-	FileSizeB        int32      `ch:"file_size_b"`
+	FileSizeB        *uint32    `ch:"file_size_b"`
 	CID              *string    `ch:"cid"`
 	IPFSAddStart     time.Time  `ch:"ipfs_add_start"`
 	IPFSAddDurationS float64    `ch:"ipfs_add_duration_s"`
@@ -34,14 +34,14 @@ type DownloadModel struct {
 	IPFSCatDurationS     float64    `ch:"ipfs_cat_duration_s"`
 	IPFSCatTTFBS         *float64   `ch:"ipfs_cat_ttfb_s"`
 	IdleBroadcastStart   *time.Time `ch:"idle_broadcast_start"`
-	FoundProvCount       int        `ch:"found_prov_count"`
-	ConnProvCount        int        `ch:"conn_prov_count"`
+	FoundProvCount       int32      `ch:"found_prov_count"`
+	ConnProvCount        int32      `ch:"conn_prov_count"`
 	FirstConnProvFoundAt *time.Time `ch:"first_conn_prov_found_at"`
 	FirstProvConnAt      *time.Time `ch:"first_prov_conn_at"`
 	FirstProvPeerID      *string    `ch:"first_prov_peer_id"`
 	IPNIStart            *time.Time `ch:"ipni_start"`
 	IPNIDurationS        *float64   `ch:"ipni_duration_s"`
-	IPNIStatus           *int       `ch:"ipni_status"`
+	IPNIStatus           *int32     `ch:"ipni_status"`
 	FirstBlockReceivedAt *time.Time `ch:"first_block_rec_at"`
 	DiscoveryMethod      *string    `ch:"discovery_method"`
 	CIDSource            string     `ch:"cid_source"`

@@ -68,7 +68,7 @@ func NewKubo(cfg *KuboConfig) (*Kubo, error) {
 		return nil, fmt.Errorf("init kubo client: %w", err)
 	}
 
-	return &Kubo{HttpApi: kuboClient, addr: kuboAddr, tracer: tracer}, nil
+	return &Kubo{HttpApi: kuboClient, cfg: cfg, addr: kuboAddr, tracer: tracer}, nil
 }
 
 func (k *Kubo) WaitAvailable(ctx context.Context, timeout time.Duration) error {
@@ -205,10 +205,10 @@ loop:
 		case <-parseTimeout.C:
 			break loop
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return result, ctx.Err()
 		case req, more := <-k.cfg.Receiver.traceMatchChan:
 			if !more {
-				return nil, errors.New("trace receiver closed")
+				return result, errors.New("trace receiver closed")
 			}
 			result.parse(req)
 			if result.isPopulated() {
@@ -249,7 +249,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 		CID:             c,
 		IPFSCatStart:    time.Now(),
 		IPFSCatTraceID:  traceID,
-		DiscoveryMethod: "unknown",
+		DiscoveryMethod: "",
 		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
 	}
 
