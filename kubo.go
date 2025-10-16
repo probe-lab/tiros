@@ -21,8 +21,13 @@ import (
 	"github.com/ipfs/kubo/core/commands"
 	iface "github.com/ipfs/kubo/core/coreiface"
 	"github.com/ipfs/kubo/core/coreiface/options"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/routing"
+	"github.com/multiformats/go-multiaddr"
+	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/multiformats/go-multicodec"
 	pllog "github.com/probe-lab/go-commons/log"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -31,19 +36,20 @@ import (
 )
 
 type KuboConfig struct {
-	Host string
-	Port int
+	Host     string
+	APIPort  int
+	GWPort   int
+	Receiver *TraceReceiver
 }
 
 type Kubo struct {
 	*kuboclient.HttpApi
-	cfg      *KuboConfig
-	addr     string
-	receiver *TraceReceiver
-	tracer   trace.Tracer
+	cfg    *KuboConfig
+	addr   string
+	tracer trace.Tracer
 }
 
-func NewKubo(receiver *TraceReceiver, cfg *KuboConfig) (*Kubo, error) {
+func NewKubo(cfg *KuboConfig) (*Kubo, error) {
 	provider := sdktrace.NewTracerProvider()
 	tracer := provider.Tracer("Tiros")
 
@@ -56,13 +62,13 @@ func NewKubo(receiver *TraceReceiver, cfg *KuboConfig) (*Kubo, error) {
 	}
 
 	// initializing the kubo client
-	kuboAddr := net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.Port))
+	kuboAddr := net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.APIPort))
 	kuboClient, err := kuboclient.NewURLApiWithClient(kuboAddr, httpClient)
 	if err != nil {
 		return nil, fmt.Errorf("init kubo client: %w", err)
 	}
 
-	return &Kubo{HttpApi: kuboClient, addr: kuboAddr, receiver: receiver, tracer: tracer}, nil
+	return &Kubo{HttpApi: kuboClient, addr: kuboAddr, tracer: tracer}, nil
 }
 
 func (k *Kubo) WaitAvailable(ctx context.Context, timeout time.Duration) error {
@@ -152,9 +158,10 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, erro
 
 	// take the trace receiver lock before uploading the file
 	// so that we won't miss any trace data
-	k.receiver.mu.Lock()
+	k.cfg.Receiver.mu.Lock()
 
 	logEntry.Info("Adding file to Kubo")
+	uploadStart := time.Now()
 	imPath, err := k.Unixfs().Add(
 		uploadCtx,
 		files.NewBytesFile(data),
@@ -170,16 +177,18 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, erro
 	// register trace ID as well as the CID of the uploaded file
 
 	rawCID := cid.NewCidV1(uint64(multicodec.Raw), imPath.RootCid().Hash())
-	k.receiver.traceMatchers = []TraceMatcher{
+	k.cfg.Receiver.traceMatchers = []TraceMatcher{
 		traceIDMatcher(uploadSpan.SpanContext().TraceID()),
 		strAttrMatcher("key", rawCID.String()),
 	}
-	k.receiver.mu.Unlock()
+	k.cfg.Receiver.mu.Unlock()
 
 	result := &UploadResult{
 		CID:            imPath.RootCid(),
 		RawCID:         rawCID,
 		IPFSAddTraceID: uploadSpan.SpanContext().TraceID(),
+		IPFSAddStart:   uploadStart,
+		IPFSAddEnd:     time.Now(),
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
@@ -197,7 +206,7 @@ loop:
 			break loop
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		case req, more := <-k.receiver.traceMatchChan:
+		case req, more := <-k.cfg.Receiver.traceMatchChan:
 			if !more {
 				return nil, errors.New("trace receiver closed")
 			}
@@ -209,7 +218,7 @@ loop:
 	}
 	parseTimeout.Stop()
 
-	k.receiver.Reset()
+	k.cfg.Receiver.Reset()
 
 	return result, nil
 }
@@ -227,14 +236,14 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 		"traceID", traceID.String(),
 	)
 
-	k.receiver.mu.Lock()
-	k.receiver.traceMatchers = []TraceMatcher{
+	k.cfg.Receiver.mu.Lock()
+	k.cfg.Receiver.traceMatchers = []TraceMatcher{
 		traceIDMatcher(traceID),
 		nameMatcher("ProviderQueryManager.FindProvidersAsync"),
 		nameMatcher("DelegatedHTTPClient.FindProviders"),
 	}
-	k.receiver.mu.Unlock()
-	defer k.receiver.Reset()
+	k.cfg.Receiver.mu.Unlock()
+	defer k.cfg.Receiver.Reset()
 
 	result := &DownloadResult{
 		CID:             c,
@@ -255,7 +264,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 				return
 			case <-ctx.Done():
 				return
-			case req, more := <-k.receiver.traceMatchChan:
+			case req, more := <-k.cfg.Receiver.traceMatchChan:
 				if !more {
 					return
 				}
@@ -317,4 +326,185 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	result.FileSize = len(data)
 
 	return result, nil
+}
+
+type provider struct {
+	website   string
+	path      string
+	id        peer.ID
+	addrs     []multiaddr.Multiaddr
+	agent     *string
+	err       error
+	isRelayed *bool
+}
+
+func (k *Kubo) findProviders(ctx context.Context, website string, results chan<- *provider) error {
+	logEntry := slog.With("website", website)
+	logEntry.Info("Finding providers for " + website)
+
+	nameResp, err := k.Request("name/resolve").
+		Option("arg", website).
+		Option("nocache", "true").
+		Option("dht-timeout", "30s").Send(ctx)
+	if err != nil {
+		return fmt.Errorf("name/resolve: %w", err)
+	} else if nameResp.Error != nil {
+		return fmt.Errorf("name/resolve: %w", nameResp.Error)
+	} else if nameResp == nil {
+		return fmt.Errorf("name/resolve no error but response nil")
+	} else if nameResp.Output == nil {
+		return fmt.Errorf("name/resolve no error but response output nil")
+	}
+
+	defer func() {
+		if err = nameResp.Close(); err != nil {
+			log.WithError(err).Warnln("Error closing name/resolve response")
+		}
+	}()
+
+	dat, err := io.ReadAll(nameResp.Output)
+	if err != nil {
+		return fmt.Errorf("read name/resolve bytes: %w", err)
+	}
+
+	type nameResolveResponse struct {
+		Path string
+	}
+
+	nrr := nameResolveResponse{}
+	err = json.Unmarshal(dat, &nrr)
+	if err != nil {
+		return fmt.Errorf("unmarshal name/resolve response: %w", err)
+	}
+
+	findResp, err := k.
+		Request("routing/findprovs").
+		Option("arg", nrr.Path).
+		Option("num-providers", "1000").
+		Send(ctx)
+	if err != nil {
+		return fmt.Errorf("routing/findprovs: %w", err)
+	} else if findResp.Error != nil {
+		return fmt.Errorf("routing/findprovs: %w", findResp.Error)
+	} else if findResp == nil {
+		return fmt.Errorf("routing/findprovs no error but response nil")
+	} else if findResp.Output == nil {
+		return fmt.Errorf("routing/findprovs no error but response output nil")
+	}
+	defer func() {
+		if err = findResp.Close(); err != nil {
+			log.WithError(err).Warnln("Error closing name/resolve response")
+		}
+	}()
+
+	var providerPeers []*peer.AddrInfo
+	dec := json.NewDecoder(findResp.Output)
+	for dec.More() {
+		evt := routing.QueryEvent{}
+		if err = dec.Decode(&evt); err != nil {
+			return fmt.Errorf("decode routing/findprovs response: %w", err)
+		}
+
+		if evt.Type != routing.Provider {
+			continue
+		}
+
+		if len(evt.Responses) != 1 {
+			logEntry.Warn("findprovs Providerquery event with != 1 responses", "actual", len(evt.Responses))
+			continue
+		}
+
+		providerPeers = append(providerPeers, evt.Responses[0])
+	}
+
+	type idResult struct {
+		peer *peer.AddrInfo
+		id   *commands.IdOutput
+		err  error
+	}
+
+	numJobs := len(providerPeers)
+	idJobs := make(chan *peer.AddrInfo, numJobs)
+	idResults := make(chan idResult, numJobs)
+
+	for w := 0; w < 10; w++ {
+		go func() {
+			for j := range idJobs {
+				tCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+				id, err := k.ID(tCtx)
+				cancel()
+
+				idResults <- idResult{
+					peer: j,
+					id:   id,
+					err:  err,
+				}
+			}
+		}()
+	}
+
+	for _, providerPeer := range providerPeers {
+		idJobs <- providerPeer
+	}
+	close(idJobs)
+
+	for i := 0; i < numJobs; i++ {
+		idr := <-idResults
+
+		prov := &provider{
+			website: website,
+			path:    nrr.Path,
+			id:      idr.peer.ID,
+			addrs:   idr.peer.Addrs,
+		}
+
+		if idr.err != nil {
+			prov.err = idr.err
+		} else {
+			prov.agent = toPtr(idr.id.AgentVersion)
+			if len(idr.id.Addresses) != len(idr.peer.Addrs) && len(idr.id.Addresses) != 0 {
+				newAddrs := make([]multiaddr.Multiaddr, len(idr.id.Addresses))
+				for j, addr := range idr.id.Addresses {
+					newAddrs[j] = multiaddr.StringCast(addr)
+				}
+				prov.addrs = newAddrs
+			}
+		}
+
+		prov.isRelayed = isRelayed(prov.addrs)
+
+		results <- prov
+	}
+
+	return nil
+}
+
+func (k *Kubo) websiteURL(website string, protocol WebsiteProbeProtocol) string {
+	switch protocol {
+	case WebsiteProbeProtocolIPFS:
+		return fmt.Sprintf("http://%s:%d/ipns/%s", k.cfg.Host, k.cfg.GWPort, website)
+	case WebsiteProbeProtocolHTTP:
+		return fmt.Sprintf("https://%s", website)
+	default:
+		panic(fmt.Sprintf("unknown probe type: %s", protocol))
+	}
+}
+
+func isRelayed(maddrs []multiaddr.Multiaddr) *bool {
+	if len(maddrs) == 0 {
+		return nil
+	}
+
+	for _, maddr := range maddrs {
+		if manet.IsPrivateAddr(maddr) {
+			continue
+		}
+
+		if _, err := maddr.ValueForProtocol(multiaddr.P_CIRCUIT); err != nil {
+			out := false
+			return &out
+		}
+	}
+	out := true
+	return &out
 }

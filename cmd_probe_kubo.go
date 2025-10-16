@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/urfave/cli/v3"
 )
@@ -84,14 +85,14 @@ var probeKuboFlags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:        "traces.receiver.host",
-		Usage:       "TODO",
+		Usage:       "The host that the trace receiver is binding to (this is where Kubo should send the traces to)",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_RECEIVER_HOST"),
 		Value:       probeKuboConfig.TracesRecHost,
 		Destination: &probeKuboConfig.TracesRecHost,
 	},
 	&cli.IntFlag{
 		Name:        "traces.receiver.port",
-		Usage:       "TODO",
+		Usage:       "The port on which the trace receiver should listen on (this is where Kubo should send the traces to)",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_TRACES_RECEIVER_PORT"),
 		Value:       probeKuboConfig.TracesRecPort,
 		Destination: &probeKuboConfig.TracesRecPort,
@@ -154,6 +155,11 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	runID, err := uuid.NewV7()
+	if err != nil {
+		return fmt.Errorf("creating run id: %w", err)
+	}
+
 	trCfg := &TraceReceiverConfig{
 		Host:        probeKuboConfig.TracesRecHost,
 		Port:        probeKuboConfig.TracesRecPort,
@@ -179,20 +185,10 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		}
 	}()
 
-	// initializing the clickhouse db client
-	var dbClient DBClient
-	if probeConfig.DryRun {
-		dbClient = NewNoopClient()
-	} else if probeConfig.JSONOut != "" {
-		dbClient, err = NewJSONClient(probeConfig.JSONOut)
-		if err != nil {
-			return fmt.Errorf("connecting to json client: %w", err)
-		}
-	} else {
-		dbClient, err = NewClickhouseClient(ctx, probeConfig.Clickhouse, probeConfig.Migrations)
-		if err != nil {
-			return fmt.Errorf("connecting to clickhouse: %w", err)
-		}
+	// initializing the db client
+	dbClient, err := newDBClient(ctx)
+	if err != nil {
+		return fmt.Errorf("creating database client: %w", err)
 	}
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
@@ -203,10 +199,11 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	}
 
 	kuboCfg := &KuboConfig{
-		Host: probeKuboConfig.KuboHost,
-		Port: probeKuboConfig.KuboAPIPort,
+		Host:     probeKuboConfig.KuboHost,
+		APIPort:  probeKuboConfig.KuboAPIPort,
+		Receiver: tr,
 	}
-	kubo, err := NewKubo(tr, kuboCfg)
+	kubo, err := NewKubo(kuboCfg)
 	if err != nil {
 		return fmt.Errorf("creating kubo client: %w", err)
 	}
@@ -261,53 +258,37 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 		if !probeKuboConfig.DownloadOnly {
 			slog.Info("Starting upload measurement")
 
-			var (
-				uploadStart = time.Now()
-				errStr      string
-			)
 			ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
-			if err != nil {
-				errStr = err.Error()
-				slog.With("err", err).Warn("Error uploading file to Kubo")
 
-				dbUpload := &UploadModel{
-					Region:       rootConfig.AWSRegion,
-					TirosVersion: rootConfig.BuildInfo.ShortCommit(),
-					KuboVersion:  kuboVersion.Version,
-					KuboPeerID:   kuboID.ID,
-					FileSizeB:    int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
-					IPFSAddStart: uploadStart,
-					Error:        errStr,
-				}
-				if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
-					return fmt.Errorf("inserting upload into database: %w", err)
-				}
+			cidStr := ""
+			if ur.CID.Defined() {
+				cidStr = ur.CID.String()
+			}
+
+			dbUpload := &UploadModel{
+				RunID:            runID.String(),
+				Region:           rootConfig.AWSRegion,
+				TirosVersion:     rootConfig.BuildInfo.ShortCommit(),
+				KuboVersion:      kuboVersion.Version,
+				KuboPeerID:       kuboID.ID,
+				FileSizeB:        int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
+				CID:              toPtr(cidStr),
+				IPFSAddStart:     ur.IPFSAddStart,
+				IPFSAddDurationS: ur.IPFSAddEnd.Sub(ur.IPFSAddStart).Seconds(),
+				ProvideStart:     toPtr(ur.ProvideStart),
+				ProvideDurationS: toPtr(ur.ProvideEnd.Sub(ur.ProvideStart).Seconds()),
+				ProvideDelayS:    toPtr(ur.ProvideStart.Sub(ur.IPFSAddEnd).Seconds()),
+				UploadDurationS:  toPtr(ur.ProvideEnd.Sub(ur.IPFSAddStart).Seconds()),
+			}
+
+			if err != nil {
+				slog.With("err", err).Warn("Error uploading file to Kubo")
+				dbUpload.Error = toPtr(err.Error())
 			} else {
 				slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
-
-				ipfsAddDuration := ur.IPFSAddEnd.Sub(ur.IPFSAddStart)
-				provideDuration := ur.ProvideEnd.Sub(ur.ProvideStart)
-				provideDelay := ur.ProvideStart.Sub(ur.IPFSAddEnd)
-				uploadDuration := ur.ProvideEnd.Sub(ur.IPFSAddStart)
-
-				dbUpload := &UploadModel{
-					Region:            rootConfig.AWSRegion,
-					TirosVersion:      rootConfig.BuildInfo.ShortCommit(),
-					KuboVersion:       kuboVersion.Version,
-					KuboPeerID:        kuboID.ID,
-					FileSizeB:         int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
-					CID:               ur.CID.String(),
-					IPFSAddStart:      ur.IPFSAddStart,
-					IPFSAddDurationMs: int32(ipfsAddDuration.Milliseconds()),
-					ProvideStart:      ur.ProvideStart,
-					ProvideDurationMs: int32(provideDuration.Milliseconds()),
-					ProvideDelayMs:    int32(provideDelay.Milliseconds()),
-					UploadDurationMs:  int32(uploadDuration.Milliseconds()),
-					Error:             errStr,
-				}
-				if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
-					return fmt.Errorf("inserting upload into database: %w", err)
-				}
+			}
+			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
+				return fmt.Errorf("inserting upload into database: %w", err)
 			}
 		}
 
@@ -324,19 +305,9 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 					return fmt.Errorf("selecting cid from database: %w", err)
 				}
 
-				var errStr string
 				dr, err := kubo.Download(ctx, ciid)
-				if err != nil {
-					errStr = err.Error()
-					slog.With("err", err).Warn("Error downloading file from Kubo")
-				} else {
-					slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
-				}
-
-				ipfsCatDuration := dr.IPFSCatEnd.Sub(dr.IPFSCatStart)
-				ipniDuration := dr.IPNIEnd.Sub(dr.IPNIStart)
-
 				dbDownload := &DownloadModel{
+					RunID:                runID.String(),
 					Region:               rootConfig.AWSRegion,
 					TirosVersion:         rootConfig.BuildInfo.ShortCommit(),
 					KuboVersion:          kuboVersion.Version,
@@ -344,22 +315,28 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 					FileSizeB:            int32(dr.FileSize),
 					CID:                  ciid.String(),
 					IPFSCatStart:         dr.IPFSCatStart,
-					IPFSCatTTFBMs:        int32(dr.IPFSCatTTFB.Milliseconds()),
-					IPFSCatDurationMs:    int32(ipfsCatDuration.Milliseconds()),
-					IdleBroadcastStart:   dr.IdleBroadcastStartedAt,
+					IPFSCatDurationS:     dr.IPFSCatEnd.Sub(dr.IPFSCatStart).Seconds(),
+					IPFSCatTTFBS:         toPtr(dr.IPFSCatTTFB.Seconds()),
+					IdleBroadcastStart:   toPtr(dr.IdleBroadcastStartedAt),
 					FoundProvCount:       dr.FoundProvidersCount,
 					ConnProvCount:        dr.ConnectedProvidersCount,
-					FirstConnProvFoundAt: dr.FirstConnectedProviderFoundAt,
-					FirstProvConnAt:      dr.FirstProviderConnectedAt,
-					FirstProvPeerID:      dr.FirstConnectedProviderPeerID,
-					IPNIStart:            dr.IPNIStart,
-					IPNIDurationMs:       int32(ipniDuration.Milliseconds()),
-					IPNIStatus:           dr.IPNIStatus,
-					FirstBlockReceivedAt: dr.FirstBlockReceivedAt,
-					DiscoveryMethod:      dr.DiscoveryMethod,
+					FirstConnProvFoundAt: toPtr(dr.FirstConnectedProviderFoundAt),
+					FirstProvConnAt:      toPtr(dr.FirstProviderConnectedAt),
+					FirstProvPeerID:      toPtr(dr.FirstConnectedProviderPeerID),
+					IPNIStart:            toPtr(dr.IPNIStart),
+					IPNIDurationS:        toPtr(dr.IPNIEnd.Sub(dr.IPNIStart).Seconds()),
+					IPNIStatus:           toPtr(dr.IPNIStatus),
+					FirstBlockReceivedAt: toPtr(dr.FirstBlockReceivedAt),
+					DiscoveryMethod:      toPtr(dr.DiscoveryMethod),
 					CIDSource:            "bitsniffer_" + origin,
-					Error:                errStr,
 				}
+				if err != nil {
+					slog.With("err", err).Warn("Error downloading file from Kubo")
+					dbDownload.Error = toPtr(err.Error())
+				} else {
+					slog.With("discovery", dr.DiscoveryMethod).Info(fmt.Sprintf("Download finished in %s", dr.IPFSCatEnd.Sub(dr.IPFSCatStart)))
+				}
+
 				if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
 					return fmt.Errorf("inserting upload into database: %w", err)
 				}
@@ -368,4 +345,11 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	}
 
 	return nil
+}
+
+func toPtr[T comparable](t T) *T {
+	if t == *new(T) {
+		return nil
+	}
+	return &t
 }

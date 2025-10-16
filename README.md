@@ -406,3 +406,18 @@ Feel free to dive in! [Open an issue](https://github.com/RichardLitt/standard-re
 ## License
 
 [MIT](LICENSE) © Dennis Trautwein
+
+
+
+---
+
+create migration:
+
+```
+migrate create -dir migrations -ext sql -seq create_website_measurements_table
+```
+
+- use Float32  
+At 1 second, smallest step  0.1 µs (fine!)
+
+At 1000 seconds (~17 minutes), smallest step ≈ 0.1 ms

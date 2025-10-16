@@ -2,175 +2,219 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"log/slog"
 	"math/rand"
+	"strings"
 	"time"
 
-	kuboclient "github.com/ipfs/kubo/client/rpc"
-	"github.com/probe-lab/tiros/models"
-	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/google/uuid"
+	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/urfave/cli/v3"
 )
 
 var probeWebsitesConfig = struct {
 	Websites        *cli.StringSlice
-	SettleTimes     *cli.IntSlice
 	Probes          int
 	LookupProviders bool
-	RunTimeout      time.Duration
+	KuboHost        string
+	KuboAPIPort     int
+	KuboGatewayPort int
+	ChromeCDPHost   string
+	ChromeCDPPort   int
 }{
 	Websites:        cli.NewStringSlice(),
-	SettleTimes:     cli.NewIntSlice(10, 1200),
 	Probes:          3,
 	LookupProviders: true,
-	RunTimeout:      0,
+	KuboHost:        "127.0.0.1",
+	KuboAPIPort:     5001,
+	KuboGatewayPort: 8080,
+	ChromeCDPHost:   "127.0.0.1",
+	ChromeCDPPort:   3000,
 }
 
 var probeWebsitesCmd = &cli.Command{
 	Name: "websites",
 	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:        "websites",
-			Usage:       "Websites to test against. Example: 'ipfs.io' or 'filecoin.io",
-			EnvVars:     []string{"TIROS_PROBE_WEBSITES_WEBSITES"},
-			Value:       probeWebsitesConfig.Websites,
-			Destination: probeWebsitesConfig.Websites,
-		},
-		&cli.IntSliceFlag{
-			Name:        "settle-times",
-			Usage:       "a list of times to settle in seconds",
-			EnvVars:     []string{"TIROS_PROBE_WEBSITES_SETTLE_TIMES"},
-			Value:       probeWebsitesConfig.SettleTimes,
-			Destination: probeWebsitesConfig.SettleTimes,
-		},
 		&cli.IntFlag{
-			Name:        "times",
-			Usage:       "number of times to test each URL",
-			EnvVars:     []string{"TIROS_PROBE_WEBSITES_TIMES"},
+			Name:        "probes",
+			Usage:       "number of times to probe each URL",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_PROBES"),
 			Value:       probeWebsitesConfig.Probes,
 			Destination: &probeWebsitesConfig.Probes,
 		},
 		&cli.BoolFlag{
-			Name:        "lookup-providers",
+			Name:        "lookupProviders",
 			Usage:       "Whether to lookup website providers",
-			EnvVars:     []string{"TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS"},
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS"),
 			Value:       probeWebsitesConfig.LookupProviders,
 			Destination: &probeWebsitesConfig.LookupProviders,
 		},
-		&cli.DurationFlag{
-			Name:        "timeout",
-			Usage:       "The maximum allowed time for this experiment to run (0 no timeout)",
-			EnvVars:     []string{"TIROS_PROBE_WEBSITES_TIMEOUT"},
-			Value:       probeWebsitesConfig.RunTimeout,
-			Destination: &probeWebsitesConfig.RunTimeout,
+		&cli.StringFlag{
+			Name:        "kubo.host",
+			Usage:       "Host at which to reach Kubo",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_KUBO_HOST"),
+			Value:       probeWebsitesConfig.KuboHost,
+			Destination: &probeWebsitesConfig.KuboHost,
+		},
+		&cli.IntFlag{
+			Name:        "kubo.apiPort",
+			Usage:       "port to reach a Kubo-compatible RPC API",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_KUBO_API_PORT"),
+			Value:       probeWebsitesConfig.KuboAPIPort,
+			Destination: &probeWebsitesConfig.KuboAPIPort,
+		},
+		&cli.IntFlag{
+			Name:        "kubo.gatewayPort",
+			Usage:       "port at which to reach Kubo's HTTP gateway",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_KUBO_GATEWAY_PORT"),
+			Value:       probeWebsitesConfig.KuboGatewayPort,
+			Destination: &probeWebsitesConfig.KuboGatewayPort,
+		},
+		&cli.StringFlag{
+			Name:        "chrome.cdpHost",
+			Usage:       "host at which the Chrome DevTools Protocol is reachable",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_CHROME_CDP_HOST"),
+			Value:       probeWebsitesConfig.ChromeCDPHost,
+			Destination: &probeWebsitesConfig.ChromeCDPHost,
+		},
+		&cli.IntFlag{
+			Name:        "chrome.cdpPort",
+			Usage:       "port to reach the Chrome DevTools Protocol port",
+			Sources:     cli.EnvVars("TIROS_PROBE_WEBSITES_CHROME_CDP_PORT"),
+			Value:       probeWebsitesConfig.ChromeCDPPort,
+			Destination: &probeWebsitesConfig.ChromeCDPPort,
 		},
 	},
 	Action: RunAction,
 }
 
-type tiros struct {
-	dbClient IDBClient
-	ipfs     *kuboclient.HttpApi
-	dbRun    *models.Run
-}
-
-func RunAction(c *cli.Context) error {
-	log.Infoln("Starting Tiros run...")
-	defer log.Infoln("Stopped Tiros run.")
-
-	// create global timeout context
-	if probeWebsitesConfig.RunTimeout > 0 {
-		ctx, cancel := context.WithTimeout(c.Context, probeWebsitesConfig.RunTimeout)
-		defer cancel()
-		c.Context = ctx
-	}
-
-	// Initialize database client
-	dbClient, err := newDBClient(c.Context)
+func RunAction(ctx context.Context, c *cli.Command) error {
+	runID, err := uuid.NewV7()
 	if err != nil {
-		return fmt.Errorf("init database client: %w", err)
+		return fmt.Errorf("creating run id: %w", err)
 	}
 
-	ipfsClient, err := newKuboClient()
+	// initializing the clickhouse db client
+	dbClient, err := newDBClient(ctx)
 	if err != nil {
-		return fmt.Errorf("init ipfs client: %w", err)
+		return fmt.Errorf("creating database client: %w", err)
+	}
+	defer pllog.Defer(dbClient.Close, "Failed closing database client")
+
+	kuboCfg := &KuboConfig{
+		Host:    probeKuboConfig.KuboHost,
+		APIPort: probeKuboConfig.KuboAPIPort,
+	}
+	kubo, err := NewKubo(kuboCfg)
+	if err != nil {
+		return fmt.Errorf("creating kubo client: %w", err)
 	}
 
-	// configure tiros struct
-	t := tiros{
-		dbClient: dbClient,
-		ipfs:     ipfsClient,
+	if err := kubo.WaitAvailable(ctx, time.Minute); err != nil {
+		return err
 	}
 
-	// Create a measurement run entry in the database. This entry will
-	// contain information about the measurement configuration.
-	if _, err := t.InitRun(c); err != nil {
-		return fmt.Errorf("init run: %w", err)
+	kuboVersion, err := kubo.Version(ctx)
+	if err != nil {
+		return err
 	}
-	// rootBefore we're completely exiting we "seal" the run entry. Right now, this only means we're setting the
-	// finished_at timestamp.
-	defer func() {
-		if _, err = t.dbClient.SealRun(context.Background(), t.dbRun); err != nil {
-			log.WithError(err).Warnln("Couldn't seal run")
-		}
-	}()
+
+	kuboID, err := kubo.ID(ctx)
+	if err != nil {
+		return err
+	}
+
+	websites, err := dbClient.Websites(ctx)
+	if err != nil {
+		return fmt.Errorf("getting websites from database: %w", err)
+	}
 
 	// shuffle websites, so that we have a different order in which we request the websites.
 	// If we didn't do this a single website would always be requested with a comparatively "cold" ipfs node.
-	websites := probeWebsitesConfig.Websites.Value()
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(websites), func(i, j int) {
 		websites[i], websites[j] = websites[j], websites[i]
 	})
 
-	log.WithFields(log.Fields{
-		"websites":    websites,
-		"settleTimes": probeWebsitesConfig.SettleTimes.Value(),
-		"times":       probeWebsitesConfig.Probes,
-	}).Infoln("Starting run!")
-
-	providerResults := make(chan *provider)
-	probeResults := make(chan *probeResult)
-
-	go t.measureWebsites(c, websites, probeResults)
-
-	if probeWebsitesConfig.LookupProviders {
-		go t.findAllProviders(c, websites, providerResults)
-	} else {
-		close(providerResults)
+	slog.With("probes", probeWebsitesConfig.Probes).Info(fmt.Sprintf("Queried %d websites:", len(websites)))
+	for _, w := range websites {
+		slog.Info("  " + w)
 	}
 
+	providerResults := make(chan *provider)
+	probeResults := make(chan *websiteProbeResult)
+
+	go measureWebsites(ctx, kubo, websites, probeResults)
+	go findAllProviders(ctx, kubo, websites, providerResults)
+
 	for {
-		log.Infoln("Awaiting Provider or Probe result...")
+		slog.Info("Awaiting Provider or Probe result...")
 		select {
 		case pr, more := <-probeResults:
 			if !more {
-				log.Infoln("Probing websites done!")
+				slog.Info("Probing websites done!")
 				probeResults = nil
 			} else {
-				log.WithField("url", pr.url).Infoln("Handling probe result")
-				if _, err := t.dbClient.SaveMeasurement(c, t.dbRun, pr); err != nil {
+				slog.With("url", pr.url).Info("Handling probe result")
+
+				var errStr string
+				if pr.err != nil {
+					errStr = pr.err.Error()
+				}
+
+				metricsJSON, err := pr.MetricsJSON()
+				if err != nil {
+					slog.With("err", err).Warn("Error marshalling metrics")
+					metricsJSON = nil
+				}
+
+				wpm := &WebsiteProbeModel{
+					RunID:        runID.String(),
+					Region:       rootConfig.AWSRegion,
+					TirosVersion: rootConfig.BuildInfo.ShortCommit(),
+					KuboVersion:  kuboVersion.Version,
+					KuboPeerID:   kuboID.ID,
+					Website:      pr.website,
+					URL:          pr.url,
+					Protocol:     string(pr.protocol),
+					IPFSImpl:     "KUBO",
+					Try:          pr.try,
+					TTFBS:        pr.ttfb,
+					FCPS:         pr.fcp,
+					LCPS:         pr.lcp,
+					TTIS:         pr.tti,
+					CLSS:         pr.cls,
+					TTFBRating:   pr.ttfbRating,
+					CLSRating:    pr.clsRating,
+					FCPRating:    pr.fcpRating,
+					LCPRating:    pr.lcpRating,
+					StatusCode:   pr.httpStatus,
+					Body:         pr.httpBody,
+					Metrics:      metricsJSON,
+					Error:        toPtr(errStr),
+					CreatedAt:    time.Time{},
+				}
+				if err = dbClient.InsertWebsiteProbe(ctx, wpm); err != nil {
 					return fmt.Errorf("save measurement: %w", err)
 				}
 			}
 
 		case pr, more := <-providerResults:
 			if !more {
-				log.Infoln("Searching for providers done!")
+				slog.Info("Searching for providers done!")
 				providerResults = nil
 			} else {
 				if errors.Is(pr.err, context.DeadlineExceeded) {
 					pr.err = context.DeadlineExceeded
 				}
-				log.WithError(pr.err).
-					WithField("peerID", pr.id.String()[:16]).
-					WithField("website", pr.website).
-					Infoln("Handling provider result")
-				_, err := t.dbClient.SaveProvider(c, t.dbRun, pr)
-				if err != nil {
+				slog.With("err", pr.err).
+					With("peerID", pr.id.String()[:16]).
+					With("website", pr.website).
+					Info("Handling provider result")
+				pm := &ProviderModel{}
+				if err = dbClient.InsertProvider(ctx, pm); err != nil {
 					return fmt.Errorf("save provider: %w", err)
 				}
 			}
@@ -184,43 +228,75 @@ func RunAction(c *cli.Context) error {
 	return nil
 }
 
-func (t *tiros) InitRun(c *cli.Context) (*models.Run, error) {
-	vinfo, err := kuboVersion(c.Context, t.ipfs)
-	if err != nil {
-		return nil, fmt.Errorf("ipfs api offline: %w", err)
+func measureWebsites(ctx context.Context, k *Kubo, websites []string, results chan<- *websiteProbeResult) {
+	defer close(results)
+
+	if !probeWebsitesConfig.LookupProviders {
+		return
 	}
 
-	ipfsImpl := probeConfig.IPFS.Implementation
-	dbRun, err := t.dbClient.InsertRun(c, ipfsImpl, fmt.Sprintf("%s-%s", vinfo.Version, vinfo.Commit))
-	if err != nil {
-		return nil, fmt.Errorf("insert run: %w", err)
+	for i := 0; i < probeWebsitesConfig.Probes; i++ {
+		for _, protocol := range []WebsiteProbeProtocol{WebsiteProbeProtocolIPFS, WebsiteProbeProtocolHTTP} {
+			for _, website := range websites {
+				slog.Info("Start probing", "website", website, "protocol", protocol)
+				wp := &websiteProbe{
+					url:       k.websiteURL(website, protocol),
+					website:   website,
+					probeType: protocol,
+					cdpPort:   probeWebsitesConfig.ChromeCDPPort,
+					result: &websiteProbeResult{
+						url:      k.websiteURL(website, protocol),
+						website:  website,
+						protocol: protocol,
+					},
+				}
+
+				pr, err := wp.run(ctx)
+				if errors.Is(ctx.Err(), context.Canceled) {
+					return
+				} else if err != nil {
+					slog.With("err", err, "website", website).Warn("error probing website")
+					continue
+				}
+
+				pr.website = website
+				pr.protocol = protocol
+				pr.try = i
+
+				slog.With(
+					"ttfb", p2f(pr.ttfb),
+					"lcp", p2f(pr.lcp),
+					"fcp", p2f(pr.fcp),
+					"tti", p2f(pr.tti),
+					"status", pr.httpStatus,
+					"err", pr.err,
+				).Info("Probed website", website)
+
+				results <- pr
+
+				if protocol == WebsiteProbeProtocolIPFS {
+					if k.Reset(ctx); err != nil {
+						slog.With("err", err).Warn("error running ipfs gc")
+						continue
+					}
+				}
+			}
+		}
 	}
-
-	t.dbRun = dbRun
-
-	return t.dbRun, nil
 }
 
-type versionInfo struct {
-	Version string
-	Commit  string
-	Repo    string
-	System  string
-	Golang  string
-}
-
-func kuboVersion(ctx context.Context, client *kuboclient.HttpApi) (*versionInfo, error) {
-	res, err := client.Request("version").Send(ctx)
-	if err != nil {
-		panic(err)
+func findAllProviders(ctx context.Context, k *Kubo, websites []string, results chan<- *provider) {
+	defer close(results)
+	for _, website := range websites {
+		for retry := 0; retry < 3; retry++ {
+			err := k.findProviders(ctx, website, results)
+			if err != nil {
+				slog.With("err", err, "retry", retry, "website", website).Warn("Couldn't find providers")
+				if strings.Contains(err.Error(), "routing/findprovs") {
+					continue
+				}
+			}
+			break
+		}
 	}
-	defer res.Close()
-
-	data, err := io.ReadAll(res.Output)
-	if err != nil {
-		panic(err)
-	}
-
-	info := &versionInfo{}
-	return info, json.Unmarshal(data, info)
 }

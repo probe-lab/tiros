@@ -8,6 +8,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multicodec"
+	pllog "github.com/probe-lab/go-commons/log"
 )
 
 type CIDProvider interface {
@@ -85,7 +86,7 @@ func (p *BitswapSnifferClickhouseCIDProvider) SelectCID(ctx context.Context, ori
 	if err != nil {
 		return cid.Cid{}, err
 	}
-	defer rows.Close()
+	defer pllog.Defer(rows.Close, "Failed closing rows")
 
 	if !rows.Next() {
 		return cid.Cid{}, sql.ErrNoRows

@@ -1,1 +1,0 @@
-ALTER TYPE measurement_type RENAME VALUE 'IPFS' TO 'KUBO';

@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-
-	"github.com/aarondl/null/v8"
 )
 
 type Metrics struct {
@@ -11,17 +9,12 @@ type Metrics struct {
 	// can grow
 }
 
-func (pr *probeResult) NullJSON() (null.JSON, error) {
+func (pr *websiteProbeResult) MetricsJSON() (json.RawMessage, error) {
 	m := Metrics{
 		NavigationPerformance: pr.navPerf,
 	}
 
-	data, err := json.Marshal(m)
-	if err != nil {
-		return null.NewJSON(nil, false), err
-	}
-
-	return null.JSONFrom(data), nil
+	return json.Marshal(m)
 }
 
 // PerformanceNavigationEntry was generated with quicktype.io
