@@ -176,16 +176,16 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, erro
 	}
 	k.receiver.mu.Unlock()
 
-	// if an error occurred, log it and continue with the next iteration
-	if err != nil {
-		return nil, fmt.Errorf("add file to kubo: %w", err)
-	}
-
 	result := &UploadResult{
 		CID:            imPath.RootCid(),
 		RawCID:         rawCID,
 		IPFSAddTraceID: uploadSpan.SpanContext().TraceID(),
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	// if an error occurred, log it and continue with the next iteration
+	if err != nil {
+		return result, fmt.Errorf("add file to kubo: %w", err)
 	}
 
 	logEntry.Info("Waiting for trace data...")
@@ -215,7 +215,7 @@ loop:
 }
 
 func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 45*time.Second)
 
 	ctx, downloadSpan := k.tracer.Start(ctx, "Download")
 	defer downloadSpan.End()
@@ -237,17 +237,18 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	defer k.receiver.Reset()
 
 	result := &DownloadResult{
-		CID:            c,
-		IPFSCatStart:   time.Now(),
-		IPFSCatTraceID: traceID,
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+		CID:             c,
+		IPFSCatStart:    time.Now(),
+		IPFSCatTraceID:  traceID,
+		DiscoveryMethod: "unknown",
+		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
 	}
 
-	parseTimeout := time.NewTimer(45 * time.Second)
+	parseTimeout := time.NewTimer(30 * time.Second)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		logEntry.With("timeout", 45*time.Second).Info("Subscribing to trace data...")
+		logEntry.With("timeout", 30*time.Second).Info("Subscribing to trace data...")
 		for {
 			select {
 			case <-parseTimeout.C:
@@ -275,7 +276,9 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	}()
 
 	logEntry.Info("Downloading file from Kubo")
-	resp, err := k.Request("cat", c.String()).Send(ctx)
+	catCtx, catCancel := context.WithTimeout(ctx, 10*time.Second)
+	defer catCancel()
+	resp, err := k.Request("cat", c.String()).Send(catCtx)
 	if err != nil {
 		return result, err
 	} else if resp.Error != nil {
@@ -295,7 +298,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	r := io.LimitReader(resp.Output, 100*1024*1024) // read at most 20 MiB
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 	downloadEnd := time.Now()
 

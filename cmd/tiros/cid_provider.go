@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/ipfs/go-cid"
+	"github.com/multiformats/go-multicodec"
 )
 
 type CIDProvider interface {
@@ -86,7 +88,7 @@ func (p *BitswapSnifferClickhouseCIDProvider) SelectCID(ctx context.Context, ori
 	defer rows.Close()
 
 	if !rows.Next() {
-		return cid.Cid{}, fmt.Errorf("no rows")
+		return cid.Cid{}, sql.ErrNoRows
 	}
 
 	var cidStr string
@@ -94,5 +96,15 @@ func (p *BitswapSnifferClickhouseCIDProvider) SelectCID(ctx context.Context, ori
 		return cid.Cid{}, err
 	}
 
-	return cid.Parse(cidStr)
+	c, err := cid.Parse(cidStr)
+	if err != nil {
+		return cid.Cid{}, err
+	}
+
+	// tmp fix until https://github.com/probe-lab/bitswap-sniffer/pull/11 is merged
+	if c.Prefix().Codec != uint64(multicodec.DagPb) {
+		return cid.NewCidV1(uint64(multicodec.Raw), c.Hash()), nil
+	}
+
+	return c, nil
 }

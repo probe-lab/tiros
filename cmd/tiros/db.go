@@ -54,6 +54,7 @@ type DownloadModel struct {
 	IPNIStatus           int       `ch:"ipni_status"`
 	FirstBlockReceivedAt time.Time `ch:"first_block_rec_at"`
 	DiscoveryMethod      string    `ch:"discovery_method"`
+	CIDSource            string    `ch:"cid_source"`
 	Error                string    `ch:"error"`
 }
 

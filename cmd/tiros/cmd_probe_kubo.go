@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"embed"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -67,7 +69,7 @@ var probeKuboFlags = []cli.Flag{
 		Destination: &probeKuboConfig.KuboHost,
 	},
 	&cli.IntFlag{
-		Name:        "ipfs-api-port",
+		Name:        "kubo.apiPort",
 		Usage:       "port to reach a Kubo-compatible RPC API",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_KUBO_API_PORT"),
 		Value:       probeKuboConfig.KuboAPIPort,
@@ -274,7 +276,6 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 					KuboVersion:  kuboVersion.Version,
 					KuboPeerID:   kuboID.ID,
 					FileSizeB:    int32(probeKuboConfig.FileSizeMiB * 1024 * 1024),
-					CID:          ur.CID.String(),
 					IPFSAddStart: uploadStart,
 					Error:        errStr,
 				}
@@ -316,7 +317,10 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 
 				slog.With("origin", origin).Info("Starting download measurement")
 				ciid, err := cidProvider.SelectCID(ctx, origin)
-				if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					slog.With("origin", origin).Info("No CID found in database")
+					continue
+				} else if err != nil {
 					return fmt.Errorf("selecting cid from database: %w", err)
 				}
 
@@ -353,6 +357,7 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 					IPNIStatus:           dr.IPNIStatus,
 					FirstBlockReceivedAt: dr.FirstBlockReceivedAt,
 					DiscoveryMethod:      dr.DiscoveryMethod,
+					CIDSource:            "bitsniffer_" + origin,
 					Error:                errStr,
 				}
 				if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
@@ -360,7 +365,6 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 				}
 			}
 		}
-
 	}
 
 	return nil

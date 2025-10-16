@@ -36,7 +36,7 @@ type TraceReceiver struct {
 	coltracepb.UnimplementedTraceServiceServer
 	server *plgrpc.Server
 
-	mu sync.Mutex
+	mu sync.RWMutex
 
 	traceMatchers  []TraceMatcher
 	traceMatchChan chan *ExportTraceServiceRequest
@@ -125,8 +125,8 @@ func (t *ExportTraceServiceRequest) Spans() iter.Seq[*v1.Span] {
 }
 
 func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTraceServiceRequest) (*coltracepb.ExportTraceServiceResponse, error) {
-	tr.mu.Lock()
-	defer tr.mu.Unlock()
+	tr.mu.RLock()
+	defer tr.mu.RUnlock()
 
 	if tr.traceOut != "" {
 		protoName := "./" + path.Join(tr.traceOut, fmt.Sprintf("trace-%d.proto.json", tr.traceCounter))

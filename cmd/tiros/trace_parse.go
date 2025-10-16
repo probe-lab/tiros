@@ -164,17 +164,21 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 
 	if spans, found := r.spansByTraceID[r.FindProvTraceID]; found && r.IPNIStart.IsZero() {
 		for _, span := range spans {
-			if span.Name != "DelegatedHTTPClient.FindProviders" {
-				continue
-			}
+			switch {
+			case span.Name == "Bitswap.Client.Session.IdleBroadcast":
+				r.IdleBroadcastStartedAt = time.Unix(0, int64(span.StartTimeUnixNano))
+			case span.Name == "DelegatedHTTPClient.FindProviders":
+				r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
+				r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
 
-			r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
-			r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
-
-			for _, attr := range span.GetAttributes() {
-				if attr.Key == "http.response.status_code" {
-					r.IPNIStatus = int(attr.GetValue().GetIntValue())
-					break
+				for _, attr := range span.GetAttributes() {
+					if attr.Key == "http.response.status_code" {
+						r.IPNIStatus = int(attr.GetValue().GetIntValue())
+						break
+					}
+					if attr.Key == "otel.status_description" && attr.GetValue().GetStringValue() == "context canceled" {
+						r.IPNIStatus = 499
+					}
 				}
 			}
 		}
@@ -185,15 +189,6 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 			switch {
 			case span.Name == "corehttp.cmdsHandler":
 				r.cmdHandlerDone = true
-			case span.Name == "Bitswap.Client.Getter.SyncGetBlock":
-				for _, evt := range span.Events {
-					if evt.Name == "IdleBroadcast" {
-						newIdleBroadcast := time.Unix(0, int64(evt.TimeUnixNano))
-						if newIdleBroadcast.Before(r.IdleBroadcastStartedAt) || r.IdleBroadcastStartedAt.IsZero() {
-							r.IdleBroadcastStartedAt = newIdleBroadcast
-						}
-					}
-				}
 			case span.Name == "Bitswap.Client.Getter.handleIncoming":
 				for _, evt := range span.Events {
 					if evt.Name != "received block" {
