@@ -1,8 +1,7 @@
-analysis
 rod
-sqlboiler.toml
 README.md
 Makefile
 Dockerfile
 docker-compose.yml
 .gitignore
+testdata

@@ -22,37 +22,17 @@ type StaticCIDProvider struct {
 
 var _ CIDProvider = (*StaticCIDProvider)(nil)
 
-func NewStaticCIDProvider() *StaticCIDProvider {
-	testCIDStrs := []string{
-		"bafkreigmes4fo2xnpixfk4syb5m27iok7rusrh6yziod4y5kunfhb6mf5e",
-		"QmPrRV2DJHJCneS6Xyjg4y1FkoGidzAbSQxkwjcXi5rpiu",
-		"bafkreihaa5hixintqqa2hdkgcoiczlpmv7dl4yammrg5f2ixovwkjc7peu",
-		"bafybeiaprerug3p76ozy772iudrr5sqecs7wpxyrtwqzxmlyu7ri3unqae",
-		"QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1",
-		"QmfAxJ75ePH87jxh6K364P7ce2EFtz3KnU3xzLMmrv3eMN",
-		"bafkreigemrgrxezrzyvt2jq7kj2v5m3aajjdyuemwkhgfuizbuudasrf6e",
-		"bafkreie3trdds4kskfyxw3hzyxzjpwogwwbjpuja5l24avqrf4scwlusri",
-		"bafybeiawuyyxivuxnaqe6iztn4op555flezzfug3h6zf4j2z3vdbit5vue",
-		"bafkreia2gwddcggdprkn5t6wu4j5a3gv77ftgum7mdid53a6phxzpba5f4",
-		"bafkreibon5tv5zuu4lt2re6yfhkuo3ojtfbfdn6t5zna4excyewazmofca",
-		"bafkreiha5ukwhn6ytl73w4tp3v7h2zayvnpoe64uobhb3f3gf36ng3aa4q",
-		"bafkreias4o6xfoitigzponn5zb7oqifj4fysmk6fjtogp5zmrizr7ijeja",
-		"bafkreig2ltiutlf35ioab6cceorgbjbfu7pkvfdoduhugrvwl5by5yw2di",
-		"bafkreia73jrngvxgmanbyozjmln5f6roqbjzt6yugqzja3s4exqrmwvvkq",
-		"bafkreihtf7ckw7kapkwkcp6vh7vsnqxdxii5gi5fodj3k5rxbithfvxfem",
-		"bafkreifxturkxlmfanavfv2amr63dowtrhegkqpxqposigda2uono2bvyy",
-		"bafkreihnyskm5bpa47xsi2wde3vephyewfupawrqebraqmnm3bhk673caa",
-		"bafkreibocixhj5ln3k37anfdwqp4rfxqlf2ffs7em2kokptq2pgvmohr2a",
-	}
-
-	testCIDs := make([]cid.Cid, 0, len(testCIDStrs))
-	for _, c := range testCIDStrs {
-		parse := cid.MustParse(c)
+func NewStaticCIDProvider(cids []string) (*StaticCIDProvider, error) {
+	testCIDs := make([]cid.Cid, 0, len(cids))
+	for _, c := range cids {
+		parse, err := cid.Parse(c)
+		if err != nil {
+			return nil, fmt.Errorf("parsing cid: %w", err)
+		}
 		testCIDs = append(testCIDs, parse)
-
 	}
 
-	return &StaticCIDProvider{testCIDs: testCIDs}
+	return &StaticCIDProvider{testCIDs: testCIDs}, nil
 }
 
 func (p *StaticCIDProvider) SelectCID(ctx context.Context, origin string) (cid.Cid, error) {

@@ -29,6 +29,7 @@ var probeKuboConfig = struct {
 	TracesOut     string
 	DownloadOnly  bool
 	UploadOnly    bool
+	DownloadCIDs  []string
 
 	TracesForwardHost string
 	TracesForwardPort int
@@ -45,6 +46,7 @@ var probeKuboConfig = struct {
 	TracesForwardPort: 0,
 	DownloadOnly:      false,
 	UploadOnly:        false,
+	DownloadCIDs:      []string{},
 }
 
 var probeKuboFlags = []cli.Flag{
@@ -70,16 +72,16 @@ var probeKuboFlags = []cli.Flag{
 		Destination: &probeKuboConfig.KuboHost,
 	},
 	&cli.IntFlag{
-		Name:        "kubo.apiPort",
+		Name:        "kubo.api.port",
 		Usage:       "port to reach a Kubo-compatible RPC API",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_KUBO_API_PORT"),
 		Value:       probeKuboConfig.KuboAPIPort,
 		Destination: &probeKuboConfig.KuboAPIPort,
 	},
 	&cli.IntFlag{
-		Name:        "maxIterations",
+		Name:        "iterations.max",
 		Usage:       "The number of iterations to run. 0 means infinite.",
-		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_MAX_ITERATIONS"),
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_ITERATIONS_MAX"),
 		Value:       probeKuboConfig.MaxIterations,
 		Destination: &probeKuboConfig.MaxIterations,
 	},
@@ -118,6 +120,13 @@ var probeKuboFlags = []cli.Flag{
 		Value:       probeKuboConfig.TracesForwardPort,
 		Destination: &probeKuboConfig.TracesForwardPort,
 	},
+	&cli.StringSliceFlag{
+		Name:        "download.cids",
+		Usage:       "A static list of CIDs to download from Kubo.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_CIDS"),
+		Value:       probeKuboConfig.DownloadCIDs,
+		Destination: &probeKuboConfig.DownloadCIDs,
+	},
 }
 
 var probeKuboMuExFlags = []cli.MutuallyExclusiveFlags{
@@ -134,9 +143,9 @@ var probeKuboMuExFlags = []cli.MutuallyExclusiveFlags{
 				&cli.BoolFlag{
 					Name:        "upload.only",
 					Usage:       "Only download the file from Kubo",
-					Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_ONLY"),
-					Value:       probeKuboConfig.DownloadOnly,
-					Destination: &probeKuboConfig.DownloadOnly,
+					Sources:     cli.EnvVars("TIROS_PROBE_KUBO_UPLOAD_ONLY"),
+					Value:       probeKuboConfig.UploadOnly,
+					Destination: &probeKuboConfig.UploadOnly,
 				},
 			},
 		},
@@ -193,9 +202,20 @@ func probeKuboAction(ctx context.Context, c *cli.Command) error {
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
 	var cidProvider CIDProvider
-	cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
-	if err != nil {
-		return fmt.Errorf("creating cid provider: %w", err)
+	if !probeKuboConfig.UploadOnly {
+		if len(probeKuboConfig.DownloadCIDs) > 0 {
+			// cid provider not needed for upload only
+			cidProvider, err = NewStaticCIDProvider(probeKuboConfig.DownloadCIDs)
+			if err != nil {
+				return fmt.Errorf("creating static cid provider: %w", err)
+			}
+		} else {
+			// cid provider not needed for upload only
+			cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
+			if err != nil {
+				return fmt.Errorf("creating clickhouse cid provider: %w", err)
+			}
+		}
 	}
 
 	kuboCfg := &KuboConfig{

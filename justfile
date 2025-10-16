@@ -45,6 +45,7 @@ run: dev-up
 # Clean up built artifacts
 clean:
     rm -f tiros
+    rm -r tests/upload/tmp.* || true
 
 # Format Go code
 fmt:
@@ -56,3 +57,11 @@ test:
 # Connect to local database
 db-connect:
     docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
+
+test-upload:
+    ./tests/upload/test_upload.sh
+
+test-download:
+    ./tests/download/test_download.sh
+
+
