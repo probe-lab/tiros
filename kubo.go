@@ -325,6 +325,16 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	result.IPFSCatTTFB = ttfb
 	result.FileSize = len(data)
 
+	// the FirstBlockReceivedAt field is only used to determine
+	// the discovery method. This field will only be set though,
+	// when https://github.com/ipfs/boxo/pull/1053 is merged.
+	// Until then, we assume ttfb == FirstBlockReceivedAt.
+	if result.DiscoveryMethod == "unknown" {
+		if result.IPFSCatStart.Add(ttfb).Before(result.FirstProviderConnectedAt) || result.FirstProviderConnectedAt.IsZero() {
+			result.DiscoveryMethod = "bitswap"
+		}
+	}
+
 	return result, nil
 }
 
