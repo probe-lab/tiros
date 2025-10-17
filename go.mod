@@ -14,7 +14,7 @@ require (
 	github.com/libp2p/go-libp2p v0.43.0
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/multiformats/go-multicodec v0.9.2
-	github.com/probe-lab/go-commons v0.0.0-20251013091215-758be286e6da
+	github.com/probe-lab/go-commons v0.0.0-20251017100305-59170bd91c5d
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.4.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
