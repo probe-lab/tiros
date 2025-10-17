@@ -25,6 +25,9 @@ fmt:
 db-connect:
     docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
 
+test:
+    go test ./...
+
 e2e case:
     ./e2e/test_{{case}}.sh
 

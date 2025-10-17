@@ -27,7 +27,6 @@ import (
 	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/multiformats/go-multicodec"
 	pllog "github.com/probe-lab/go-commons/log"
-	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -356,12 +355,7 @@ func (k *Kubo) findProviders(ctx context.Context, website string, results chan<-
 	} else if nameResp.Output == nil {
 		return fmt.Errorf("name/resolve no error but response output nil")
 	}
-
-	defer func() {
-		if err = nameResp.Close(); err != nil {
-			log.WithError(err).Warnln("Error closing name/resolve response")
-		}
-	}()
+	defer pllog.Defer(nameResp.Output.Close, "Failed closing name/resolve response output")
 
 	dat, err := io.ReadAll(nameResp.Output)
 	if err != nil {
@@ -392,11 +386,7 @@ func (k *Kubo) findProviders(ctx context.Context, website string, results chan<-
 	} else if findResp.Output == nil {
 		return fmt.Errorf("routing/findprovs no error but response output nil")
 	}
-	defer func() {
-		if err = findResp.Close(); err != nil {
-			log.WithError(err).Warnln("Error closing name/resolve response")
-		}
-	}()
+	defer pllog.Defer(findResp.Output.Close, "Error closing name/resolve response")
 
 	var providerPeers []*peer.AddrInfo
 	dec := json.NewDecoder(findResp.Output)
