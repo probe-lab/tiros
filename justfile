@@ -15,7 +15,7 @@ build:
 # Clean up built artifacts
 clean:
     rm -f tiros
-    rm -r tests/**/tmp.* || true
+    rm -r ./e2e/tmp.* || true
 
 # Format Go code
 fmt:
