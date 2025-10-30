@@ -18,7 +18,7 @@ parse_json_output "$OUTPUT_FILE"
 # Assertions on fields
 echo "Asserting..."
 assert_not_empty "RunID"
-assert_eq "KuboVersion" "0.38.0"
+assert_eq "KuboVersion" "0.38.2"
 assert_gt "FileSizeB" "0" "Filesize is not greater than 0"
 assert_gt "IPFSAddDurationS" "0"
 assert_gt "ProvideDurationS" "0"

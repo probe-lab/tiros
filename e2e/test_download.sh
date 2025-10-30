@@ -20,7 +20,7 @@ parse_json_output "$OUTPUT_FILE"
 # Assertions on fields
 echo "Asserting..."
 assert_not_empty "RunID"
-assert_eq "KuboVersion" "0.38.0"
+assert_eq "KuboVersion" "0.38.2"
 # assert_not_empty "TirosVersion" # not set with `go run`
 assert_not_empty "KuboPeerID"
 assert_gt "FileSizeB" "0" "Filesize is not greater than 0"

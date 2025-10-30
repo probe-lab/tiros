@@ -17,7 +17,7 @@ parse_json_output "$OUTPUT_FILE"
 
 # Assertions on fields
 echo "Asserting..."
-assert_eq "KuboVersion" "0.38.0"
+assert_eq "KuboVersion" "0.38.2"
 assert_not_empty "RunID"
 assert_not_empty "KuboPeerID"
 assert_not_empty "Website"
