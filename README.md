@@ -75,7 +75,7 @@ To run the content routing performance measurement you could do the following:
 
 Terminal 1:
 ```shell
-docker compose -f e2e/docker-compose.kubo.yml up 
+docker compose -f docker-compose.kubo.yml up 
 ```
 
 Terminal 2:
@@ -90,26 +90,16 @@ be written to a Clickhouse database.
 You can also forward Kubo's traces to, e.g., Jaeger. First start Jaeger:
 
 ```text
-docker run -d --rm --name jaeger
- -e COLLECTOR_OTLP_ENABLED=true \ 
- -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
- -p 5775:5775/udp \
- -p 6831:6831/udp \
- -p 6832:6832/udp \
- -p 5778:5778 \
+docker run --rm --name jaeger \
+ -e COLLECTOR_OTLP_ENABLED=true \
  -p 16686:16686 \
- -p 14250:14250 \
- -p 14268:14268 \
- -p 14269:14269 \
  -p 55680:4317 \
- -p 4318:4318 \
- -p 9411:9411 \
- jaegertracing/all-in-one
+ cr.jaegertracing.io/jaegertracing/jaeger:2.11.0
 ```
 
 Then pass the following flags to the above Tiros command:
 ```
----traces.forward.host 127.0.0.1 --traces.forward.port 55680
+--traces.forward.host 127.0.0.1 --traces.forward.port 55680
 ```
 
 That way you can inspect the traces that Tiros caught in Jaeger.
