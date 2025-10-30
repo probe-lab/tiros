@@ -2,7 +2,7 @@ version: "3.9"
 name: tiros
 services:
   kubo:
-    image: ipfs/kubo:v0.38.0
+    image: ipfs/kubo:v0.38.2
     environment:
       - IPFS_TELEMETRY=off
     ports:

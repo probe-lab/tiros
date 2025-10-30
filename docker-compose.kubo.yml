@@ -2,7 +2,7 @@ version: "3.9"
 name: tiros
 services:
   kubo:
-    image: ipfs/kubo:v0.38.0
+    image: ipfs/kubo:v0.38.2
     # in our measurement setup we require the `roots` provide strategy to make
     # sure to have predictable results. Here we set this strategy explicitly
     # during startup. However, for this we need to reset the entrypoint, init
