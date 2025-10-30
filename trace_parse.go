@@ -66,9 +66,8 @@ func (r *UploadResult) isPopulated() bool {
 }
 
 type DownloadResult struct {
-	CID             cid.Cid
-	IPFSCatTraceID  trace.TraceID
-	FindProvTraceID trace.TraceID
+	CID            cid.Cid
+	IPFSCatTraceID trace.TraceID
 
 	IPFSCatStart time.Time
 	IPFSCatEnd   time.Time
@@ -102,11 +101,6 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 			r.spansByTraceID[trace.TraceID(span.TraceId)] = []*v1.Span{span}
 		}
 
-		// if we already have a trace ID for the provide operation, we can skip
-		if r.FindProvTraceID.IsValid() {
-			continue
-		}
-
 		// if the span is not a provide operation, we can skip
 		if span.Name != "ProviderQueryManager.FindProvidersAsync" {
 			continue
@@ -115,7 +109,6 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 		// if the span does not have the attribute key set to the raw CID, we can skip
 		for _, attr := range span.Attributes {
 			if attr.Key == "cid" && attr.Value.GetStringValue() == r.CID.String() {
-				r.FindProvTraceID = trace.TraceID(span.TraceId)
 				findProvSpan = span
 			}
 		}
@@ -162,28 +155,6 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 		r.FirstConnectedProviderPeerID = firstConnectedProvider
 	}
 
-	if spans, found := r.spansByTraceID[r.FindProvTraceID]; found && r.IPNIStart.IsZero() {
-		for _, span := range spans {
-			switch {
-			case span.Name == "Bitswap.Client.Session.IdleBroadcast":
-				r.IdleBroadcastStartedAt = time.Unix(0, int64(span.StartTimeUnixNano))
-			case span.Name == "DelegatedHTTPClient.FindProviders":
-				r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
-				r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
-
-				for _, attr := range span.GetAttributes() {
-					if attr.Key == "http.response.status_code" {
-						r.IPNIStatus = int(attr.GetValue().GetIntValue())
-						break
-					}
-					if attr.Key == "otel.status_description" && attr.GetValue().GetStringValue() == "context canceled" {
-						r.IPNIStatus = 499
-					}
-				}
-			}
-		}
-	}
-
 	if spans, found := r.spansByTraceID[r.IPFSCatTraceID]; found {
 		for _, span := range spans {
 			switch {
@@ -198,6 +169,21 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 					blockReceivedAt := time.Unix(0, int64(evt.TimeUnixNano))
 					if blockReceivedAt.Before(r.FirstBlockReceivedAt) || r.FirstBlockReceivedAt.IsZero() {
 						r.FirstBlockReceivedAt = blockReceivedAt
+					}
+				}
+			case span.Name == "Bitswap.Client.Session.IdleBroadcast":
+				r.IdleBroadcastStartedAt = time.Unix(0, int64(span.StartTimeUnixNano))
+			case span.Name == "DelegatedHTTPClient.FindProviders":
+				r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
+				r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
+
+				for _, attr := range span.GetAttributes() {
+					if attr.Key == "http.response.status_code" {
+						r.IPNIStatus = int(attr.GetValue().GetIntValue())
+						break
+					}
+					if attr.Key == "otel.status_description" && attr.GetValue().GetStringValue() == "context canceled" {
+						r.IPNIStatus = 499
 					}
 				}
 			}
@@ -223,6 +209,7 @@ func (r *DownloadResult) isPopulated() bool {
 	if r.IdleBroadcastStartedAt.IsZero() {
 		return true
 	}
+
 	return true
 }
 

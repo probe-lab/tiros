@@ -1,0 +1,689 @@
+{
+    "data": [
+        {
+            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+            "spans": [
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "644f9321f7c4935e",
+                    "operationName": "Blockservice.Session.GetBlock",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "9b20346bf71c0320"
+                        }
+                    ],
+                    "startTime": 1761819000486575,
+                    "duration": 101,
+                    "tags": [
+                        {
+                            "key": "CID",
+                            "type": "string",
+                            "value": "QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"
+                        },
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "blockservice"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "638e18efc00af01a",
+                    "operationName": "Namesys.Resolve",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "cd234e3ab6bedd20"
+                        }
+                    ],
+                    "startTime": 1761819000486504,
+                    "duration": 44,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/namesys"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "537b010f7b13c124",
+                    "operationName": "Bitswap.Client.SessionManager.NewSession",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "fd9401e691af2617"
+                        }
+                    ],
+                    "startTime": 1761819000487482,
+                    "duration": 11,
+                    "tags": [
+                        {
+                            "key": "ID",
+                            "type": "string",
+                            "value": "2"
+                        },
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "cf77b14aac5922e8",
+                    "operationName": "Bitswap.Client.Session.GetBlocks",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "b38899fbd871fe7b"
+                        }
+                    ],
+                    "startTime": 1761819000487497,
+                    "duration": 5,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "885ecced328414cd",
+                    "operationName": "Bitswap.Client.Getter.handleIncoming",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "3f2e3b49e0a352a6"
+                        }
+                    ],
+                    "startTime": 1761819000487509,
+                    "duration": 64726,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [
+                        {
+                            "timestamp": 1761819000552233,
+                            "fields": [
+                                {
+                                    "key": "event",
+                                    "type": "string",
+                                    "value": "received block"
+                                },
+                                {
+                                    "key": "cid",
+                                    "type": "string",
+                                    "value": "QmR7LMF56UJ4oNdiuAGyAkZ97CNz4byB8mbe3kAVt2DTtA"
+                                }
+                            ]
+                        }
+                    ],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "212a5d0040208f78",
+                    "operationName": "Namesys.ResolveAsync",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "6122cf926902f3b3"
+                        }
+                    ],
+                    "startTime": 1761819000486510,
+                    "duration": 13,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/namesys"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "1168f1c1b01f0c50",
+                    "operationName": "Namesys.ResolveAsync.Worker",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "212a5d0040208f78"
+                        }
+                    ],
+                    "startTime": 1761819000486541,
+                    "duration": 4,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/namesys"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": [
+                        "clock skew adjustment disabled; not applying calculated delta of -26.042µs"
+                    ]
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "6122cf926902f3b3",
+                    "operationName": "Namesys.namesys.Resolve",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "638e18efc00af01a"
+                        }
+                    ],
+                    "startTime": 1761819000486507,
+                    "duration": 41,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/namesys"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": [
+                        "clock skew adjustment disabled; not applying calculated delta of -1.521µs"
+                    ]
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "cd234e3ab6bedd20",
+                    "operationName": "CoreAPI.ResolvePath",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "9b20346bf71c0320"
+                        }
+                    ],
+                    "startTime": 1761819000486501,
+                    "duration": 67,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "Kubo"
+                        },
+                        {
+                            "key": "path",
+                            "type": "string",
+                            "value": "/ipfs/QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "fd9401e691af2617",
+                    "operationName": "Bitswap.NewSession",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "d882ddada5395ef6"
+                        }
+                    ],
+                    "startTime": 1761819000487479,
+                    "duration": 17,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": [
+                        "clock skew adjustment disabled; not applying calculated delta of -884.021µs"
+                    ]
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "b38899fbd871fe7b",
+                    "operationName": "Blockservice.Session.GetBlocks",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "d882ddada5395ef6"
+                        }
+                    ],
+                    "startTime": 1761819000486749,
+                    "duration": 2,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "blockservice"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": [
+                        "clock skew adjustment disabled; not applying calculated delta of -146.771µs"
+                    ]
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "d882ddada5395ef6",
+                    "operationName": "CoreAPI.UnixfsAPI.Get",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "3fbc33494016e6ae"
+                        }
+                    ],
+                    "startTime": 1761819000486492,
+                    "duration": 223,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "Kubo"
+                        },
+                        {
+                            "key": "path",
+                            "type": "string",
+                            "value": "/ipfs/QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "345015ad3bc924ba",
+                    "operationName": "Bitswap.NotifyNewBlocks",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "b38899fbd871fe7b"
+                        }
+                    ],
+                    "startTime": 1761819000552615,
+                    "duration": 2,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "13df36d6102d4d0a",
+                    "operationName": "Namesys.namesys.ResolveOnceAsync",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "212a5d0040208f78"
+                        }
+                    ],
+                    "startTime": 1761819000486512,
+                    "duration": 2,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/namesys"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "cd6a315f23fde93d",
+                    "operationName": "Path.basicResolver.ResolveToLastNode",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "cd234e3ab6bedd20"
+                        }
+                    ],
+                    "startTime": 1761819000486556,
+                    "duration": 1,
+                    "tags": [
+                        {
+                            "key": "Path",
+                            "type": "string",
+                            "value": "/ipfs/QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"
+                        },
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "boxo/path/resolver"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "9b20346bf71c0320",
+                    "operationName": "CoreAPI.ResolveNode",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "d882ddada5395ef6"
+                        }
+                    ],
+                    "startTime": 1761819000486499,
+                    "duration": 201,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "Kubo"
+                        },
+                        {
+                            "key": "path",
+                            "type": "string",
+                            "value": "/ipfs/QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "3fbc33494016e6ae",
+                    "operationName": "corehttp.cmdsHandler",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "f007932856361b83"
+                        }
+                    ],
+                    "startTime": 1761819000486368,
+                    "duration": 72371,
+                    "tags": [
+                        {
+                            "key": "client.address",
+                            "type": "string",
+                            "value": "127.0.0.1"
+                        },
+                        {
+                            "key": "http.request.method",
+                            "type": "string",
+                            "value": "POST"
+                        },
+                        {
+                            "key": "http.response.body.size",
+                            "type": "int64",
+                            "value": 1277869
+                        },
+                        {
+                            "key": "http.response.status_code",
+                            "type": "int64",
+                            "value": 200
+                        },
+                        {
+                            "key": "http.route",
+                            "type": "string",
+                            "value": "/api/v0/"
+                        },
+                        {
+                            "key": "network.peer.address",
+                            "type": "string",
+                            "value": "127.0.0.1"
+                        },
+                        {
+                            "key": "network.peer.port",
+                            "type": "int64",
+                            "value": 64025
+                        },
+                        {
+                            "key": "network.protocol.version",
+                            "type": "string",
+                            "value": "1.1"
+                        },
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+                        },
+                        {
+                            "key": "otel.scope.version",
+                            "type": "string",
+                            "value": "0.63.0"
+                        },
+                        {
+                            "key": "server.address",
+                            "type": "string",
+                            "value": "127.0.0.1"
+                        },
+                        {
+                            "key": "server.port",
+                            "type": "int64",
+                            "value": 5001
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "url.path",
+                            "type": "string",
+                            "value": "/api/v0/cat"
+                        },
+                        {
+                            "key": "url.scheme",
+                            "type": "string",
+                            "value": "http"
+                        },
+                        {
+                            "key": "user_agent.original",
+                            "type": "string",
+                            "value": "Go-http-client/1.1"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": [
+                        "invalid parent span IDs=f007932856361b83; skipping clock skew adjustment"
+                    ]
+                },
+                {
+                    "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                    "spanID": "3f2e3b49e0a352a6",
+                    "operationName": "Bitswap.Client.Getter.AsyncGetBlocks",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "4aa8efb4adc78e4266cbc314e1b7be75",
+                            "spanID": "cf77b14aac5922e8"
+                        }
+                    ],
+                    "startTime": 1761819000487498,
+                    "duration": 4,
+                    "tags": [
+                        {
+                            "key": "otel.scope.name",
+                            "type": "string",
+                            "value": "go-bitswap"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "internal"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                }
+            ],
+            "processes": {
+                "p1": {
+                    "serviceName": "Kubo",
+                    "tags": [
+                        {
+                            "key": "service.version",
+                            "type": "string",
+                            "value": "0.38.2"
+                        },
+                        {
+                            "key": "telemetry.sdk.language",
+                            "type": "string",
+                            "value": "go"
+                        },
+                        {
+                            "key": "telemetry.sdk.name",
+                            "type": "string",
+                            "value": "opentelemetry"
+                        },
+                        {
+                            "key": "telemetry.sdk.version",
+                            "type": "string",
+                            "value": "1.38.0"
+                        }
+                    ]
+                }
+            },
+            "warnings": null
+        }
+    ],
+    "total": 0,
+    "limit": 0,
+    "offset": 0,
+    "errors": null
+}

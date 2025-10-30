@@ -239,8 +239,6 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	k.cfg.Receiver.mu.Lock()
 	k.cfg.Receiver.traceMatchers = []TraceMatcher{
 		traceIDMatcher(traceID),
-		nameMatcher("ProviderQueryManager.FindProvidersAsync"),
-		nameMatcher("DelegatedHTTPClient.FindProviders"),
 	}
 	k.cfg.Receiver.mu.Unlock()
 	defer k.cfg.Receiver.Reset()
