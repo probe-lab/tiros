@@ -368,6 +368,9 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				if err := dbClient.InsertDownload(ctx, dbDownload); err != nil {
 					return fmt.Errorf("inserting upload into database: %w", err)
 				}
+
+				// reset in between downloads as well
+				kubo.Reset(ctx)
 			}
 		}
 	}
