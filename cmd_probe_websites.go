@@ -105,10 +105,10 @@ var probeWebsitesCmd = &cli.Command{
 			DefaultText: "--kubo.host",
 		},
 	},
-	Action: RunAction,
+	Action: probeWebsitesAction,
 }
 
-func RunAction(ctx context.Context, cmd *cli.Command) error {
+func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 	runID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("creating run id: %w", err)
