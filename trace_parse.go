@@ -172,7 +172,10 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 					}
 				}
 			case span.Name == "Bitswap.Client.Session.IdleBroadcast":
-				r.IdleBroadcastStartedAt = time.Unix(0, int64(span.StartTimeUnixNano))
+				idleBroadcastStart := time.Unix(0, int64(span.StartTimeUnixNano))
+				if idleBroadcastStart.Before(r.IdleBroadcastStartedAt) || r.IdleBroadcastStartedAt.IsZero() {
+					r.IdleBroadcastStartedAt = idleBroadcastStart
+				}
 			case span.Name == "DelegatedHTTPClient.FindProviders":
 				r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
 				r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
