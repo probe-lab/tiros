@@ -138,8 +138,11 @@ func (k *Kubo) Reset(ctx context.Context) {
 	}
 
 	slog.Info("Running repo garbage collection")
-	if _, err := k.Request("repo/gc").Send(ctx); err != nil {
+	res, err := k.Request("repo/gc").Send(ctx)
+	if err != nil {
 		slog.With("err", err).Warn("Error running ipfs gc")
+	} else {
+		defer pllog.Defer(res.Close, "Failed closing repo garbage collection")
 	}
 }
 
@@ -292,7 +295,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 		return result, resp.Error
 	}
 
-	defer pllog.Defer(resp.Output.Close, "Failed closing response output")
+	defer pllog.Defer(resp.Close, "Failed closing response output")
 
 	var buf [1]byte
 	_, err = resp.Output.Read(buf[:])
