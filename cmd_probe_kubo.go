@@ -13,6 +13,9 @@ import (
 	"github.com/google/uuid"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/urfave/cli/v3"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 )
 
 //go:embed migrations
@@ -164,6 +167,18 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	meter := otel.GetMeterProvider().Meter("tiros")
+
+	uploadCounter, err := meter.Int64Counter("uploads")
+	if err != nil {
+		return err
+	}
+
+	downloadCounter, err := meter.Int64Counter("downloads")
+	if err != nil {
+		return err
+	}
+
 	runID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("creating run id: %w", err)
@@ -279,6 +294,9 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 			slog.Info("Starting upload measurement")
 
 			ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
+			uploadCounter.Add(ctx, 1, metric.WithAttributes(
+				attribute.Bool("success", err == nil),
+			))
 
 			cidStr := ""
 			if ur.CID.Defined() {
@@ -326,6 +344,11 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				}
 
 				dr, err := kubo.Download(ctx, ciid)
+				downloadCounter.Add(ctx, 1, metric.WithAttributes(
+					attribute.String("origin", origin),
+					attribute.Bool("success", err == nil),
+				))
+
 				dbDownload := &DownloadModel{
 					RunID:                runID.String(),
 					Region:               rootConfig.AWSRegion,

@@ -1,0 +1,58 @@
+prometheus.scrape "metrics_ecs_tiros_scheduler" {
+        targets = [{
+                __address__  = "localhost:6060",
+                component    = "scheduler",
+                ipfs_impl    = sys.env("LABEL_IPFS_IMPL"),
+                ipfs_version = sys.env("LABEL_IPFS_VERSION"),
+                location     = sys.env("LABEL_LOCATION"),
+                project      = sys.env("LABEL_PROJECT"),
+                service      = sys.env("LABEL_SERVICE"),
+        }]
+        forward_to     = [prometheus.remote_write.metrics_ecs.receiver]
+        job_name       = "tiros-scheduler"
+        honor_labels   = true
+        scrape_timeout = "30s"
+}
+
+prometheus.scrape "metrics_ecs_tiros_kubo" {
+        targets = [{
+                __address__  = "localhost:5001",
+                component    = "kubo",
+                ipfs_impl    = sys.env("LABEL_IPFS_IMPL"),
+                ipfs_version = sys.env("LABEL_IPFS_VERSION"),
+                location     = sys.env("LABEL_LOCATION"),
+                project      = sys.env("LABEL_PROJECT"),
+                service      = sys.env("LABEL_SERVICE"),
+        }]
+        forward_to     = [prometheus.relabel.metrics_ecs_tiros_kubo.receiver]
+        job_name       = "tiros-kubo"
+        honor_labels   = true
+        scrape_timeout = "30s"
+        metrics_path   = "/debug/metrics/prometheus"
+}
+
+prometheus.relabel "metrics_ecs_tiros_kubo" {
+        forward_to = [prometheus.remote_write.metrics_ecs.receiver]
+
+        rule {
+                source_labels = ["__name__"]
+                regex         = "^libp2p_.*$"
+                action        = "drop"
+        }
+}
+
+prometheus.remote_write "metrics_ecs" {
+        endpoint {
+                name = "grafana_cloud"
+                url  = sys.env("PROMETHEUS_URL")
+
+                basic_auth {
+                        username = sys.env("PROMETHEUS_USER")
+                        password = sys.env("PROMETHEUS_PASS")
+                }
+
+                queue_config { }
+
+                metadata_config { }
+        }
+}
