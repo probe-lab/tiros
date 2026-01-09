@@ -54,6 +54,10 @@ func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 		r.IPFSAddEnd = end
 	}
 
+	if !r.ProvideTraceID.IsValid() {
+		return
+	}
+
 	if spans, found := r.spansByTraceID[r.ProvideTraceID]; found {
 		start, end := extractTimeRange(spans)
 		r.ProvideStart = start
@@ -62,7 +66,7 @@ func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 }
 
 func (r *UploadResult) isPopulated() bool {
-	return r.IPFSAddTraceID.IsValid() && r.ProvideTraceID.IsValid()
+	return r.IPFSAddTraceID.IsValid() && r.ProvideTraceID.IsValid() && !r.ProvideStart.IsZero() && !r.ProvideEnd.IsZero() && !r.IPFSAddStart.IsZero() && !r.IPFSAddEnd.IsZero()
 }
 
 type DownloadResult struct {
