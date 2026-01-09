@@ -349,6 +349,11 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 					attribute.Bool("success", err == nil),
 				))
 
+				cidSource := "bitsniffer_" + origin
+				if _, ok := cidProvider.(*StaticCIDProvider); ok {
+					cidSource = "static"
+				}
+
 				dbDownload := &DownloadModel{
 					RunID:                runID.String(),
 					Region:               rootConfig.AWSRegion,
@@ -371,7 +376,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 					IPNIStatus:           toPtr(int32(dr.IPNIStatus)),
 					FirstBlockReceivedAt: toPtr(dr.FirstBlockReceivedAt),
 					DiscoveryMethod:      toPtr(dr.DiscoveryMethod),
-					CIDSource:            "bitsniffer_" + origin,
+					CIDSource:            cidSource,
 				}
 				if err != nil {
 					slog.With("err", err).Warn("Error downloading file from Kubo")
