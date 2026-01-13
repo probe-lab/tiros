@@ -19,10 +19,12 @@ import (
 type DBClient interface {
 	io.Closer
 	Websites(ctx context.Context) ([]string, error)
+	Gateways(ctx context.Context) ([]string, error)
 	InsertUpload(ctx context.Context, upload *UploadModel) error
 	InsertDownload(ctx context.Context, download *DownloadModel) error
 	InsertWebsiteProbe(ctx context.Context, websiteProbe *WebsiteProbeModel) error
 	InsertProvider(ctx context.Context, provider *ProviderModel) error
+	InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error
 }
 
 type ClickhouseClient struct {
@@ -72,6 +74,25 @@ func (c *ClickhouseClient) Websites(ctx context.Context) ([]string, error) {
 	}
 
 	return websites, nil
+}
+
+func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
+	rows, err := c.conn.Query(ctx, `SELECT * FROM gateways WHERE deactivated_at IS NULL`)
+	if err != nil {
+		return nil, err
+	}
+	defer pllog.Defer(rows.Close, "Failed closing rows")
+
+	var gateways []string
+	for rows.Next() {
+		var gateway string
+		if err := rows.Scan(&gateway); err != nil {
+			return nil, err
+		}
+		gateways = append(gateways, gateway)
+	}
+
+	return gateways, nil
 }
 
 func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
@@ -128,6 +149,19 @@ func (c *ClickhouseClient) InsertProvider(ctx context.Context, provider *Provide
 	return b.Send()
 }
 
+func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
+	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO gateway_probes")
+	if err != nil {
+		return fmt.Errorf("preparer batch: %w", err)
+	}
+	defer pllog.Defer(b.Close, "Failed closing batch")
+
+	if err := b.AppendStruct(gatewayProbe); err != nil {
+		return fmt.Errorf("append struct: %w", err)
+	}
+	return b.Send()
+}
+
 type NoopClient struct{}
 
 var _ DBClient = (*NoopClient)(nil)
@@ -143,6 +177,10 @@ func (c *NoopClient) Close() error {
 
 func (c *NoopClient) Websites(ctx context.Context) ([]string, error) {
 	return []string{"protocol.ai"}, nil
+}
+
+func (c *NoopClient) Gateways(ctx context.Context) ([]string, error) {
+	return []string{"ipfs.io"}, nil
 }
 
 func (c *NoopClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
@@ -161,6 +199,10 @@ func (c *NoopClient) InsertProvider(ctx context.Context, provider *ProviderModel
 	return nil
 }
 
+func (c *NoopClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
+	return nil
+}
+
 type LogClient struct{}
 
 var _ DBClient = (*LogClient)(nil)
@@ -170,6 +212,10 @@ func (c *LogClient) Close() error {
 }
 
 func (c *LogClient) Websites(ctx context.Context) ([]string, error) {
+	panic("not implemented")
+}
+
+func (c *LogClient) Gateways(ctx context.Context) ([]string, error) {
 	panic("not implemented")
 }
 
@@ -189,11 +235,16 @@ func (c *LogClient) InsertProvider(ctx context.Context, provider *ProviderModel)
 	panic("implement me")
 }
 
+func (c *LogClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
+	panic("implement me")
+}
+
 type JSONClient struct {
 	uploadsFile       *os.File
 	downloadsFile     *os.File
 	websiteProbesFile *os.File
 	providersFile     *os.File
+	gatewayProbesFile *os.File
 }
 
 var _ DBClient = (*JSONClient)(nil)
@@ -224,12 +275,18 @@ func NewJSONClient(dir string) (*JSONClient, error) {
 		return nil, err
 	}
 
+	gatewayProbesFile, err := os.Create(path.Join(dir, "gateway_probes.ndjson"))
+	if err != nil {
+		return nil, err
+	}
+
 	slog.Info("Writing uploads to " + uploadsFile.Name())
 	return &JSONClient{
 		uploadsFile:       uploadsFile,
 		downloadsFile:     downloadsFile,
 		websiteProbesFile: websiteProbesFile,
 		providersFile:     providersFile,
+		gatewayProbesFile: gatewayProbesFile,
 	}, nil
 }
 
@@ -237,11 +294,18 @@ func (c *JSONClient) Close() error {
 	errg := errgroup.Group{}
 	errg.Go(c.downloadsFile.Close)
 	errg.Go(c.uploadsFile.Close)
+	errg.Go(c.websiteProbesFile.Close)
+	errg.Go(c.providersFile.Close)
+	errg.Go(c.gatewayProbesFile.Close)
 	return errg.Wait()
 }
 
 func (c *JSONClient) Websites(ctx context.Context) ([]string, error) {
 	return []string{"protocol.ai"}, nil
+}
+
+func (c *JSONClient) Gateways(ctx context.Context) ([]string, error) {
+	return []string{"ipfs.io"}, nil
 }
 
 func (c *JSONClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
@@ -262,4 +326,9 @@ func (c *JSONClient) InsertWebsiteProbe(ctx context.Context, websiteProbe *Websi
 func (c *JSONClient) InsertProvider(ctx context.Context, provider *ProviderModel) error {
 	enc := json.NewEncoder(c.providersFile)
 	return enc.Encode(provider)
+}
+
+func (c *JSONClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
+	enc := json.NewEncoder(c.gatewayProbesFile)
+	return enc.Encode(gatewayProbe)
 }

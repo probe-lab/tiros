@@ -62,8 +62,8 @@ var probeKuboFlags = []cli.Flag{
 	},
 	&cli.DurationFlag{
 		Name:        "interval",
-		Usage:       "How long to wait between each upload",
-		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_UPLOAD_INTERVAL"),
+		Usage:       "How long to wait between each upload/download iteration",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_INTERVAL", "TIROS_PROBE_KUBO_UPLOAD_INTERVAL" /* deprecated */),
 		Value:       probeKuboConfig.Interval,
 		Destination: &probeKuboConfig.Interval,
 	},
@@ -224,12 +224,14 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 			if err != nil {
 				return fmt.Errorf("creating static cid provider: %w", err)
 			}
+			slog.Info("Using CID provider for Kubo probes: StaticCIDProvider")
 		} else {
 			// cid provider not needed for upload only
 			cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
 			if err != nil {
 				return fmt.Errorf("creating clickhouse cid provider: %w", err)
 			}
+			slog.Info("Using CID provider for Kubo probes: BitswapSnifferClickhouseCIDProvider")
 		}
 	}
 

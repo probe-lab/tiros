@@ -97,3 +97,39 @@ type ProviderModel struct {
 	Error          error     `ch:"error"`
 	CreatedAt      time.Time `ch:"created_at"`
 }
+
+type GatewayProbeFormat string
+
+const (
+	GatewayProbeFormatNone GatewayProbeFormat = "none"
+	GatewayProbeFormatRaw  GatewayProbeFormat = "raw"
+	GatewayProbeFormatCAR  GatewayProbeFormat = "car"
+)
+
+type GatewayProbeModel struct {
+	RunID             string    `ch:"run_id"`
+	Region            string    `ch:"region"`
+	TirosVersion      string    `ch:"tiros_version"`
+	Gateway           string    `ch:"gateway"`
+	CID               string    `ch:"cid"`
+	CIDSource         string    `ch:"cid_source"`
+	Format            string    `ch:"format"`
+	RequestStart      time.Time `ch:"request_start"`
+	DNSDurationS      *float64  `ch:"dns_duration_s"`
+	ConnDurationS     *float64  `ch:"conn_duration_s"`
+	TTFBS             *float64  `ch:"ttfb_s"`
+	DownloadDurationS float64   `ch:"download_duration_s"`
+	BytesReceived     int64     `ch:"bytes_received"`
+	ContentLength     *int64    `ch:"content_length"`
+	DownloadSpeedMbps *float64  `ch:"download_speed_mbps"`
+	StatusCode        int       `ch:"status_code"`
+	IPFSPath          *string   `ch:"ipfs_path"`
+	IPFSRoots         *string   `ch:"ipfs_roots"`
+	CacheStatus       *string   `ch:"cache_status"`
+	ContentType       *string   `ch:"content_type"`
+	CARValidated      *bool     `ch:"car_validated"`
+	RedirectCount     int       `ch:"redirect_count"`
+	FinalURL          *string   `ch:"final_url"`
+	Error             *string   `ch:"error"`
+	CreatedAt         time.Time `ch:"created_at"`
+}

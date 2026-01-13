@@ -1,0 +1,1 @@
+DROP TABLE gateway_probes;
