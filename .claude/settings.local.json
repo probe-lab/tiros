@@ -4,7 +4,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(sqlboiler:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(go build:*)",
+      "Bash(go fmt:*)",
+      "Bash(go doc:*)"
     ],
     "deny": [],
     "ask": []

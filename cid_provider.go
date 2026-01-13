@@ -62,7 +62,17 @@ func (p *BitswapSnifferClickhouseCIDProvider) SelectCID(ctx context.Context, ori
 	if origin == "dht" {
 		msgType = "add-provider-records"
 	}
-	rows, err := p.conn.Query(ctx, `SELECT cid FROM bitswap_sniffer_ipfs.shared_cids WHERE origin = $1 AND msg_type like $2 ORDER BY timestamp DESC LIMIT 1`, origin, msgType)
+	rows, err := p.conn.Query(ctx, `
+		WITH cte AS (
+			SELECT
+				cid
+			FROM bitswap_sniffer_ipfs.shared_cids
+			WHERE origin = $1
+			  AND msg_type LIKE $2
+			ORDER BY timestamp DESC
+			LIMIT 500
+		) SELECT cid FROM cte ORDER BY RAND() LIMIT 1
+	`, origin, msgType)
 	if err != nil {
 		return cid.Cid{}, err
 	}
