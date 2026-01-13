@@ -35,10 +35,8 @@ CREATE TABLE gateway_probes
     ipfs_path            Nullable(String),
     -- the X-Ipfs-Roots header value (CID roots for trustless verification)
     ipfs_roots           Nullable(String),
-    -- the Cache-Control header value
-    cache_control        Nullable(String),
-    -- the X-Cache header value (CDN cache hit/miss status)
-    x_cache              Nullable(String),
+    -- the cache status (e.g., "HIT", "MISS", ...)
+    cache_status         Nullable(String),
     -- the Content-Type header value
     content_type         Nullable(String),
     -- whether the CAR file was validated (only applicable for "car" format)
