@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
@@ -42,7 +43,9 @@ type TraceReceiver struct {
 	traceMatchChan chan *ExportTraceServiceRequest
 	forwardClient  coltracepb.TraceServiceClient
 	traceOut       string
-	traceCounter   int
+	traceCounter   atomic.Uint64
+
+	shutdown chan struct{}
 }
 
 type TraceMatcher func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool
@@ -75,7 +78,7 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 		traceMatchChan: make(chan *ExportTraceServiceRequest),
 		traceMatchers:  make([]TraceMatcher, 0),
 		traceOut:       cfg.TraceOut,
-		traceCounter:   0,
+		shutdown:       make(chan struct{}),
 	}
 
 	coltracepb.RegisterTraceServiceServer(server, tr)
@@ -98,14 +101,27 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 }
 
 func (tr *TraceReceiver) Shutdown() {
+	close(tr.shutdown)
 	close(tr.traceMatchChan)
 	tr.server.Shutdown()
 }
 
 func (tr *TraceReceiver) Reset() {
 	tr.mu.Lock()
-	defer tr.mu.Unlock()
 	tr.traceMatchers = make([]TraceMatcher, 0)
+	tr.mu.Unlock()
+
+	// Drain outside the lock
+	for {
+		select {
+		case <-tr.shutdown:
+			return
+		case <-tr.traceMatchChan:
+			// drain the channel
+		default:
+			return
+		}
+	}
 }
 
 type ExportTraceServiceRequest struct {
@@ -125,11 +141,9 @@ func (t *ExportTraceServiceRequest) Spans() iter.Seq[*v1.Span] {
 }
 
 func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTraceServiceRequest) (*coltracepb.ExportTraceServiceResponse, error) {
-	tr.mu.RLock()
-	defer tr.mu.RUnlock()
-
 	if tr.traceOut != "" {
-		protoName := "./" + path.Join(tr.traceOut, fmt.Sprintf("trace-%d.proto.json", tr.traceCounter))
+		inc := tr.traceCounter.Add(1)
+		protoName := "./" + path.Join(tr.traceOut, fmt.Sprintf("trace-%d.proto.json", inc-1))
 
 		marshaler := protojson.MarshalOptions{Indent: "  "}
 		if protoData, err := marshaler.Marshal(req); err != nil {
@@ -137,7 +151,6 @@ func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTrace
 		} else if err := os.WriteFile(protoName, protoData, 0o644); err != nil {
 			slog.Warn("failed to write trace", "err", err)
 		}
-		tr.traceCounter++
 	}
 
 	resp := &coltracepb.ExportTraceServiceResponse{
@@ -153,19 +166,26 @@ func (tr *TraceReceiver) Export(ctx context.Context, req *coltracepb.ExportTrace
 		}
 	}
 
-	if len(tr.traceMatchers) == 0 {
+	tr.mu.RLock()
+	traceMatchers := tr.traceMatchers
+	tr.mu.RUnlock()
+
+	if len(traceMatchers) == 0 {
 		return resp, nil
 	}
 
 	for _, rspan := range req.GetResourceSpans() {
 		for _, sspan := range rspan.GetScopeSpans() {
 			for _, span := range sspan.GetSpans() {
-				for _, matcher := range tr.traceMatchers {
-					matched := matcher(rspan, sspan, span)
-					if matched {
-						tr.traceMatchChan <- &ExportTraceServiceRequest{req}
-						return resp, nil
+				for _, matcher := range traceMatchers {
+					if !matcher(rspan, sspan, span) {
+						continue
 					}
+					select {
+					case tr.traceMatchChan <- &ExportTraceServiceRequest{req}:
+					case <-tr.shutdown:
+					}
+					return resp, nil
 				}
 			}
 		}
