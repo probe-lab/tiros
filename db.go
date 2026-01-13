@@ -77,7 +77,7 @@ func (c *ClickhouseClient) Websites(ctx context.Context) ([]string, error) {
 }
 
 func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
-	rows, err := c.conn.Query(ctx, `SELECT * FROM gateways WHERE deactivated_at IS NULL`)
+	rows, err := c.conn.Query(ctx, `SELECT domain FROM gateways WHERE deactivated_at IS NULL`)
 	if err != nil {
 		return nil, err
 	}
