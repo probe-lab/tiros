@@ -339,7 +339,6 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 				} else if err != nil {
 					return fmt.Errorf("selecting cid from database: %w", err)
 				}
-				logEntry = logEntry.With("cid", ciid.String())
 				slog.Info(fmt.Sprintf("Worker %d will now start probing %s", worker, ciid.String()))
 
 				rand.Shuffle(len(currentGateways), func(i, j int) {
@@ -354,7 +353,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 					for _, format := range formats {
 						// first iteration uncached, second cached
 						for j := 0; j < 2; j++ {
-							logEntry.With("gateway", gateway, "format", format).Debug("Probing gateway")
+							logEntry.With("cid", ciid.String(), "gateway", gateway, "format", format).Debug("Probing gateway")
 
 							metrics := probeGateway(gctx, gateway, ciid, format, int64(probeGatewaysConfig.MaxDownloadMB)*1024*1024, probeGatewaysConfig.Timeout)
 
@@ -437,9 +436,9 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 							if metrics.err != nil {
 								errStr := metrics.err.Error()
 								dbGatewayProbe.Error = &errStr
-								logEntry.With("gateway", gateway, "err", metrics.err, "format", format).Info("Error downloading from gateway")
+								logEntry.With("cid", ciid.String(), "gateway", gateway, "err", metrics.err, "format", format).Info("Error downloading from gateway")
 							} else {
-								logEntry.With("gateway", gateway, "format", format, "ttfb_s", metrics.ttfb.Seconds(), "cache", deref(cacheStatus)).Info("Gateway probe successful")
+								logEntry.With("cid", ciid.String(), "gateway", gateway, "format", format, "ttfb_s", metrics.ttfb.Seconds(), "cache", deref(cacheStatus)).Info("Gateway probe successful")
 							}
 
 							if err := dbClient.InsertGatewayProbe(gctx, dbGatewayProbe); err != nil {
