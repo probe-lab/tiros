@@ -6,7 +6,7 @@ import (
 )
 
 type UploadModel struct {
-	RunID            string     `ch:"run_id"`
+	RunID            string
 	Region           string     `ch:"region"`
 	TirosVersion     string     `ch:"tiros_version"`
 	KuboVersion      string     `ch:"kubo_version"`
@@ -23,7 +23,7 @@ type UploadModel struct {
 }
 
 type DownloadModel struct {
-	RunID                string     `ch:"run_id"`
+	RunID                string
 	Region               string     `ch:"region"`
 	TirosVersion         string     `ch:"tiros_version"`
 	KuboVersion          string     `ch:"kubo_version"`
