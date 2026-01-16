@@ -305,7 +305,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 		mainLoop:
 			for i := 0; maxIter == 0 || i < maxIter; i++ {
 
-				// Wait for next iteration
+				// Wait for the next iteration
 				waitTime := time.Until(iterationStart.Add(probeGatewaysConfig.Interval)).Truncate(time.Second)
 				if i > 0 {
 					ticker.Reset(waitTime)
@@ -315,8 +315,8 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 				}
 
 				select {
-				case <-ctx.Done():
-					return ctx.Err()
+				case <-gctx.Done():
+					return gctx.Err()
 				case <-ticker.C:
 					// pass
 				}
@@ -332,7 +332,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 				gatewaysMu.RUnlock()
 
 				// Get CID to download (origin doesn't matter for gateways, use "bitswap")
-				ciid, err := cidProvider.SelectCID(ctx, "bitswap")
+				ciid, err := cidProvider.SelectCID(gctx, "bitswap")
 				if errors.Is(err, sql.ErrNoRows) {
 					logEntry.Warn("No CID available for gateway probing")
 					continue mainLoop
