@@ -8,6 +8,8 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -32,6 +34,40 @@ type ClickhouseClient struct {
 }
 
 var _ DBClient = (*ClickhouseClient)(nil)
+
+// buildInsertQuery builds an INSERT query and extracts values from a struct using reflection.
+// It reads the `ch` struct tags to determine column names.
+func buildInsertQuery(tableName string, model any) (query string, values []any) {
+	val := reflect.ValueOf(model)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+	typ := val.Type()
+
+	var columns []string
+	var placeholders []string
+	values = make([]any, 0, typ.NumField())
+
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		chTag := field.Tag.Get("ch")
+		if chTag == "" || chTag == "-" {
+			continue
+		}
+
+		columns = append(columns, chTag)
+		placeholders = append(placeholders, "?")
+		values = append(values, val.Field(i).Interface())
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
+		tableName,
+		strings.Join(columns, ", "),
+		strings.Join(placeholders, ", "),
+	)
+
+	return query, values
+}
 
 func NewClickhouseClient(
 	ctx context.Context,
@@ -96,70 +132,48 @@ func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
 }
 
 func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO uploads")
+	query, values := buildInsertQuery("uploads", upload)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert uploads: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(upload); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-
-	return b.Send()
+	return nil
 }
 
 func (c *ClickhouseClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO downloads")
+	query, values := buildInsertQuery("downloads", download)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert downloads: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(download); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-
-	return b.Send()
+	return nil
 }
 
 func (c *ClickhouseClient) InsertWebsiteProbe(ctx context.Context, websiteProbe *WebsiteProbeModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO website_probes")
+	query, values := buildInsertQuery("website_probes", websiteProbe)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert website_probes: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(websiteProbe); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-	return b.Send()
+	return nil
 }
 
 func (c *ClickhouseClient) InsertProvider(ctx context.Context, provider *ProviderModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO providers")
+	query, values := buildInsertQuery("providers", provider)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert providers: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(provider); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-	return b.Send()
+	return nil
 }
 
 func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO gateway_probes")
+	query, values := buildInsertQuery("gateway_probes", gatewayProbe)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert gateway_probes: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(gatewayProbe); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-	return b.Send()
+	return nil
 }
 
 type NoopClient struct{}
