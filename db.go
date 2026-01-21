@@ -58,7 +58,14 @@ func buildInsertQuery(tableName string, model any) (query string, values []any) 
 
 		columns = append(columns, chTag)
 		placeholders = append(placeholders, "?")
-		values = append(values, val.Field(i).Interface())
+
+		iface := val.Field(i).Interface()
+		switch tiface := iface.(type) {
+		case json.RawMessage:
+			values = append(values, string(tiface))
+		default:
+			values = append(values, iface)
+		}
 	}
 
 	query = fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
@@ -178,16 +185,12 @@ func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe 
 }
 
 func (c *ClickhouseClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
-	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO service_worker_probes")
+	query, values := buildInsertQuery("service_worker_probes", serviceWorkerProbe)
+	err := c.conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
-		return fmt.Errorf("preparer batch: %w", err)
+		return fmt.Errorf("async insert service_worker_probes: %w", err)
 	}
-	defer pllog.Defer(b.Close, "Failed closing batch")
-
-	if err := b.AppendStruct(serviceWorkerProbe); err != nil {
-		return fmt.Errorf("append struct: %w", err)
-	}
-	return b.Send()
+	return nil
 }
 
 type NoopClient struct{}

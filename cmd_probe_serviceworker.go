@@ -186,7 +186,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 			}
 
 			// Create and run probe
-			slog.With("url", navURL.String()).Info("Probing service worker gateway")
+			slog.With("gateway", gateway).Info("Probing service worker gateway")
 			probe := newSwProbe(navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
 
 			probeCtx, probeCancel := context.WithTimeout(ctx, probeServiceWorkerConfig.Timeout)
@@ -230,14 +230,23 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				for k, v := range result.ServerTimings {
 					// every dot in the key increases the nesting level in how
 					// clickhouse interprets these keys. Therefore, we replace
-					// them with an @.
-					k = strings.ReplaceAll(k, ".", "@")
+					// them with an _.
+					k = strings.ReplaceAll(k, ".", "_")
 					serverTimings[k] = v.value.Seconds()
 				}
 				if data, err := json.Marshal(serverTimings); err == nil {
 					dbModel.ServerTimings = data
 				}
 			}
+
+			slog.With(
+				"gateway", gateway,
+				"status", dbModel.StatusCode,
+				"totalTTFBs", deref(dbModel.TotalTTFBS),
+				"finalTTFBs", deref(dbModel.FinalTTFBS),
+				"serverTimings", string(dbModel.ServerTimings),
+				"cid", ciid.String(),
+			).Info("Inserting service worker probe into database")
 
 			if err := dbClient.InsertServiceWorkerProbe(ctx, dbModel); err != nil {
 				return fmt.Errorf("inserting service worker probe into database: %w", err)
