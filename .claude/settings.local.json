@@ -9,7 +9,12 @@
       "Bash(cat:*)",
       "Bash(go build:*)",
       "Bash(go fmt:*)",
-      "Bash(go doc:*)"
+      "Bash(go doc:*)",
+      "Bash(./tiros probe:*)",
+      "Bash(go test:*)",
+      "Bash(go list:*)",
+      "WebFetch(domain:chromedevtools.github.io)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
