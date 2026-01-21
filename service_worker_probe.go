@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net"
@@ -16,6 +18,7 @@ import (
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/cdproto/serviceworker"
+	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
 )
 
@@ -26,12 +29,21 @@ type swProbe struct {
 
 	listenMu sync.Mutex
 
+	heliaConfig       *HeliaConfig
+	trustlessGateways map[string]struct{}
+	delegatedRouters  map[string]struct{}
+
+	trustlessGatewayResponses map[network.RequestID]*network.EventResponseReceived
+	delegatedRouterResponses  map[network.RequestID]*network.EventResponseReceived
+
 	// document requests
 	requestIDs []network.RequestID
 	requests   map[network.RequestID]*swRequestTrace
 
 	navigationEvents []*page.EventFrameNavigated
 	lifecycleEvents  map[cdp.LoaderID][]*page.EventLifecycleEvent
+
+	idleWaitLogOnce sync.Once
 }
 
 func newSwProbe(url string, cdpHost string, cdpPort int) *swProbe {
@@ -39,6 +51,12 @@ func newSwProbe(url string, cdpHost string, cdpPort int) *swProbe {
 		url:     url,
 		cdpHost: cdpHost,
 		cdpPort: cdpPort,
+
+		trustlessGateways: map[string]struct{}{"trustless-gateway.link": {}},
+		delegatedRouters:  map[string]struct{}{"delegated-ipfs.dev": {}},
+
+		trustlessGatewayResponses: map[network.RequestID]*network.EventResponseReceived{},
+		delegatedRouterResponses:  map[network.RequestID]*network.EventResponseReceived{},
 
 		requestIDs:       make([]network.RequestID, 0),
 		requests:         make(map[network.RequestID]*swRequestTrace),
@@ -104,13 +122,15 @@ func (r *swProbe) isProbeDone() bool {
 		return false
 	}
 
-	slog.Info("Waiting for network idle in final navigation")
+	r.idleWaitLogOnce.Do(func() {
+		slog.Info("Waiting for network idle in final navigation")
+	})
+
 	for _, e := range lifecycleEvents {
 		if e.Name == "networkIdle" {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -225,6 +245,8 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 			p.handleRequestWillBeSent(e)
 		case *network.EventResponseReceived:
 			p.handleResponseReceived(e)
+		case *target.EventAttachedToTarget:
+			go p.handleAttachedToTarget(listenCtx, e)
 		}
 
 		if p.isProbeDone() {
@@ -240,6 +262,7 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 		runtime.Enable(),
 		serviceworker.Enable(),
 		page.SetLifecycleEventsEnabled(true),
+		target.SetAutoAttach(true, false).WithFlatten(false),
 		chromedp.Navigate(p.url),
 	)
 	if err != nil {
@@ -262,6 +285,57 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 
 	// Build comprehensive probe result
 	return p.buildProbeResult(), ctx.Err()
+}
+
+// [NEW] handleAttachedToTarget sets up a listener for the new Service Worker target
+func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAttachedToTarget) {
+	// Only care about service workers
+	if e.TargetInfo.Type != "service_worker" {
+		return
+	}
+
+	slog.Info("Service Worker Attached", "targetID", e.TargetInfo.TargetID)
+
+	// This creates a context specifically addressing the Service Worker target.
+	swCtx, cancel := chromedp.NewContext(ctx, chromedp.WithTargetID(e.TargetInfo.TargetID))
+	defer cancel()
+
+	// Enable the Network domain specifically on this Service Worker
+	if err := chromedp.Run(swCtx, network.Enable()); err != nil {
+		slog.Error("Failed to enable network on SW", "err", err)
+		return
+	}
+
+	// Attach the main event handler to this Service Worker context
+	chromedp.ListenTarget(swCtx, func(ev interface{}) {
+		p.listenMu.Lock()
+		defer p.listenMu.Unlock()
+
+		// Dispatch to the appropriate handler
+		switch e := ev.(type) {
+		case *network.EventResponseReceived:
+			if e.Type != network.ResourceTypeFetch {
+				break
+			}
+			// LoaderID is the empty string for worker requests
+			if e.LoaderID != "" {
+				break
+			}
+			u, err := url.Parse(e.Response.URL)
+			if err != nil {
+				break
+			}
+
+			if _, ok := p.trustlessGateways[u.Host]; ok {
+				p.trustlessGatewayResponses[e.RequestID] = e
+			} else if _, ok := p.delegatedRouters[u.Host]; ok {
+				p.delegatedRouterResponses[e.RequestID] = e
+			}
+		}
+	})
+
+	// Keep this goroutine alive to maintain the context/listener
+	<-ctx.Done()
 }
 
 // buildProbeResult constructs the complete probe result from collected data
@@ -402,6 +476,46 @@ func (r *swProbe) handleLifecycleEvent(e *page.EventLifecycleEvent) {
 	r.lifecycleEvents[e.LoaderID] = append(events, e)
 }
 
+type HeliaConfig struct {
+	TrustlessGateways            []string          `json:"gateways"`
+	DelegatedRouters             []string          `json:"routers"`
+	DNSJSONResolvers             map[string]string `json:"dnsJsonResolvers"`
+	EnableRecursiveGateways      bool              `json:"enableRecursiveGateways"`
+	EnableWss                    bool              `json:"enableWss"`
+	EnableWebTransport           bool              `json:"enableWebTransport"`
+	EnableGatewayProviders       bool              `json:"enableGatewayProviders"`
+	Debug                        string            `json:"debug"`
+	FetchTimeout                 int64             `json:"fetchTimeout"`
+	ServiceWorkerRegistrationTTL int64             `json:"serviceWorkerRegistrationTTL"`
+	AcceptOriginIsolationWarning bool              `json:"acceptOriginIsolationWarning"`
+	SupportDirectoryIndexes      bool              `json:"supportDirectoryIndexes"`
+	SupportWebRedirects          bool              `json:"supportWebRedirects"`
+	RenderHTMLViews              bool              `json:"renderHTMLViews"`
+}
+
+func extractHeliaConfig(rawlURL string) *HeliaConfig {
+	u, err := url.Parse(rawlURL)
+	if err != nil {
+		return nil
+	}
+
+	heliaConfigBase64Str := u.Query().Get("helia-config")
+	if heliaConfigBase64Str == "" {
+		return nil
+	}
+	heliaConfigStr, err := base64.RawStdEncoding.DecodeString(heliaConfigBase64Str)
+	if err != nil {
+		return nil
+	}
+
+	heliaConfig := &HeliaConfig{}
+	if err := json.Unmarshal(heliaConfigStr, heliaConfig); err != nil {
+		return nil
+	}
+
+	return heliaConfig
+}
+
 // handleRequestWillBeSent processes network request events for document types.
 // It tracks document requests and updates trace information on redirects.
 func (r *swProbe) handleRequestWillBeSent(e *network.EventRequestWillBeSent) {
@@ -414,6 +528,18 @@ func (r *swProbe) handleRequestWillBeSent(e *network.EventRequestWillBeSent) {
 		"url", e.Request.URL,
 		"isRedirect", e.RedirectResponse != nil,
 	)
+
+	// try to parse the helia config
+	if heliaConfig := extractHeliaConfig(e.Request.URL); heliaConfig != nil {
+		r.heliaConfig = heliaConfig
+		for _, router := range heliaConfig.DelegatedRouters {
+			r.delegatedRouters[router] = struct{}{}
+		}
+
+		for _, gateway := range heliaConfig.TrustlessGateways {
+			r.trustlessGateways[gateway] = struct{}{}
+		}
+	}
 
 	trace, found := r.requests[e.RequestID]
 	if !found {
