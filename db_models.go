@@ -133,3 +133,45 @@ type GatewayProbeModel struct {
 	Error             *string   `ch:"error"`
 	CreatedAt         time.Time `ch:"created_at"`
 }
+
+// ServiceWorkerProbeModel represents a performance measurement of an IPFS Service Worker Gateway.
+// Service worker gateways intercept HTTP requests in the browser and serve IPFS content directly
+// from the service worker, after an initial redirect chain from the gateway domain.
+type ServiceWorkerProbeModel struct {
+	// Run metadata
+	RunID        string `ch:"run_id"`        // Unique identifier for this measurement run
+	Region       string `ch:"region"`        // AWS region where the measurement was performed
+	TirosVersion string `ch:"tiros_version"` // Version of Tiros performing the measurement
+	Gateway      string `ch:"gateway"`       // Service worker gateway domain (e.g., "inbrowser.link")
+	CID          string `ch:"cid"`           // IPFS Content ID being retrieved
+	CIDSource    string `ch:"cid_source"`    // Source of the CID (e.g., "static", "bitsniffer_bitswap")
+	URL          string `ch:"url"`           // Full URL requested (e.g., "https://inbrowser.link/ipfs/QmXxx")
+
+	// Core timing metrics (all measured using browser's ResourceTiming API)
+	// All timings use the same clock source (browser performance API) for consistency
+	TotalTTFBS           *float64 `ch:"total_ttfb_s"`             // Time to first byte including all redirects (seconds)
+	FinalTTFBS           *float64 `ch:"final_ttfb_s"`             // Time to first byte of final service worker response only (seconds)
+	TimeToFinalRedirectS *float64 `ch:"time_to_final_redirect_s"` // Time from initial request to final service worker request (seconds)
+
+	// Service worker metadata
+	ServiceWorkerVersion *string `ch:"service_worker_version"` // Service worker version from "server" header (e.g., "@helia/service-worker-gateway/2.1.2#production@fb6750e")
+
+	// Response details
+	StatusCode    int     `ch:"status_code"`    // HTTP status code of final response (200 for success)
+	ContentType   *string `ch:"content_type"`   // MIME type of the content (from "content-type" header)
+	ContentLength *int64  `ch:"content_length"` // Size of the content in bytes (from "content-length" header)
+
+	// IPFS-specific headers (from final service worker response)
+	IPFSPath  *string `ch:"ipfs_path"`  // IPFS path of the content (from "x-ipfs-path" header)
+	IPFSRoots *string `ch:"ipfs_roots"` // IPFS root CIDs involved in resolution (from "x-ipfs-roots" header)
+
+	// Server timing data (map of timing metrics from service worker)
+	// Contains internal service worker metrics
+	ServerTimings json.RawMessage `ch:"server_timings"`
+
+	// Error tracking
+	Error *string `ch:"error"` // Error message if probe failed, null if successful
+
+	// Record metadata
+	CreatedAt time.Time `ch:"created_at"` // Timestamp when this record was created
+}

@@ -1,0 +1,21 @@
+version: "3.9"
+name: tiros
+services:
+  chrome:
+    image: ghcr.io/browserless/chromium:v2.38.3
+    ports:
+      - "3000:3000"
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    hostname: clickhouse
+    environment:
+      - CLICKHOUSE_DB=tiros_local
+      - CLICKHOUSE_USER=tiros_local
+      - CLICKHOUSE_PASSWORD=password
+    ports:
+      - "0.0.0.0:8123:8123"
+      - "0.0.0.0:9000:9000"
+      - "0.0.0.0:9005:9005"
+    healthcheck: # executed inside the container
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping
+      interval: 5s
