@@ -27,6 +27,7 @@ type DBClient interface {
 	InsertWebsiteProbe(ctx context.Context, websiteProbe *WebsiteProbeModel) error
 	InsertProvider(ctx context.Context, provider *ProviderModel) error
 	InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error
+	InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error
 }
 
 type ClickhouseClient struct {
@@ -176,6 +177,19 @@ func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe 
 	return nil
 }
 
+func (c *ClickhouseClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
+	b, err := c.conn.PrepareBatch(ctx, "INSERT INTO service_worker_probes")
+	if err != nil {
+		return fmt.Errorf("preparer batch: %w", err)
+	}
+	defer pllog.Defer(b.Close, "Failed closing batch")
+
+	if err := b.AppendStruct(serviceWorkerProbe); err != nil {
+		return fmt.Errorf("append struct: %w", err)
+	}
+	return b.Send()
+}
+
 type NoopClient struct{}
 
 var _ DBClient = (*NoopClient)(nil)
@@ -217,6 +231,10 @@ func (c *NoopClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *Gatew
 	return nil
 }
 
+func (c *NoopClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
+	return nil
+}
+
 type LogClient struct{}
 
 var _ DBClient = (*LogClient)(nil)
@@ -253,12 +271,17 @@ func (c *LogClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *Gatewa
 	panic("implement me")
 }
 
+func (c *LogClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
+	panic("implement me")
+}
+
 type JSONClient struct {
-	uploadsFile       *os.File
-	downloadsFile     *os.File
-	websiteProbesFile *os.File
-	providersFile     *os.File
-	gatewayProbesFile *os.File
+	uploadsFile             *os.File
+	downloadsFile           *os.File
+	websiteProbesFile       *os.File
+	providersFile           *os.File
+	gatewayProbesFile       *os.File
+	serviceWorkerProbesFile *os.File
 }
 
 var _ DBClient = (*JSONClient)(nil)
@@ -294,13 +317,19 @@ func NewJSONClient(dir string) (*JSONClient, error) {
 		return nil, err
 	}
 
+	serviceWorkerProbesFile, err := os.Create(path.Join(dir, "service_worker_probes.ndjson"))
+	if err != nil {
+		return nil, err
+	}
+
 	slog.Info("Writing uploads to " + uploadsFile.Name())
 	return &JSONClient{
-		uploadsFile:       uploadsFile,
-		downloadsFile:     downloadsFile,
-		websiteProbesFile: websiteProbesFile,
-		providersFile:     providersFile,
-		gatewayProbesFile: gatewayProbesFile,
+		uploadsFile:             uploadsFile,
+		downloadsFile:           downloadsFile,
+		websiteProbesFile:       websiteProbesFile,
+		providersFile:           providersFile,
+		gatewayProbesFile:       gatewayProbesFile,
+		serviceWorkerProbesFile: serviceWorkerProbesFile,
 	}, nil
 }
 
@@ -311,6 +340,7 @@ func (c *JSONClient) Close() error {
 	errg.Go(c.websiteProbesFile.Close)
 	errg.Go(c.providersFile.Close)
 	errg.Go(c.gatewayProbesFile.Close)
+	errg.Go(c.serviceWorkerProbesFile.Close)
 	return errg.Wait()
 }
 
@@ -345,4 +375,9 @@ func (c *JSONClient) InsertProvider(ctx context.Context, provider *ProviderModel
 func (c *JSONClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
 	enc := json.NewEncoder(c.gatewayProbesFile)
 	return enc.Encode(gatewayProbe)
+}
+
+func (c *JSONClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
+	enc := json.NewEncoder(c.serviceWorkerProbesFile)
+	return enc.Encode(serviceWorkerProbe)
 }

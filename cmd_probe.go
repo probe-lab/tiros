@@ -40,6 +40,7 @@ var probeCmd = &cli.Command{
 		probeKuboCmd,
 		probeWebsitesCmd,
 		probeGatewaysCmd,
+		probeServiceWorkerCmd,
 	},
 }
 
