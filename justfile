@@ -31,3 +31,14 @@ test:
 e2e case:
     ./e2e/test_{{case}}.sh
 
+fetch-cids:
+    @echo "Fetching the latest 100 CIDs from the bitswap sniffer..."
+    @mkdir -p testdata
+    @clickhouse client --host ym2rzr065h.us-east-1.aws.clickhouse.cloud --password --user bitswap_sniffer_ipfs_ro --database bitswap_sniffer_ipfs --query "select cid from shared_cids order by timestamp desc limit 100" \
+      | sort \
+      | uniq \
+      | tr '\n' ',' \
+      | sed 's/,$//' \
+      > testdata/cids.txt
+    @echo "CIDs stored in ./testdata/cids.txt. Use as:"
+    @echo '  --download.cids `cat ./testdata/cids.txt`'

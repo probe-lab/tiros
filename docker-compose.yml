@@ -1,8 +1,17 @@
 version: "3.9"
 name: tiros
 services:
+  chrome:
+    image: ghcr.io/browserless/chromium:v2.38.3
+    container_name: tiros-chrome
+    environment:
+      - TIMEOUT=300000 # 5 minutes
+    ports:
+      - "0.0.0.0:3000:3000"
+
   kubo:
     image: ipfs/kubo:v0.38.2
+    container_name: tiros-kubo
     # in our measurement setup we require the `roots` provide strategy to make
     # sure to have predictable results. Here we set this strategy explicitly
     # during startup. However, for this we need to reset the entrypoint, init
@@ -16,13 +25,32 @@ services:
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_SERVICE_NAME=kubo
-      - OTEL_TRACES_EXPORTER=otlp
+      # by default, the exporter is disabled (set to "")
+      # providing OTEL_TRACES_EXPORTER=otlp will enable it
+      # docs: https://github.com/ipfs/boxo/blob/main/docs/tracing.md#otel_traces_exporter
+      - OTEL_TRACES_EXPORTER=${OTEL_TRACES_EXPORTER:-}
       - IPFS_TELEMETRY=off
     ports:
       - "0.0.0.0:4001:4001/tcp"
       - "0.0.0.0:4001:4001/udp"
       - "0.0.0.0:5001:5001"
+      - "0.0.0.0:8080:8080"
+
     # untested, but the two lines below should enable Linux compatibility for
     # this test. By default, host.docker.internal is not available on Linux (according to Claude).
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: tiros-clickhouse
+    environment:
+      - CLICKHOUSE_DB=tiros_local
+      - CLICKHOUSE_USER=tiros_local
+      - CLICKHOUSE_PASSWORD=password
+    ports:
+      - "0.0.0.0:8123:8123"
+      - "0.0.0.0:9000:9000"
+    healthcheck:
+      test: clickhouse-client --query="SELECT 1"
+      interval: 5s

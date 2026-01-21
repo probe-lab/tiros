@@ -22,7 +22,7 @@ var probeConfig = struct {
 	DryRun:     false,
 	JSONOut:    "",
 	Timeout:    0,
-	Clickhouse: pldb.DefaultClickHouseConfig("tiros"),
+	Clickhouse: pldb.DefaultClickHouseConfig("tiros_local"),
 	Migrations: pldb.DefaultClickHouseMigrationsConfig(),
 }
 

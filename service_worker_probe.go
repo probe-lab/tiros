@@ -84,12 +84,27 @@ func (r *swProbe) isProbeDone() bool {
 		return false
 	}
 
+	finalResp := finalRequest.finalResponse()
+	if finalResp == nil {
+		return false
+	}
+
+	// if the final response is an attachment or inline, we're done
+	if cd, ok := finalResp.Headers["content-disposition"].(string); ok {
+		if strings.Contains(strings.ToLower(cd), "attachment") {
+			return true
+		} else if strings.Contains(strings.ToLower(cd), "inline") {
+			return true
+		}
+	}
+
 	// Then wait until the network is idle in the final navigation
 	lifecycleEvents, found := r.lifecycleEvents[finalRequest.loaderID]
 	if !found {
 		return false
 	}
 
+	slog.Info("Waiting for network idle in final navigation")
 	for _, e := range lifecycleEvents {
 		if e.Name == "networkIdle" {
 			return true
@@ -395,7 +410,7 @@ func (r *swProbe) handleRequestWillBeSent(e *network.EventRequestWillBeSent) {
 		return
 	}
 
-	slog.Info("Requesting",
+	slog.Info("Sending request",
 		"url", e.Request.URL,
 		"isRedirect", e.RedirectResponse != nil,
 	)
