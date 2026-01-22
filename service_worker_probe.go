@@ -69,7 +69,9 @@ type swProbe struct {
 }
 type NetworkEventResponse struct {
 	*network.EventResponseReceived
-	Body []byte
+	RequestFinished bool
+	Canceled        bool
+	Body            []byte
 }
 
 func newSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
@@ -119,6 +121,9 @@ type swProbeResult struct {
 	ServerTimings        map[string]serverTiming
 	DelegatedRouterTTFB  time.Duration
 	TrustlessGatewayTTFB time.Duration
+
+	DelegatedRouterStatus  int
+	TrustlessGatewayStatus int
 }
 
 func (r *swProbe) isProbeDone() bool {
@@ -139,6 +144,12 @@ func (r *swProbe) isProbeDone() bool {
 	finalResp := finalRequest.finalResponse()
 	if finalResp == nil {
 		return false
+	}
+
+	for _, e := range r.delegatedRouterRequests {
+		if e.Body == nil {
+			return false
+		}
 	}
 
 	// if the final response is an attachment or inline, we're done
@@ -373,17 +384,31 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 				}
 			}
 
-		case *network.EventLoadingFinished:
-			// Try to get the body for tracked requests
+		case *network.EventLoadingFailed:
 			respEvent, found := p.delegatedRouterRequests[e.RequestID]
 			if !found {
 				return
 			}
 
+			respEvent.RequestFinished = true
+			respEvent.Canceled = e.Canceled
+
+		case *network.EventLoadingFinished:
 			// Launch in goroutine as required by ListenTarget
 			p.responseReqWg.Add(1)
-			go func(requestID network.RequestID, respEvent *NetworkEventResponse) {
+			go func(requestID network.RequestID) {
 				defer p.responseReqWg.Done()
+
+				p.listenMu.Lock()
+				// Try to get the body for tracked requests
+				respEvent, found := p.delegatedRouterRequests[e.RequestID]
+				if !found {
+					p.listenMu.Unlock()
+					return
+				}
+
+				respEvent.RequestFinished = true
+				p.listenMu.Unlock()
 
 				body, err := network.GetResponseBody(requestID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(swCtx).Target))
 				if err != nil {
@@ -398,7 +423,7 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 					"requestID", requestID,
 					"url", respEvent.Response.URL,
 					"size", len(body))
-			}(e.RequestID, respEvent)
+			}(e.RequestID)
 		}
 	})
 
@@ -419,6 +444,31 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 
 	providers := map[peer.ID]types.PeerRecord{}
 	for _, resp := range p.delegatedRouterRequests {
+		// Determine the effective status code for this response
+		status := int(resp.Response.Status)
+		if resp.Canceled {
+			status = 499
+		}
+
+		// Apply precedence rules:
+		// 1. If we already have a Success (200-299), never overwrite it.
+		// 2. If the new status is Success, take it (overwrites any previous Error/Cancel).
+		// 3. If we have no status yet, take the new one.
+		// 4. If we have an existing Error/Cancel, only overwrite if the new one is a real Error (not 499).
+		//    (This prevents a generic "Canceled" from hiding a specific HTTP error like 502).
+		alreadySuccess := result.DelegatedRouterStatus >= 200 && result.DelegatedRouterStatus < 300
+		newSuccess := status >= 200 && status < 300
+
+		if !alreadySuccess {
+			if newSuccess {
+				result.DelegatedRouterStatus = status
+			} else if result.DelegatedRouterStatus == 0 {
+				result.DelegatedRouterStatus = status
+			} else if status != 499 {
+				result.DelegatedRouterStatus = status
+			}
+		}
+
 		dec := json.NewDecoder(bytes.NewBuffer(resp.Body))
 		for dec.More() {
 			pr := types.PeerRecord{}
@@ -441,6 +491,12 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	result.FoundProviders = len(providers)
 
 	for _, resp := range p.trustlessGatewayRequests {
+		// if result.TrustlessGatewayStatus is 0 or outside the HTTP success range, set it to the current response status
+		// basically give precedence to the first successful response
+		if result.TrustlessGatewayStatus == 0 || result.TrustlessGatewayStatus < 200 || result.TrustlessGatewayStatus >= 300 {
+			result.TrustlessGatewayStatus = int(resp.Response.Status)
+		}
+
 		if resp.Response.Status < 200 || resp.Response.Status >= 300 {
 			continue
 		}
