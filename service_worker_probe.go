@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -20,34 +21,61 @@ import (
 	"github.com/chromedp/cdproto/serviceworker"
 	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
+	"github.com/ipfs/boxo/routing/http/types"
+	"github.com/ipfs/go-cid"
+	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 type swProbe struct {
 	url     string
+	cidv0   cid.Cid
+	cidv1   cid.Cid
 	cdpHost string
 	cdpPort int
 
 	listenMu sync.Mutex
 
-	heliaConfig       *HeliaConfig
+	// Helia's configuration extracted from the query parameter during redirects.
+	// as the redirect logic changes this may not be parsed correctly in the
+	// future, so this field is set on a best effort.
+	heliaConfig *HeliaConfig
+
+	// Sets of trustless gateway and delegated router hosts. These sets
+	// are prepopulated with "trustless-gateway.link" and "delegated-ipfs.dev"
+	// but then also enriched with any entry that's parsed from the Helia config.
 	trustlessGateways map[string]struct{}
 	delegatedRouters  map[string]struct{}
 
-	trustlessGatewayResponses map[network.RequestID]*network.EventResponseReceived
-	delegatedRouterResponses  map[network.RequestID]*network.EventResponseReceived
+	// Maps of trustless gateway and delegated router responses (these are
+	// tracked in the context of the service worker target).
+	trustlessGatewayRequests map[network.RequestID]*network.EventResponseReceived
+	delegatedRouterRequests  map[network.RequestID]*NetworkEventResponse
 
-	// document requests
-	requestIDs []network.RequestID
-	requests   map[network.RequestID]*swRequestTrace
+	// The response bodies are requested asynchronously. This waitgroup
+	// completes once the go routines have finished.
+	responseReqWg sync.WaitGroup
+
+	// Page requests for "documents" (these are tracked in the context of the
+	// page and capture the redirect flow). That's also why we need to fields;
+	// the first documentRequestIDs captures the order and the documentRequests
+	// field the payload
+	documentRequestIDs []network.RequestID
+	documentRequests   map[network.RequestID]*swRequestTrace
 
 	navigationEvents []*page.EventFrameNavigated
 	lifecycleEvents  map[cdp.LoaderID][]*page.EventLifecycleEvent
 
 	idleWaitLogOnce sync.Once
 }
+type NetworkEventResponse struct {
+	*network.EventResponseReceived
+	Body []byte
+}
 
-func newSwProbe(url string, cdpHost string, cdpPort int) *swProbe {
+func newSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
 	return &swProbe{
+		cidv0:   cid.NewCidV0(c.Hash()),
+		cidv1:   cid.NewCidV1(c.Type(), c.Hash()),
 		url:     url,
 		cdpHost: cdpHost,
 		cdpPort: cdpPort,
@@ -55,13 +83,13 @@ func newSwProbe(url string, cdpHost string, cdpPort int) *swProbe {
 		trustlessGateways: map[string]struct{}{"trustless-gateway.link": {}},
 		delegatedRouters:  map[string]struct{}{"delegated-ipfs.dev": {}},
 
-		trustlessGatewayResponses: map[network.RequestID]*network.EventResponseReceived{},
-		delegatedRouterResponses:  map[network.RequestID]*network.EventResponseReceived{},
+		delegatedRouterRequests:  map[network.RequestID]*NetworkEventResponse{},
+		trustlessGatewayRequests: map[network.RequestID]*network.EventResponseReceived{},
 
-		requestIDs:       make([]network.RequestID, 0),
-		requests:         make(map[network.RequestID]*swRequestTrace),
-		navigationEvents: make([]*page.EventFrameNavigated, 0),
-		lifecycleEvents:  map[cdp.LoaderID][]*page.EventLifecycleEvent{},
+		documentRequestIDs: make([]network.RequestID, 0),
+		documentRequests:   make(map[network.RequestID]*swRequestTrace),
+		navigationEvents:   make([]*page.EventFrameNavigated, 0),
+		lifecycleEvents:    map[cdp.LoaderID][]*page.EventLifecycleEvent{},
 	}
 }
 
@@ -83,15 +111,21 @@ type swProbeResult struct {
 	IPFSPath  string // x-ipfs-path
 	IPFSRoots string // x-ipfs-roots
 
+	// Whether any delegated router returned any providers
+	FoundProviders    int
+	ServedFromGateway bool
+
 	// Server timing data (from final response)
-	ServerTimings map[string]serverTiming
+	ServerTimings        map[string]serverTiming
+	DelegatedRouterTTFB  time.Duration
+	TrustlessGatewayTTFB time.Duration
 }
 
 func (r *swProbe) isProbeDone() bool {
 	// first check if we have seen the final request
 	// for the content from the service worker gateway
 	var finalRequest *swRequestTrace
-	for _, req := range r.requests {
+	for _, req := range r.documentRequests {
 		if req.isFinalRequest() {
 			finalRequest = req
 			break
@@ -201,10 +235,10 @@ func (r *swRequestTrace) isFinalRequest() bool {
 	lower := strings.ToLower(accessControlExposeHeadersStr)
 	containsAccessControlExposeHeadersValues := strings.Contains(lower, xIPFSPathHeader) && strings.Contains(lower, xIPFSRootsHeader)
 
-	_, constainsXIPFSPathHeader := finalResp.Headers[xIPFSPathHeader]
-	_, constainsXIPFSRootsHeader := finalResp.Headers[xIPFSRootsHeader]
+	_, containsXIPFSPathHeader := finalResp.Headers[xIPFSPathHeader]
+	_, containsXIPFSRootsHeader := finalResp.Headers[xIPFSRootsHeader]
 
-	if containsAccessControlExposeHeadersValues || constainsXIPFSPathHeader || constainsXIPFSRootsHeader {
+	if containsAccessControlExposeHeadersValues || containsXIPFSPathHeader || containsXIPFSRootsHeader {
 		return true
 	}
 
@@ -246,7 +280,7 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 		case *network.EventResponseReceived:
 			p.handleResponseReceived(e)
 		case *target.EventAttachedToTarget:
-			go p.handleAttachedToTarget(listenCtx, e)
+			go p.handleAttachedToTarget(browserCtx, e)
 		}
 
 		if p.isProbeDone() {
@@ -271,6 +305,7 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 
 	// Wait for completion or timeout
 	<-listenCtx.Done()
+	p.responseReqWg.Wait()
 
 	switch ctx.Err() {
 	case context.DeadlineExceeded:
@@ -287,7 +322,10 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 	return p.buildProbeResult(), ctx.Err()
 }
 
-// [NEW] handleAttachedToTarget sets up a listener for the new Service Worker target
+// handleAttachedToTarget sets up a listener for the new Service Worker target
+// and tries to capture the response body for any delegated routing requests.
+// In theory there could be more than one delegated router be configured. In
+// practice, only one is supported but we still try to handle it here.
 func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAttachedToTarget) {
 	// Only care about service workers
 	if e.TargetInfo.Type != "service_worker" {
@@ -300,7 +338,7 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 	swCtx, cancel := chromedp.NewContext(ctx, chromedp.WithTargetID(e.TargetInfo.TargetID))
 	defer cancel()
 
-	// Enable the Network domain specifically on this Service Worker
+	// Enable the Network domain with buffering on this Service Worker
 	if err := chromedp.Run(swCtx, network.Enable()); err != nil {
 		slog.Error("Failed to enable network on SW", "err", err)
 		return
@@ -315,41 +353,109 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 		switch e := ev.(type) {
 		case *network.EventResponseReceived:
 			if e.Type != network.ResourceTypeFetch {
-				break
-			}
-			// LoaderID is the empty string for worker requests
-			if e.LoaderID != "" {
-				break
-			}
-			u, err := url.Parse(e.Response.URL)
-			if err != nil {
-				break
+				return
 			}
 
-			if _, ok := p.trustlessGateways[u.Host]; ok {
-				p.trustlessGatewayResponses[e.RequestID] = e
-			} else if _, ok := p.delegatedRouters[u.Host]; ok {
-				p.delegatedRouterResponses[e.RequestID] = e
+			u, err := url.Parse(e.Response.URL)
+			if err != nil {
+				return
 			}
+
+			if _, ok := p.delegatedRouters[u.Host]; ok {
+				if !strings.Contains(u.Path, "routing/v1/providers") {
+					return
+				}
+
+				p.delegatedRouterRequests[e.RequestID] = &NetworkEventResponse{EventResponseReceived: e}
+			} else if _, ok := p.trustlessGateways[u.Host]; ok {
+				if strings.Contains(u.Path, p.cidv0.String()) || strings.Contains(u.Path, p.cidv1.String()) {
+					p.trustlessGatewayRequests[e.RequestID] = e
+				}
+			}
+
+		case *network.EventLoadingFinished:
+			// Try to get the body for tracked requests
+			respEvent, found := p.delegatedRouterRequests[e.RequestID]
+			if !found {
+				return
+			}
+
+			// Launch in goroutine as required by ListenTarget
+			p.responseReqWg.Add(1)
+			go func(requestID network.RequestID, respEvent *NetworkEventResponse) {
+				defer p.responseReqWg.Done()
+
+				body, err := network.GetResponseBody(requestID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(swCtx).Target))
+				if err != nil {
+					return
+				}
+
+				p.listenMu.Lock()
+				respEvent.Body = []byte(body)
+				p.listenMu.Unlock()
+
+				slog.Info("Captured response body",
+					"requestID", requestID,
+					"url", respEvent.Response.URL,
+					"size", len(body))
+			}(e.RequestID, respEvent)
 		}
 	})
 
 	// Keep this goroutine alive to maintain the context/listener
-	<-ctx.Done()
+	<-swCtx.Done()
 }
 
 // buildProbeResult constructs the complete probe result from collected data
 func (p *swProbe) buildProbeResult() *swProbeResult {
 	result := &swProbeResult{
-		ServerTimings: make(map[string]serverTiming),
+		ServerTimings:        make(map[string]serverTiming),
+		DelegatedRouterTTFB:  0,
+		TrustlessGatewayTTFB: 0,
+	}
+
+	providers := map[peer.ID]types.PeerRecord{}
+	for _, resp := range p.delegatedRouterRequests {
+		dec := json.NewDecoder(bytes.NewBuffer(resp.Body))
+		for dec.More() {
+			pr := types.PeerRecord{}
+			if err := dec.Decode(&pr); err != nil {
+				continue
+			}
+
+			if pr.ID == nil {
+				continue
+			}
+
+			providers[*pr.ID] = pr
+		}
+
+		ttfb := time.Duration(resp.Response.Timing.ReceiveHeadersStart * float64(time.Millisecond))
+		if result.DelegatedRouterTTFB == 0 || ttfb < result.DelegatedRouterTTFB {
+			result.DelegatedRouterTTFB = ttfb
+		}
+	}
+	result.FoundProviders = len(providers)
+
+	for _, resp := range p.trustlessGatewayRequests {
+		if resp.Response.Status < 200 || resp.Response.Status >= 300 {
+			continue
+		}
+
+		// If there are multiple successful retrievals, track the fastest one
+		result.ServedFromGateway = true
+		ttfb := time.Duration(resp.Response.Timing.ReceiveHeadersStart * float64(time.Millisecond))
+		if result.TrustlessGatewayTTFB == 0 || ttfb < result.TrustlessGatewayTTFB {
+			result.TrustlessGatewayTTFB = ttfb
+		}
 	}
 
 	// Find first and final requests
 	var firstReq *swRequestTrace
 	var finalReq *swRequestTrace
 
-	for _, reqID := range p.requestIDs {
-		req := p.requests[reqID]
+	for _, reqID := range p.documentRequestIDs {
+		req := p.documentRequests[reqID]
 		if firstReq == nil {
 			firstReq = req
 		}
@@ -533,23 +639,31 @@ func (r *swProbe) handleRequestWillBeSent(e *network.EventRequestWillBeSent) {
 	if heliaConfig := extractHeliaConfig(e.Request.URL); heliaConfig != nil {
 		r.heliaConfig = heliaConfig
 		for _, router := range heliaConfig.DelegatedRouters {
-			r.delegatedRouters[router] = struct{}{}
+			u, err := url.Parse(router)
+			if err != nil {
+				continue
+			}
+			r.delegatedRouters[u.Host] = struct{}{}
 		}
 
 		for _, gateway := range heliaConfig.TrustlessGateways {
-			r.trustlessGateways[gateway] = struct{}{}
+			u, err := url.Parse(gateway)
+			if err != nil {
+				continue
+			}
+			r.trustlessGateways[u.Host] = struct{}{}
 		}
 	}
 
-	trace, found := r.requests[e.RequestID]
+	trace, found := r.documentRequests[e.RequestID]
 	if !found {
 		trace = &swRequestTrace{
 			currentURL: e.DocumentURL,
 			loaderID:   e.LoaderID,
 		}
 
-		r.requestIDs = append(r.requestIDs, e.RequestID)
-		r.requests[e.RequestID] = trace
+		r.documentRequestIDs = append(r.documentRequestIDs, e.RequestID)
+		r.documentRequests[e.RequestID] = trace
 	}
 
 	if e.RedirectResponse == nil {
@@ -580,7 +694,7 @@ func (r *swProbe) handleResponseReceived(e *network.EventResponseReceived) {
 		"status", e.Response.Status,
 	)
 
-	trace, found := r.requests[e.RequestID]
+	trace, found := r.documentRequests[e.RequestID]
 	if !found {
 		return
 	}
