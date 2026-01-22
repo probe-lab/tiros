@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS service_worker_probes
     ipfs_path                Nullable(String) COMMENT 'IPFS path of the content (from "x-ipfs-path" header)',
     ipfs_roots               Nullable(String) COMMENT 'IPFS root CIDs involved in resolution (from "x-ipfs-roots" header)',
     server_timings           JSON() COMMENT 'Map of service worker internal timing metrics',
+    found_providers          Int32 COMMENT 'Number of unique providers found via delegated routing',
+    served_from_gateway      Bool COMMENT 'Whether content was successfully retrieved from a trustless gateway',
+    delegated_router_ttfb_s  Nullable(Float64) COMMENT 'Fastest TTFB from any delegated router request (seconds)',
+    trustless_gateway_ttfb_s Nullable(Float64) COMMENT 'Fastest TTFB from any successful trustless gateway request (seconds)',
     error                    Nullable(String) COMMENT 'Error message if probe failed, null if successful',
     created_at               DateTime64(3) COMMENT 'Timestamp when this record was created'
 )
