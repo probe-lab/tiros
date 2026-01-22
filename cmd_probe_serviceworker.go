@@ -187,7 +187,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 
 			// Create and run probe
 			slog.With("gateway", gateway).Info("Probing service worker gateway")
-			probe := newSwProbe(navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
+			probe := newSwProbe(ciid, navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
 
 			probeCtx, probeCancel := context.WithTimeout(ctx, probeServiceWorkerConfig.Timeout)
 			result, err := probe.run(probeCtx)
