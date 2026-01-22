@@ -14,7 +14,9 @@
       "Bash(go test:*)",
       "Bash(go list:*)",
       "WebFetch(domain:chromedevtools.github.io)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(./tiros:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
