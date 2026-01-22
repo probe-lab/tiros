@@ -12,6 +12,9 @@ import (
 	"github.com/google/uuid"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/urfave/cli/v3"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 )
 
 var probeServiceWorkerConfig = struct {
@@ -104,6 +107,13 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	meter := otel.GetMeterProvider().Meter("tiros")
+
+	probeCounter, err := meter.Int64Counter("probes")
+	if err != nil {
+		return fmt.Errorf("creating probe counter: %w", err)
+	}
+
 	runID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("creating run id: %w", err)
@@ -193,6 +203,16 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 			result, err := probe.run(probeCtx)
 			probeCancel()
 
+			status := 0
+			if result != nil {
+				status = result.FinalStatusCode
+			}
+			probeCounter.Add(ctx, 1, metric.WithAttributes(
+				attribute.String("gateway", gateway),
+				attribute.Int("status", status),
+				attribute.String("source", cidSource),
+			))
+
 			var errStr *string
 			if err != nil {
 				slog.Warn("Error running service worker probe", "url", navURL.String(), "err", err)
@@ -224,6 +244,10 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				dbModel.ContentLength = toPtr(result.ContentLength)
 				dbModel.IPFSPath = toPtr(result.IPFSPath)
 				dbModel.IPFSRoots = toPtr(result.IPFSRoots)
+				dbModel.FoundProviders = result.FoundProviders
+				dbModel.ServedFromGateway = result.ServedFromGateway
+				dbModel.DelegatedRouterTTFBS = toPtr(result.DelegatedRouterTTFB.Seconds())
+				dbModel.TrustlessGatewayTTFBS = toPtr(result.TrustlessGatewayTTFB.Seconds())
 
 				// Server timings as JSON
 				serverTimings := make(map[string]float64, len(result.ServerTimings))
