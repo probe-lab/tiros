@@ -408,6 +408,9 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 
 // buildProbeResult constructs the complete probe result from collected data
 func (p *swProbe) buildProbeResult() *swProbeResult {
+	p.listenMu.Lock()
+	defer p.listenMu.Unlock()
+
 	result := &swProbeResult{
 		ServerTimings:        make(map[string]serverTiming),
 		DelegatedRouterTTFB:  0,
@@ -576,7 +579,6 @@ func (r *swProbe) handleLifecycleEvent(e *page.EventLifecycleEvent) {
 	events, found := r.lifecycleEvents[e.LoaderID]
 	if !found {
 		events = make([]*page.EventLifecycleEvent, 0)
-		r.lifecycleEvents[e.LoaderID] = events
 	}
 
 	r.lifecycleEvents[e.LoaderID] = append(events, e)
