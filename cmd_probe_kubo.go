@@ -124,7 +124,7 @@ var probeKuboFlags = []cli.Flag{
 		Destination: &probeKuboConfig.TracesForwardPort,
 	},
 	&cli.StringSliceFlag{
-		Name:        "download.cids",
+		Name:        "cids",
 		Usage:       "A static list of CIDs to download from Kubo.",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_CIDS"),
 		Value:       probeKuboConfig.DownloadCIDs,

@@ -333,6 +333,28 @@ func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
 	return p.buildProbeResult(), ctx.Err()
 }
 
+// handleFrameNavigated processes page navigation events
+func (r *swProbe) handleFrameNavigated(e *page.EventFrameNavigated) {
+	slog.Debug("Navigated to "+e.Frame.URL, "loaderID", e.Frame.LoaderID)
+	r.navigationEvents = append(r.navigationEvents, e)
+}
+
+// handleLifecycleEvent processes page lifecycle events
+func (r *swProbe) handleLifecycleEvent(e *page.EventLifecycleEvent) {
+	if e.Name == "networkIdle" {
+		slog.Info("Lifecycle event", "name", e.Name)
+	} else {
+		slog.Debug("Lifecycle event", "name", e.Name)
+	}
+
+	events, found := r.lifecycleEvents[e.LoaderID]
+	if !found {
+		events = make([]*page.EventLifecycleEvent, 0)
+	}
+
+	r.lifecycleEvents[e.LoaderID] = append(events, e)
+}
+
 // handleAttachedToTarget sets up a listener for the new Service Worker target
 // and tries to capture the response body for any delegated routing requests.
 // In theory there could be more than one delegated router be configured. In
@@ -488,7 +510,12 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 			result.DelegatedRouterTTFB = ttfb
 		}
 	}
-	result.FoundProviders = len(providers)
+
+	if len(p.delegatedRouterRequests) > 0 {
+		result.FoundProviders = len(providers)
+	} else {
+		result.FoundProviders = -1
+	}
 
 	for _, resp := range p.trustlessGatewayRequests {
 		// if result.TrustlessGatewayStatus is 0 or outside the HTTP success range, set it to the current response status
@@ -616,28 +643,6 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	result.TotalTTFB = time.Duration(totalTTFBms * float64(time.Millisecond)) // ms to ns
 
 	return result
-}
-
-// handleFrameNavigated processes page navigation events
-func (r *swProbe) handleFrameNavigated(e *page.EventFrameNavigated) {
-	slog.Debug("Navigated to "+e.Frame.URL, "loaderID", e.Frame.LoaderID)
-	r.navigationEvents = append(r.navigationEvents, e)
-}
-
-// handleLifecycleEvent processes page lifecycle events
-func (r *swProbe) handleLifecycleEvent(e *page.EventLifecycleEvent) {
-	slog.Debug("Lifecycle event",
-		"name", e.Name,
-		"loader", e.LoaderID,
-		"frame", e.FrameID,
-	)
-
-	events, found := r.lifecycleEvents[e.LoaderID]
-	if !found {
-		events = make([]*page.EventLifecycleEvent, 0)
-	}
-
-	r.lifecycleEvents[e.LoaderID] = append(events, e)
 }
 
 type HeliaConfig struct {

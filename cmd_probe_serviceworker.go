@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
+	"math/rand/v2"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ipfs/go-cid"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
@@ -18,23 +22,27 @@ import (
 )
 
 var probeServiceWorkerConfig = struct {
-	Interval      time.Duration
-	MaxIterations int
-	DownloadCIDs  []string
-	Gateways      []string
-	MaxDownloadMB int
-	Timeout       time.Duration
-	ChromeCDPHost string
-	ChromeCDPPort int
+	Interval        time.Duration
+	MaxIterations   int
+	DownloadCIDs    []string
+	Gateways        []string
+	MaxDownloadMB   int
+	Timeout         time.Duration
+	ChromeCDPHost   string
+	ChromeCDPPort   int
+	ControlledCIDs  bool
+	ControlledShare float32
 }{
-	Interval:      10 * time.Second,
-	MaxIterations: 0,
-	DownloadCIDs:  []string{},
-	Gateways:      []string{"inbrowser.link"},
-	MaxDownloadMB: 10,
-	Timeout:       2 * time.Minute,
-	ChromeCDPHost: "127.0.0.1",
-	ChromeCDPPort: 3000,
+	Interval:        10 * time.Second,
+	MaxIterations:   0,
+	DownloadCIDs:    []string{},
+	Gateways:        []string{"inbrowser.link"},
+	MaxDownloadMB:   10,
+	Timeout:         2 * time.Minute,
+	ChromeCDPHost:   "127.0.0.1",
+	ChromeCDPPort:   3000,
+	ControlledCIDs:  true,
+	ControlledShare: 0.2,
 }
 
 var probeServiceWorkerFlags = []cli.Flag{
@@ -53,7 +61,7 @@ var probeServiceWorkerFlags = []cli.Flag{
 		Destination: &probeServiceWorkerConfig.MaxIterations,
 	},
 	&cli.StringSliceFlag{
-		Name:        "download.cids",
+		Name:        "cids",
 		Usage:       "A static list of CIDs to download from the Gateways.",
 		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_DOWNLOAD_CIDS"),
 		Value:       probeServiceWorkerConfig.DownloadCIDs,
@@ -93,6 +101,20 @@ var probeServiceWorkerFlags = []cli.Flag{
 		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CHROME_CDP_PORT"),
 		Value:       probeServiceWorkerConfig.ChromeCDPPort,
 		Destination: &probeServiceWorkerConfig.ChromeCDPPort,
+	},
+	&cli.BoolFlag{
+		Name:        "controlled.cids",
+		Usage:       "Whether to use the ControlledCIDProvider to select CIDs to probe",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONTROLLED_CIDS"),
+		Value:       probeGatewaysConfig.ControlledCIDs,
+		Destination: &probeGatewaysConfig.ControlledCIDs,
+	},
+	&cli.Float32Flag{
+		Name:        "controlled.share",
+		Usage:       "What share of requests should be made for controlled CIDs",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONTROLLED_SHARE"),
+		Value:       probeGatewaysConfig.ControlledShare,
+		Destination: &probeGatewaysConfig.ControlledShare,
 	},
 }
 
@@ -144,14 +166,14 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	slog.With("provider", cidProviderName).Info("Using CID provider for service worker probes")
 
+	controlledCIDsProvider, err := NewControlledCIDProvider()
+	if err != nil {
+		return fmt.Errorf("creating controlled cid provider: %w", err)
+	}
+
 	// Use configured gateways (defaults to inbrowser.link)
 	gateways := probeServiceWorkerConfig.Gateways
 	slog.With("count", len(gateways), "gateways", gateways).Info("Using service worker gateways")
-
-	cidSource := "bitsniffer_bitswap"
-	if _, ok := cidProvider.(*StaticCIDProvider); ok {
-		cidSource = "static"
-	}
 
 	ticker := time.NewTimer(0)
 	iterationStart := time.Now()
@@ -178,13 +200,26 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 
 		slog.With("iteration", i).Info("Starting new service worker probing iteration...")
 
-		// Get CID to download
-		ciid, err := cidProvider.SelectCID(ctx, "bitswap")
-		if err != nil {
+		var ciid cid.Cid
+		var cidSource string
+		if rand.Float32() < probeGatewaysConfig.ControlledShare {
+			cidSource = "controlled"
+			ciid, err = controlledCIDsProvider.SelectCID(ctx, "controlled")
+		} else {
+			ciid, err = cidProvider.SelectCID(ctx, "dht")
+
+			cidSource = "bitsniffer_bitswap"
+			if _, ok := cidProvider.(*StaticCIDProvider); ok {
+				cidSource = "static"
+			}
+		}
+
+		if errors.Is(err, sql.ErrNoRows) {
 			slog.With("err", err).Warn("No CID available for service worker probing")
 			continue
+		} else if err != nil {
+			return fmt.Errorf("selecting cid from database: %w", err)
 		}
-		slog.Info(fmt.Sprintf("Iteration %d: probing CID %s", i, ciid.String()))
 
 		// Probe each gateway
 		for _, gateway := range gateways {

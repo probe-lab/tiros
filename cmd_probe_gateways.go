@@ -38,6 +38,8 @@ var probeGatewaysConfig = struct {
 	Timeout         time.Duration
 	RefreshInterval time.Duration
 	Concurrency     int
+	ControlledCIDs  bool
+	ControlledShare float32
 }{
 	Interval:        10 * time.Second,
 	MaxIterations:   0,
@@ -47,6 +49,8 @@ var probeGatewaysConfig = struct {
 	Timeout:         30 * time.Second,
 	RefreshInterval: 5 * time.Minute,
 	Concurrency:     10,
+	ControlledCIDs:  true,
+	ControlledShare: 0.2,
 }
 
 var probeGatewaysFlags = []cli.Flag{
@@ -65,9 +69,9 @@ var probeGatewaysFlags = []cli.Flag{
 		Destination: &probeGatewaysConfig.MaxIterations,
 	},
 	&cli.StringSliceFlag{
-		Name:        "download.cids",
+		Name:        "cids",
 		Usage:       "A static list of CIDs to download from the Gateways.",
-		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_DOWNLOAD_CIDS"),
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CIDS"),
 		Value:       probeGatewaysConfig.DownloadCIDs,
 		Destination: &probeGatewaysConfig.DownloadCIDs,
 	},
@@ -105,6 +109,20 @@ var probeGatewaysFlags = []cli.Flag{
 		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONCURRENCY"),
 		Value:       probeGatewaysConfig.Concurrency,
 		Destination: &probeGatewaysConfig.Concurrency,
+	},
+	&cli.BoolFlag{
+		Name:        "controlled.cids",
+		Usage:       "Whether to use the ControlledCIDProvider to select CIDs to probe",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONTROLLED_CIDS"),
+		Value:       probeGatewaysConfig.ControlledCIDs,
+		Destination: &probeGatewaysConfig.ControlledCIDs,
+	},
+	&cli.Float32Flag{
+		Name:        "controlled.share",
+		Usage:       "What share of requests should be made for controlled CIDs",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONTROLLED_SHARE"),
+		Value:       probeGatewaysConfig.ControlledShare,
+		Destination: &probeGatewaysConfig.ControlledShare,
 	},
 }
 
@@ -175,6 +193,11 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 		cidProviderName = "BitswapSnifferClickhouseCIDProvider"
 	}
 	slog.With("provider", cidProviderName).Info("Using CID provider for gateway probes")
+
+	controlledCIDsProvider, err := NewControlledCIDProvider()
+	if err != nil {
+		return fmt.Errorf("creating controlled cid provider: %w", err)
+	}
 
 	// Gateway list management
 	var gatewaysMu sync.RWMutex
@@ -276,11 +299,6 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("creating active_gateways gauge: %w", err)
 	}
 
-	cidSource := "bitsniffer_bitswap"
-	if _, ok := cidProvider.(*StaticCIDProvider); ok {
-		cidSource = "static"
-	}
-
 	downloadCIDsCount := math.MaxInt
 	if len(probeGatewaysConfig.DownloadCIDs) > 0 {
 		downloadCIDsCount = len(probeGatewaysConfig.DownloadCIDs)
@@ -331,15 +349,29 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 				copy(currentGateways, gateways)
 				gatewaysMu.RUnlock()
 
-				// Get CID to download (origin doesn't matter for gateways, use "bitswap")
-				ciid, err := cidProvider.SelectCID(gctx, "bitswap")
+				var ciid cid.Cid
+				var cidSource string
+				if rand.Float32() < probeGatewaysConfig.ControlledShare {
+					cidSource = "controlled"
+					ciid, err = controlledCIDsProvider.SelectCID(gctx, "controlled")
+				} else {
+					// Get CID to download (origin doesn't matter for gateways, use "bitswap")
+					ciid, err = cidProvider.SelectCID(gctx, "bitswap")
+
+					cidSource = "bitsniffer_bitswap"
+					if _, ok := cidProvider.(*StaticCIDProvider); ok {
+						cidSource = "static"
+					}
+				}
+
 				if errors.Is(err, sql.ErrNoRows) {
 					logEntry.Warn("No CID available for gateway probing")
 					continue mainLoop
 				} else if err != nil {
 					return fmt.Errorf("selecting cid from database: %w", err)
 				}
-				slog.Info(fmt.Sprintf("Worker %d will now start probing %s", worker, ciid.String()))
+
+				slog.Info(fmt.Sprintf("Worker %d will now start probing %s (%s)", worker, ciid.String(), cidSource))
 
 				rand.Shuffle(len(currentGateways), func(i, j int) {
 					currentGateways[i], currentGateways[j] = currentGateways[j], currentGateways[i]
@@ -358,6 +390,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 							metrics := probeGateway(gctx, gateway, ciid, format, int64(probeGatewaysConfig.MaxDownloadMB)*1024*1024, probeGatewaysConfig.Timeout)
 
 							downloadCounter.Add(gctx, 1, metric.WithAttributes(
+								attribute.String("source", cidSource),
 								attribute.String("gateway", gateway),
 								attribute.Bool("success", metrics.err == nil),
 							))
@@ -550,8 +583,6 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format Gate
 	}
 
 	// Set appropriate Accept header for CAR format
-	if format == GatewayProbeFormatCAR {
-	}
 	switch format {
 	case GatewayProbeFormatNone:
 		// none
