@@ -64,7 +64,7 @@ docker compose -f docker-compose.kubo.yml up
 go run . probe --json.out out kubo \
   --iterations.max 1 \
   --traces.receiver.host 0.0.0.0 \
-  --download.cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+  --cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
 ```
 
 **Website Performance:**
@@ -190,7 +190,7 @@ Data Collectors & Persistence
 **Configuration System:**
 - Global flags: `--log.level`, `--metrics.enabled`, `--tracing.enabled`, `--aws.region`
 - Probe flags: `--dry.run`, `--json.out`, `--timeout`
-- Kubo-specific: `--filesize`, `--iterations.max`, `--traces.receiver.host/port`, `--download.cids`, `--upload.only`, `--download.only`
+- Kubo-specific: `--filesize`, `--iterations.max`, `--traces.receiver.host/port`, `--cids`, `--upload.only`, `--download.only`
 - Website-specific: `--websites`, `--probes`, `--chrome.cdp.host/port`, `--kubo.gateway.port`
 
 ## Important Implementation Details

@@ -9,7 +9,7 @@ setup_test_env kubo
 STATIC_CIDS=bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
 
 # Run tiros with a single iteration and the JSON output option
-go run . probe --json.out $TEMP_DIR kubo --iterations.max 1 --download.only --traces.receiver.host 0.0.0.0 --download.cids $STATIC_CIDS
+go run . probe --json.out $TEMP_DIR kubo --iterations.max 1 --download.only --traces.receiver.host 0.0.0.0 --cids $STATIC_CIDS
 
 # Find the file suffixed with _upload.ndjson in the temp directory
 OUTPUT_FILE=$(find "$TEMP_DIR" -type f -name 'downloads.ndjson' | head -n 1)

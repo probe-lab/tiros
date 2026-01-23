@@ -2,10 +2,18 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement tool.
+Tiros comprises four distinct IPFS performance measurements:
+
+1. Traditional HTTP Gateway Performance
+2. Service Worker Gateway Performance
+3. Kubo Retrieval and Publication Performance
+4. Kubo Website Performance
+
+Each of these measurements is supposed to be run in geographically distributed
+regions and requires a different deployment setup. This readme describes each
+setup in detail and how the measurement can be run locally.
 
 ## Table of Contents
-
 
 <!-- TOC -->
 * [Tiros](#tiros)
@@ -27,6 +35,94 @@ Tiros is an IPFS [Kubo](https://github.com/ipfs/kubo) performance measurement to
   * [Contributing](#contributing)
   * [License](#license)
 <!-- TOC -->
+
+## CID Provider Concept
+
+The Traditional HTTP Gateway Performance, Service Worker Gateway Performance,
+and Kubo Retrieval and Publication Performance measurements require a set of
+CIDs that they should request from the network. These CIDs are provided by a
+CID provider:
+
+```go
+type CIDProvider interface {
+	SelectCID(ctx context.Context, origin string) (cid.Cid, error)
+}
+```
+
+Currently, there are five implementations of this interface:
+
+1. `StaticCIDProvider` - a provider that returns a CID from a static list of CIDs
+2. `BitswapSnifferClickhouseCIDProvider` - a provider that queries the Clickhouse database of [ProbeLab's BitSwap sniffer](https://github.com/probe-lab/bitswap-sniffer) for the latest discovered CIDs
+3. `KuboCIDProvider` (unused) - a provider that queries the IPFS Kubo RPC API for pinned CIDs (useful if we want to probe controlled CIDs as opposed to organically discovered ones)
+4. `ControlledCIDProvider` - a provider that returns a CID from a predefined list of CIDs that are hosted on controlled nodes
+5. `NoopCIDProvider` - a provider that returns an undefined CID (`cid.Undef`) and never fails
+
+The `StaticCIDProvider` gets its list of CIDs from the `--cids` flag.
+This flag expects a comma-separated list of CIDs.
+
+By default, the different performance experiments interleave CIDs from the
+`ControlledCIDProvider` with whatever other provider is configured. This can
+be disabled with `--controlled.cids=false`.
+
+## Traditional HTTP Gateway Performance
+
+The traditional HTTP Gateway Performance experiment probes the performance of different
+HTTP Gateways. The list of gateways to probe can either be provided on the command line
+as a comma-separated list of hostnames for the `--gateways` flag or via a
+query to a Clickhouse database (default). Then you can provide a list of CIDs to probe
+via the `--cids` flag. By default 20% of requests will randomly be made for controlled CIDs.
+To disable this behavior, set `--controlled.cids=false` or `--controlled.share=0`. Conversely,
+if you only want to probe controlled CIDs, set `--controlled.share=1`.
+
+To run the traditional HTTP Gateway Performance experiment and store the results in a Clickhouse database, run the following commands:
+
+```shell
+docker compose up clickhouse
+
+go run . probe gateways --iterations.max 1 --gateways ipfs.io,dweb.link --controlled.share 1 --cids QmUvSqPqYsjeab2JgsNc4PjbAGnCzfn5xid6piJgYYzehH
+```
+
+The docker command starts a clickhouse database which will get migrations automatically applied when tiros interacts with the db
+for the first time. The user and database are `tiros_local` and the password is `password`. You can connect to the database with the following command:
+
+```shell
+clickhouse client --host localhost --password --user tiros_local
+```
+
+These are the configuration flags that can be passed to the `probe gateways` command:
+
+```text
+NAME:
+   tiros probe gateways - Start probing IPFS Gateways retrieval performance
+
+USAGE:
+   tiros probe gateways [options]
+
+OPTIONS:
+   --interval duration                      How long to wait between each download iteration (default: 10s) [$TIROS_PROBE_GATEWAYS_INTERVAL]
+   --iterations.max int                     The number of iterations per concurrent worker to run. 0 means infinite. (default: 0) [$TIROS_PROBE_GATEWAYS_ITERATIONS_MAX]
+   --cids string [ --cids string ]          A static list of CIDs to download from the Gateways. [$TIROS_PROBE_GATEWAYS_CIDS]
+   --gateways string [ --gateways string ]  A static list of gateways to probe (takes precedence over database) [$TIROS_PROBE_GATEWAYS_GATEWAYS]
+   --download.max.mb int                    Maximum download size in MiB before cancelling (default: 10) [$TIROS_PROBE_GATEWAYS_DOWNLOAD_MAX_MB]
+   --timeout duration                       Timeout for each gateway request (default: 30s) [$TIROS_PROBE_GATEWAYS_TIMEOUT]
+   --refresh.interval duration              How frequently to refresh the gateway list from the database (default: 5m0s) [$TIROS_PROBE_GATEWAYS_REFRESH_INTERVAL]
+   --concurrency int                        Number of gateways to probe concurrently (default: 10) [$TIROS_PROBE_GATEWAYS_CONCURRENCY]
+   --controlled.cids                        Whether to use the ControlledCIDProvider to select CIDs to probe (default: true) [$TIROS_PROBE_GATEWAYS_CONTROLLED_CIDS]
+   --controlled.share float                 What share of requests should be made for controlled CIDs (default: 0.2) [$TIROS_PROBE_GATEWAYS_CONTROLLED_SHARE]
+   --help, -h                               show help
+
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen [$AWS_REGION]
+```
+
 
 ## Measurement Methodology
 
@@ -80,7 +176,7 @@ docker compose -f docker-compose.kubo.yml up
 
 Terminal 2:
 ```shell
-go run . probe --json.out out kubo --iterations.max 1 --traces.receiver.host 0.0.0.0 --download.cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+go run . probe --json.out out kubo --iterations.max 1 --traces.receiver.host 0.0.0.0 --cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
 ```
 
 The `--json.out` flag instructs Tiros to write the output to newline-delimited
@@ -453,7 +549,7 @@ OPTIONS:
    --traces.out string                                If set, where to write the traces to. [$TIROS_PROBE_KUBO_TRACES_OUT]
    --traces.forward.host string                       The host to forward Kubo's traces to. [$TIROS_PROBE_KUBO_TRACES_FORWARD_HOST]
    --traces.forward.port int                          The port to forward Kubo's traces to. (default: 0) [$TIROS_PROBE_KUBO_TRACES_FORWARD_PORT]
-   --download.cids string [ --download.cids string ]  A static list of CIDs to download from Kubo. [$TIROS_PROBE_KUBO_DOWNLOAD_CIDS]
+   --cids string [ --static.cids string ]  A static list of CIDs to download from Kubo. [$TIROS_PROBE_KUBO_DOWNLOAD_CIDS]
    --help, -h                                         show help
    --download.only                                    Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_DOWNLOAD_ONLY]
    --upload.only                                      Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_UPLOAD_ONLY]
