@@ -137,11 +137,13 @@ func (r *swProbe) isProbeDone() bool {
 		}
 	}
 
+	// if we haven't seen the final request yet, we're not done
 	if finalRequest == nil {
 		return false
 	}
 
-	finalResp := finalRequest.finalResponse()
+	finalResp := finalRequest.lastResponse()
+	// if the final request has no response yet, we're not done
 	if finalResp == nil {
 		return false
 	}
@@ -188,8 +190,8 @@ type swRequestTrace struct {
 	loaderID   cdp.LoaderID        // loaderID represents the unique LoaderID associated with the request trace.
 }
 
-// finalResponse returns the last response in the trace or nil if no responses exist.
-func (r *swRequestTrace) finalResponse() *network.Response {
+// lastResponse returns the last response in the trace or nil if no responses exist.
+func (r *swRequestTrace) lastResponse() *network.Response {
 	respCount := len(r.responses)
 	if respCount == 0 {
 		return nil
@@ -204,7 +206,7 @@ func (r *swRequestTrace) finalResponse() *network.Response {
 // Returns true if all conditions are satisfied, otherwise false.
 func (r *swRequestTrace) isFinalRequest() bool {
 	// get last traces response
-	finalResp := r.finalResponse()
+	finalResp := r.lastResponse()
 	if finalResp == nil {
 		return false
 	}
@@ -454,6 +456,7 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 }
 
 // buildProbeResult constructs the complete probe result from collected data
+// It aggregates metrics from document requests, trustless gateway fetches, and delegated router queries.
 func (p *swProbe) buildProbeResult() *swProbeResult {
 	p.listenMu.Lock()
 	defer p.listenMu.Unlock()
@@ -568,7 +571,7 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	}
 
 	firstResp := firstReq.responses[0]
-	finalResp := finalReq.finalResponse()
+	finalResp := finalReq.lastResponse()
 
 	if firstResp == nil {
 		slog.Warn("First request has no response")
