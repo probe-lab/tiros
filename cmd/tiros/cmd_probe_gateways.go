@@ -22,6 +22,8 @@ import (
 	"github.com/ipfs/go-cid"
 	carv2 "github.com/ipld/go-car/v2"
 	pllog "github.com/probe-lab/go-commons/log"
+	main2 "github.com/probe-lab/tiros/pkg"
+	"github.com/probe-lab/tiros/pkg/db"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -177,16 +179,16 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
 	// Initialize CID provider
-	var cidProvider CIDProvider
+	var cidProvider main2.CIDProvider
 	var cidProviderName string
 	if len(probeGatewaysConfig.DownloadCIDs) > 0 {
-		cidProvider, err = NewStaticCIDProvider(probeGatewaysConfig.DownloadCIDs)
+		cidProvider, err = main2.NewStaticCIDProvider(probeGatewaysConfig.DownloadCIDs)
 		if err != nil {
 			return fmt.Errorf("creating static cid provider: %w", err)
 		}
 		cidProviderName = "StaticCIDProvider"
 	} else {
-		cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
+		cidProvider, err = main2.NewBitswapSnifferClickhouseCIDProvider(dbClient)
 		if err != nil {
 			return fmt.Errorf("creating clickhouse cid provider: %w", err)
 		}
@@ -194,7 +196,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	slog.With("provider", cidProviderName).Info("Using CID provider for gateway probes")
 
-	controlledCIDsProvider, err := NewControlledCIDProvider()
+	controlledCIDsProvider, err := main2.NewControlledCIDProvider()
 	if err != nil {
 		return fmt.Errorf("creating controlled cid provider: %w", err)
 	}
@@ -359,7 +361,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 					ciid, err = cidProvider.SelectCID(gctx, "bitswap")
 
 					cidSource = "bitsniffer_bitswap"
-					if _, ok := cidProvider.(*StaticCIDProvider); ok {
+					if _, ok := cidProvider.(*main2.StaticCIDProvider); ok {
 						cidSource = "static"
 					}
 				}
@@ -380,7 +382,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 			gatewaysLoop:
 				for _, gateway := range currentGateways {
 					// Test both raw and trustless (CAR) formats
-					formats := []GatewayProbeFormat{GatewayProbeFormatNone, GatewayProbeFormatCAR}
+					formats := []db.GatewayProbeFormat{db.GatewayProbeFormatNone, db.GatewayProbeFormatCAR}
 
 					for _, format := range formats {
 						// first iteration uncached, second cached
@@ -439,7 +441,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 							}
 
 							// Prepare database model
-							dbGatewayProbe := &GatewayProbeModel{
+							dbGatewayProbe := &db.GatewayProbeModel{
 								RunID:             runID.String(),
 								Region:            rootConfig.AWSRegion,
 								TirosVersion:      cmd.Root().Version,
@@ -493,7 +495,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	return g.Wait()
 }
 
-func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format GatewayProbeFormat, maxBytes int64, timeout time.Duration) *gatewayMetrics {
+func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.GatewayProbeFormat, maxBytes int64, timeout time.Duration) *gatewayMetrics {
 	metrics := &gatewayMetrics{
 		reqStart: time.Now(),
 	}
@@ -510,11 +512,11 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format Gate
 	gateway = strings.TrimSuffix(gateway, "/")
 
 	switch format {
-	case GatewayProbeFormatNone:
+	case db.GatewayProbeFormatNone:
 		url = fmt.Sprintf("%s/ipfs/%s", gateway, ciid.String())
-	case GatewayProbeFormatRaw:
+	case db.GatewayProbeFormatRaw:
 		url = fmt.Sprintf("%s/ipfs/%s?format=raw", gateway, ciid.String())
-	case GatewayProbeFormatCAR:
+	case db.GatewayProbeFormatCAR:
 		url = fmt.Sprintf("%s/ipfs/%s?format=car", gateway, ciid.String())
 	default:
 		panic(fmt.Sprintf("unknown gateway probe format: %s", format))
@@ -584,11 +586,11 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format Gate
 
 	// Set appropriate Accept header for CAR format
 	switch format {
-	case GatewayProbeFormatNone:
+	case db.GatewayProbeFormatNone:
 		// none
-	case GatewayProbeFormatRaw:
+	case db.GatewayProbeFormatRaw:
 		req.Header.Set("Accept", "application/vnd.ipld.raw")
-	case GatewayProbeFormatCAR:
+	case db.GatewayProbeFormatCAR:
 		req.Header.Set("Accept", "application/vnd.ipld.car")
 	default:
 		panic(fmt.Sprintf("unknown gateway probe format: %s", format))
@@ -632,7 +634,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format Gate
 	}
 
 	// Validate CAR format if applicable
-	if format != GatewayProbeFormatCAR || resp.StatusCode != 200 {
+	if format != db.GatewayProbeFormatCAR || resp.StatusCode != 200 {
 		return metrics
 	}
 

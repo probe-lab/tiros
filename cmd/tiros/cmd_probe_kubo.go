@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"embed"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,14 +11,14 @@ import (
 
 	"github.com/google/uuid"
 	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/probe-lab/tiros/pkg"
+	"github.com/probe-lab/tiros/pkg/db"
+	"github.com/probe-lab/tiros/pkg/kubo"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 )
-
-//go:embed migrations
-var migrations embed.FS
 
 var probeKuboConfig = struct {
 	FileSizeMiB   int
@@ -184,7 +183,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("creating run id: %w", err)
 	}
 
-	trCfg := &TraceReceiverConfig{
+	trCfg := &kubo.TraceReceiverConfig{
 		Host:        probeKuboConfig.TracesRecHost,
 		Port:        probeKuboConfig.TracesRecPort,
 		TraceOut:    probeKuboConfig.TracesOut,
@@ -193,7 +192,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	// initializing the trace receiver
-	tr, err := NewTraceReceiver(trCfg)
+	tr, err := kubo.NewTraceReceiver(trCfg)
 	if err != nil {
 		return fmt.Errorf("creating trace receiver gRPC server: %w", err)
 	}
@@ -201,7 +200,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 
 	// start to listen for incoming gRPC requests in a separate goroutine
 	go func() {
-		if err := tr.server.ListenAndServe(); err != nil {
+		if err := tr.Server.ListenAndServe(); err != nil {
 			slog.Error("Failed to start trace receiver gRPC server", "err", err)
 			// cancel the root context to stop the main
 			// loop if the server fails to start
@@ -216,18 +215,18 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
-	var cidProvider CIDProvider
+	var cidProvider pkg.CIDProvider
 	if !probeKuboConfig.UploadOnly {
 		if len(probeKuboConfig.DownloadCIDs) > 0 {
 			// cid provider not needed for upload only
-			cidProvider, err = NewStaticCIDProvider(probeKuboConfig.DownloadCIDs)
+			cidProvider, err = pkg.NewStaticCIDProvider(probeKuboConfig.DownloadCIDs)
 			if err != nil {
 				return fmt.Errorf("creating static cid provider: %w", err)
 			}
 			slog.Info("Using CID provider for Kubo probes: StaticCIDProvider")
 		} else {
 			// cid provider not needed for upload only
-			cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
+			cidProvider, err = pkg.NewBitswapSnifferClickhouseCIDProvider(dbClient)
 			if err != nil {
 				return fmt.Errorf("creating clickhouse cid provider: %w", err)
 			}
@@ -235,12 +234,13 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
-	kuboCfg := &KuboConfig{
-		Host:     probeKuboConfig.KuboHost,
-		APIPort:  probeKuboConfig.KuboAPIPort,
-		Receiver: tr,
+	kuboCfg := &kubo.KuboConfig{
+		Host:        probeKuboConfig.KuboHost,
+		APIPort:     probeKuboConfig.KuboAPIPort,
+		Receiver:    tr,
+		FileSizeMiB: probeKuboConfig.FileSizeMiB,
 	}
-	kubo, err := NewKubo(kuboCfg)
+	kubo, err := kubo.NewKubo(kuboCfg)
 	if err != nil {
 		return fmt.Errorf("creating kubo client: %w", err)
 	}
@@ -305,7 +305,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				cidStr = ur.CID.String()
 			}
 
-			dbUpload := &UploadModel{
+			dbUpload := &db.UploadModel{
 				RunID:            runID.String(),
 				Region:           rootConfig.AWSRegion,
 				TirosVersion:     cmd.Root().Version,
@@ -352,11 +352,11 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				))
 
 				cidSource := "bitsniffer_" + origin
-				if _, ok := cidProvider.(*StaticCIDProvider); ok {
+				if _, ok := cidProvider.(*pkg.StaticCIDProvider); ok {
 					cidSource = "static"
 				}
 
-				dbDownload := &DownloadModel{
+				dbDownload := &db.DownloadModel{
 					RunID:                runID.String(),
 					Region:               rootConfig.AWSRegion,
 					TirosVersion:         cmd.Root().Version,

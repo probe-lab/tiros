@@ -9,6 +9,7 @@ import (
 
 	plcli "github.com/probe-lab/go-commons/cli"
 	pldb "github.com/probe-lab/go-commons/db"
+	"github.com/probe-lab/tiros/pkg/db"
 	"github.com/urfave/cli/v3"
 )
 
@@ -82,20 +83,20 @@ func probeBefore(ctx context.Context, c *cli.Command) (context.Context, error) {
 	return ctx, nil
 }
 
-func newDBClient(ctx context.Context) (DBClient, error) {
+func newDBClient(ctx context.Context) (db.Client, error) {
 	var (
-		dbClient DBClient
+		dbClient db.Client
 		err      error
 	)
 	if probeConfig.DryRun {
-		dbClient = NewNoopClient()
+		dbClient = db.NewNoopClient()
 	} else if probeConfig.JSONOut != "" {
-		dbClient, err = NewJSONClient(probeConfig.JSONOut)
+		dbClient, err = db.NewJSONClient(probeConfig.JSONOut)
 		if err != nil {
 			return nil, fmt.Errorf("connecting to json client: %w", err)
 		}
 	} else {
-		dbClient, err = NewClickhouseClient(ctx, probeConfig.Clickhouse, probeConfig.Migrations)
+		dbClient, err = db.NewClickhouseClient(ctx, probeConfig.Clickhouse, probeConfig.Migrations)
 		if err != nil {
 			return nil, fmt.Errorf("connecting to clickhouse: %w", err)
 		}

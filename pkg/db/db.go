@@ -1,7 +1,8 @@
-package main
+package db
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -18,7 +19,10 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type DBClient interface {
+//go:embed migrations
+var migrations embed.FS
+
+type Client interface {
 	io.Closer
 	Websites(ctx context.Context) ([]string, error)
 	Gateways(ctx context.Context) ([]string, error)
@@ -31,10 +35,10 @@ type DBClient interface {
 }
 
 type ClickhouseClient struct {
-	conn driver.Conn
+	Conn driver.Conn
 }
 
-var _ DBClient = (*ClickhouseClient)(nil)
+var _ Client = (*ClickhouseClient)(nil)
 
 // buildInsertQuery builds an INSERT query and extracts values from a struct using reflection.
 // It reads the `ch` struct tags to determine column names.
@@ -83,26 +87,26 @@ func NewClickhouseClient(
 	migrationsConfig *pldb.ClickHouseMigrationsConfig,
 ) (*ClickhouseClient, error) {
 	// initializing the clickhouse db client
-	chOpts := probeConfig.Clickhouse.Options()
-	conn, err := probeConfig.Clickhouse.OpenAndPing(ctx)
+
+	conn, err := chConfig.OpenAndPing(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("connecting to clickhouse: %w", err)
 	}
 	defer pllog.Defer(conn.Close, "Failed closing clickhouse client")
 
-	if err = probeConfig.Migrations.Apply(chOpts, migrations); err != nil {
+	if err = migrationsConfig.Apply(chConfig.Options(), migrations); err != nil {
 		return nil, fmt.Errorf("applying migrations: %w", err)
 	}
 
-	return &ClickhouseClient{conn: conn}, nil
+	return &ClickhouseClient{Conn: conn}, nil
 }
 
 func (c *ClickhouseClient) Close() error {
-	return c.conn.Close()
+	return c.Conn.Close()
 }
 
 func (c *ClickhouseClient) Websites(ctx context.Context) ([]string, error) {
-	rows, err := c.conn.Query(ctx, `SELECT * FROM websites WHERE deactivated_at IS NULL`)
+	rows, err := c.Conn.Query(ctx, `SELECT * FROM websites WHERE deactivated_at IS NULL`)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +125,7 @@ func (c *ClickhouseClient) Websites(ctx context.Context) ([]string, error) {
 }
 
 func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
-	rows, err := c.conn.Query(ctx, `SELECT domain FROM gateways WHERE deactivated_at IS NULL`)
+	rows, err := c.Conn.Query(ctx, `SELECT domain FROM gateways WHERE deactivated_at IS NULL`)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +145,7 @@ func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
 
 func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
 	query, values := buildInsertQuery("uploads", upload)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert uploads: %w", err)
 	}
@@ -150,7 +154,7 @@ func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel
 
 func (c *ClickhouseClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
 	query, values := buildInsertQuery("downloads", download)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert downloads: %w", err)
 	}
@@ -159,7 +163,7 @@ func (c *ClickhouseClient) InsertDownload(ctx context.Context, download *Downloa
 
 func (c *ClickhouseClient) InsertWebsiteProbe(ctx context.Context, websiteProbe *WebsiteProbeModel) error {
 	query, values := buildInsertQuery("website_probes", websiteProbe)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert website_probes: %w", err)
 	}
@@ -168,7 +172,7 @@ func (c *ClickhouseClient) InsertWebsiteProbe(ctx context.Context, websiteProbe 
 
 func (c *ClickhouseClient) InsertProvider(ctx context.Context, provider *ProviderModel) error {
 	query, values := buildInsertQuery("providers", provider)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert providers: %w", err)
 	}
@@ -177,7 +181,7 @@ func (c *ClickhouseClient) InsertProvider(ctx context.Context, provider *Provide
 
 func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
 	query, values := buildInsertQuery("gateway_probes", gatewayProbe)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert gateway_probes: %w", err)
 	}
@@ -186,7 +190,7 @@ func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe 
 
 func (c *ClickhouseClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
 	query, values := buildInsertQuery("service_worker_probes", serviceWorkerProbe)
-	err := c.conn.AsyncInsert(ctx, query, false, values...)
+	err := c.Conn.AsyncInsert(ctx, query, false, values...)
 	if err != nil {
 		return fmt.Errorf("async insert service_worker_probes: %w", err)
 	}
@@ -195,7 +199,7 @@ func (c *ClickhouseClient) InsertServiceWorkerProbe(ctx context.Context, service
 
 type NoopClient struct{}
 
-var _ DBClient = (*NoopClient)(nil)
+var _ Client = (*NoopClient)(nil)
 
 func NewNoopClient() *NoopClient {
 	slog.Info("Skipping database interactions.")
@@ -240,7 +244,7 @@ func (c *NoopClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorker
 
 type LogClient struct{}
 
-var _ DBClient = (*LogClient)(nil)
+var _ Client = (*LogClient)(nil)
 
 func (c *LogClient) Close() error {
 	return nil
@@ -287,7 +291,7 @@ type JSONClient struct {
 	serviceWorkerProbesFile *os.File
 }
 
-var _ DBClient = (*JSONClient)(nil)
+var _ Client = (*JSONClient)(nil)
 
 func NewJSONClient(dir string) (*JSONClient, error) {
 	dir = path.Join(dir, time.Now().Format("2006-01-02T15-04"))

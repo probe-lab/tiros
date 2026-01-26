@@ -11,6 +11,10 @@ import (
 
 	"github.com/google/uuid"
 	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/probe-lab/go-commons/ptr"
+	"github.com/probe-lab/tiros/pkg/db"
+	"github.com/probe-lab/tiros/pkg/kubo"
+	"github.com/probe-lab/tiros/pkg/ws"
 	"github.com/urfave/cli/v3"
 )
 
@@ -125,27 +129,27 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 		probeWebsitesConfig.ChromeKuboHost = probeWebsitesConfig.KuboHost
 	}
 
-	kuboCfg := &KuboConfig{
+	kuboCfg := &kubo.KuboConfig{
 		Host:           probeWebsitesConfig.KuboHost,
 		APIPort:        probeWebsitesConfig.KuboAPIPort,
 		GWPort:         probeWebsitesConfig.KuboGatewayPort,
 		ChromeKuboHost: probeWebsitesConfig.ChromeKuboHost,
 	}
-	kubo, err := NewKubo(kuboCfg)
+	kuboClient, err := kubo.NewKubo(kuboCfg)
 	if err != nil {
 		return fmt.Errorf("creating kubo client: %w", err)
 	}
 
-	if err := kubo.WaitAvailable(ctx, time.Minute); err != nil {
+	if err := kuboClient.WaitAvailable(ctx, time.Minute); err != nil {
 		return err
 	}
 
-	kuboVersion, err := kubo.Version(ctx)
+	kuboVersion, err := kuboClient.Version(ctx)
 	if err != nil {
 		return err
 	}
 
-	kuboID, err := kubo.ID(ctx)
+	kuboID, err := kuboClient.ID(ctx)
 	if err != nil {
 		return err
 	}
@@ -172,11 +176,11 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 		slog.Info("  " + w)
 	}
 
-	providerResults := make(chan *provider)
-	probeResults := make(chan *websiteProbeResult)
+	providerResults := make(chan *kubo.Provider)
+	probeResults := make(chan *ws.WebsiteProbeResult)
 
-	go measureWebsites(ctx, kubo, websites, probeResults)
-	go findAllProviders(ctx, kubo, websites, providerResults)
+	go measureWebsites(ctx, kuboClient, websites, probeResults)
+	go findAllProviders(ctx, kuboClient, websites, providerResults)
 
 	for {
 		slog.Info("Awaiting Provider or Probe result...")
@@ -186,11 +190,11 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 				slog.Info("Probing websites done!")
 				probeResults = nil
 			} else {
-				slog.With("url", pr.url).Info("Handling probe result")
+				slog.With("url", pr.URL).Info("Handling probe result")
 
 				var errStr string
-				if pr.err != nil {
-					errStr = pr.err.Error()
+				if pr.Err != nil {
+					errStr = pr.Err.Error()
 				}
 
 				metricsJSON, err := pr.MetricsJSON()
@@ -199,28 +203,28 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 					metricsJSON = nil
 				}
 
-				wpm := &WebsiteProbeModel{
+				wpm := &db.WebsiteProbeModel{
 					RunID:        runID.String(),
 					Region:       rootConfig.AWSRegion,
 					TirosVersion: cmd.Root().Version,
 					KuboVersion:  kuboVersion.Version,
 					KuboPeerID:   kuboID.ID,
-					Website:      pr.website,
-					URL:          pr.url,
-					Protocol:     string(pr.protocol),
+					Website:      pr.Website,
+					URL:          pr.URL,
+					Protocol:     string(pr.Protocol),
 					IPFSImpl:     "KUBO",
-					Try:          pr.try,
-					TTFB:         pr.ttfb,
-					FCP:          pr.fcp,
-					LCP:          pr.lcp,
-					TTI:          pr.tti,
-					CLS:          pr.cls,
-					TTFBRating:   pr.ttfbRating,
-					CLSRating:    pr.clsRating,
-					FCPRating:    pr.fcpRating,
-					LCPRating:    pr.lcpRating,
-					StatusCode:   pr.httpStatus,
-					Body:         pr.httpBody,
+					Try:          pr.Try,
+					TTFB:         pr.TTFB,
+					FCP:          pr.FCP,
+					LCP:          pr.LCP,
+					TTI:          pr.TTI,
+					CLS:          pr.CLS,
+					TTFBRating:   pr.TTFBRating,
+					CLSRating:    pr.CLSRating,
+					FCPRating:    pr.FCPRating,
+					LCPRating:    pr.LCPRating,
+					StatusCode:   pr.HTTPStatus,
+					Body:         pr.HTTPBody,
 					Metrics:      metricsJSON,
 					Error:        toPtr(errStr),
 					CreatedAt:    time.Now(),
@@ -235,32 +239,32 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 				slog.Info("Searching for providers done!")
 				providerResults = nil
 			} else {
-				if errors.Is(pr.err, context.DeadlineExceeded) {
-					pr.err = context.DeadlineExceeded
+				if errors.Is(pr.Err, context.DeadlineExceeded) {
+					pr.Err = context.DeadlineExceeded
 				}
-				slog.With("err", pr.err).
-					With("peerID", pr.id.String()[:16]).
-					With("website", pr.website).
+				slog.With("err", pr.Err).
+					With("peerID", pr.ID.String()[:16]).
+					With("website", pr.Website).
 					Info("Handling provider result")
 
-				maddrs := make([]string, 0, len(pr.addrs))
-				for _, addr := range pr.addrs {
+				maddrs := make([]string, 0, len(pr.Maddrs))
+				for _, addr := range pr.Maddrs {
 					maddrs = append(maddrs, addr.String())
 				}
 
-				pm := &ProviderModel{
+				pm := &db.ProviderModel{
 					RunID:          runID.String(),
 					Region:         rootConfig.AWSRegion,
 					TirosVersion:   cmd.Root().Version,
 					KuboVersion:    kuboVersion.Version,
 					KuboPeerID:     kuboID.ID,
-					Website:        pr.website,
-					Path:           pr.path,
-					ProviderID:     pr.id.String(),
-					AgentVersion:   pr.agent,
+					Website:        pr.Website,
+					Path:           pr.Path,
+					ProviderID:     pr.ID.String(),
+					AgentVersion:   pr.Agent,
 					MultiAddresses: maddrs,
-					IsRelayed:      pr.isRelayed,
-					Error:          pr.err,
+					IsRelayed:      pr.IsRelayed,
+					Error:          pr.Err,
 					CreatedAt:      time.Now(),
 				}
 				if err = dbClient.InsertProvider(ctx, pm); err != nil {
@@ -277,7 +281,7 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-func measureWebsites(ctx context.Context, k *Kubo, websites []string, results chan<- *websiteProbeResult) {
+func measureWebsites(ctx context.Context, k *kubo.Kubo, websites []string, results chan<- *ws.WebsiteProbeResult) {
 	defer close(results)
 
 	if !probeWebsitesConfig.LookupProviders {
@@ -285,22 +289,22 @@ func measureWebsites(ctx context.Context, k *Kubo, websites []string, results ch
 	}
 
 	for i := 0; i < probeWebsitesConfig.Probes; i++ {
-		for _, protocol := range []WebsiteProbeProtocol{WebsiteProbeProtocolIPFS, WebsiteProbeProtocolHTTP} {
+		for _, protocol := range []db.WebsiteProbeProtocol{db.WebsiteProbeProtocolIPFS, db.WebsiteProbeProtocolHTTP} {
 			for _, website := range websites {
 				slog.Info("Start probing", "website", website, "protocol", protocol)
-				wp := &websiteProbe{
-					url:       k.websiteURL(website, protocol),
-					website:   website,
-					probeType: protocol,
-					cdpPort:   probeWebsitesConfig.ChromeCDPPort,
-					result: &websiteProbeResult{
-						url:      k.websiteURL(website, protocol),
-						website:  website,
-						protocol: protocol,
+				wp := &ws.WebsiteProbe{
+					URL:       k.WebsiteURL(website, protocol),
+					Website:   website,
+					ProbeType: protocol,
+					CDPPort:   probeWebsitesConfig.ChromeCDPPort,
+					Result: &ws.WebsiteProbeResult{
+						URL:      k.WebsiteURL(website, protocol),
+						Website:  website,
+						Protocol: protocol,
 					},
 				}
 
-				pr, err := wp.run(ctx)
+				pr, err := wp.Run(ctx)
 				if errors.Is(ctx.Err(), context.Canceled) {
 					return
 				} else if err != nil {
@@ -308,22 +312,22 @@ func measureWebsites(ctx context.Context, k *Kubo, websites []string, results ch
 					continue
 				}
 
-				pr.website = website
-				pr.protocol = protocol
-				pr.try = i
+				pr.Website = website
+				pr.Protocol = protocol
+				pr.Try = i
 
 				slog.With(
-					"ttfb", p2f(pr.ttfb),
-					"lcp", p2f(pr.lcp),
-					"fcp", p2f(pr.fcp),
-					"tti", p2f(pr.tti),
-					"status", pr.httpStatus,
-					"err", pr.err,
+					"ttfb", ptr.From(pr.TTFB),
+					"lcp", ptr.From(pr.LCP),
+					"fcp", ptr.From(pr.FCP),
+					"tti", ptr.From(pr.TTI),
+					"status", pr.HTTPStatus,
+					"err", pr.Err,
 				).Info("Probed website " + website)
 
 				results <- pr
 
-				if protocol == WebsiteProbeProtocolIPFS {
+				if protocol == db.WebsiteProbeProtocolIPFS {
 					if k.Reset(ctx); err != nil {
 						slog.With("err", err).Warn("error running ipfs gc")
 						continue
@@ -334,11 +338,11 @@ func measureWebsites(ctx context.Context, k *Kubo, websites []string, results ch
 	}
 }
 
-func findAllProviders(ctx context.Context, k *Kubo, websites []string, results chan<- *provider) {
+func findAllProviders(ctx context.Context, k *kubo.Kubo, websites []string, results chan<- *kubo.Provider) {
 	defer close(results)
 	for _, website := range websites {
 		for retry := 0; retry < 3; retry++ {
-			err := k.findProviders(ctx, website, results)
+			err := k.FindProviders(ctx, website, results)
 			if err != nil {
 				slog.With("err", err, "retry", retry, "website", website).Warn("Couldn't find providers")
 				if strings.Contains(err.Error(), "routing/findprovs") {

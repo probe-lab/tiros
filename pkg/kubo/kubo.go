@@ -1,4 +1,4 @@
-package main
+package kubo
 
 import (
 	"context"
@@ -27,6 +27,8 @@ import (
 	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/multiformats/go-multicodec"
 	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/probe-lab/go-commons/ptr"
+	"github.com/probe-lab/tiros/pkg/db"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -40,6 +42,7 @@ type KuboConfig struct {
 	GWPort         int
 	Receiver       *TraceReceiver
 	ChromeKuboHost string
+	FileSizeMiB    int
 }
 
 type Kubo struct {
@@ -148,7 +151,7 @@ func (k *Kubo) Reset(ctx context.Context) {
 
 func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, error) {
 	// Generate random data
-	size := probeKuboConfig.FileSizeMiB * 1024 * 1024
+	size := k.cfg.FileSizeMiB * 1024 * 1024
 	data := make([]byte, size)
 	rand.Read(data)
 
@@ -339,17 +342,17 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	return result, nil
 }
 
-type provider struct {
-	website   string
-	path      string
-	id        peer.ID
-	addrs     []multiaddr.Multiaddr
-	agent     *string
-	err       error
-	isRelayed *bool
+type Provider struct {
+	Website   string
+	Path      string
+	ID        peer.ID
+	Maddrs    []multiaddr.Multiaddr
+	Agent     *string
+	Err       error
+	IsRelayed *bool
 }
 
-func (k *Kubo) findProviders(ctx context.Context, website string, results chan<- *provider) error {
+func (k *Kubo) FindProviders(ctx context.Context, website string, results chan<- *Provider) error {
 	logEntry := slog.With("website", website)
 	logEntry.Info("Finding providers for " + website)
 
@@ -453,27 +456,27 @@ func (k *Kubo) findProviders(ctx context.Context, website string, results chan<-
 	for i := 0; i < numJobs; i++ {
 		idr := <-idResults
 
-		prov := &provider{
-			website: website,
-			path:    nrr.Path,
-			id:      idr.peer.ID,
-			addrs:   idr.peer.Addrs,
+		prov := &Provider{
+			Website: website,
+			Path:    nrr.Path,
+			ID:      idr.peer.ID,
+			Maddrs:  idr.peer.Addrs,
 		}
 
 		if idr.err != nil {
-			prov.err = idr.err
+			prov.Err = idr.err
 		} else {
-			prov.agent = toPtr(idr.id.AgentVersion)
+			prov.Agent = ptr.From(idr.id.AgentVersion)
 			if len(idr.id.Addresses) != len(idr.peer.Addrs) && len(idr.id.Addresses) != 0 {
 				newAddrs := make([]multiaddr.Multiaddr, len(idr.id.Addresses))
 				for j, addr := range idr.id.Addresses {
 					newAddrs[j] = multiaddr.StringCast(addr)
 				}
-				prov.addrs = newAddrs
+				prov.Maddrs = newAddrs
 			}
 		}
 
-		prov.isRelayed = isRelayed(prov.addrs)
+		prov.IsRelayed = isRelayed(prov.Maddrs)
 
 		results <- prov
 	}
@@ -481,11 +484,11 @@ func (k *Kubo) findProviders(ctx context.Context, website string, results chan<-
 	return nil
 }
 
-func (k *Kubo) websiteURL(website string, protocol WebsiteProbeProtocol) string {
+func (k *Kubo) WebsiteURL(website string, protocol db.WebsiteProbeProtocol) string {
 	switch protocol {
-	case WebsiteProbeProtocolIPFS:
+	case db.WebsiteProbeProtocolIPFS:
 		return fmt.Sprintf("http://%s:%d/ipns/%s", k.cfg.ChromeKuboHost, k.cfg.GWPort, website)
-	case WebsiteProbeProtocolHTTP:
+	case db.WebsiteProbeProtocolHTTP:
 		return fmt.Sprintf("https://%s", website)
 	default:
 		panic(fmt.Sprintf("unknown probe type: %s", protocol))

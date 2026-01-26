@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"context"
@@ -21,6 +21,7 @@ import (
 	"github.com/ipfs/kubo/core/coreiface/options"
 	"github.com/multiformats/go-multicodec"
 	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/probe-lab/tiros/pkg/db"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
@@ -64,8 +65,8 @@ type BitswapSnifferClickhouseCIDProvider struct {
 
 var _ CIDProvider = (*BitswapSnifferClickhouseCIDProvider)(nil)
 
-func NewBitswapSnifferClickhouseCIDProvider(dbClient DBClient) (*BitswapSnifferClickhouseCIDProvider, error) {
-	chClient, ok := dbClient.(*ClickhouseClient)
+func NewBitswapSnifferClickhouseCIDProvider(dbClient db.Client) (*BitswapSnifferClickhouseCIDProvider, error) {
+	chClient, ok := dbClient.(*db.ClickhouseClient)
 	if !ok {
 		return nil, fmt.Errorf("expected clickhouse client, got: %T", dbClient)
 	}
@@ -77,7 +78,7 @@ func NewBitswapSnifferClickhouseCIDProvider(dbClient DBClient) (*BitswapSnifferC
 	}
 
 	return &BitswapSnifferClickhouseCIDProvider{
-		conn:             chClient.conn,
+		conn:             chClient.Conn,
 		cidSelectCounter: cidSelectCounter,
 	}, nil
 }

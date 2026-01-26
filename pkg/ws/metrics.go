@@ -1,4 +1,4 @@
-package main
+package ws
 
 import (
 	"encoding/json"
@@ -9,9 +9,9 @@ type Metrics struct {
 	// can grow
 }
 
-func (pr *websiteProbeResult) MetricsJSON() (json.RawMessage, error) {
+func (pr *WebsiteProbeResult) MetricsJSON() (json.RawMessage, error) {
 	m := Metrics{
-		NavigationPerformance: pr.navPerf,
+		NavigationPerformance: pr.NavPerf,
 	}
 
 	return json.Marshal(m)
