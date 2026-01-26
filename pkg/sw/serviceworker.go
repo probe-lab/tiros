@@ -75,9 +75,28 @@ type NetworkEventResponse struct {
 }
 
 func NewSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
+	var (
+		cidv0 cid.Cid
+		cidv1 cid.Cid
+	)
+
+	switch c.Version() {
+	case 0:
+		cidv0 = c
+		cidv1 = cid.NewCidV1(c.Type(), c.Hash())
+	case 1:
+		// parse tries to transform the multihash into a CIDv0. It fails if the
+		// multihash is not a SHA256 hash or is not 32 bytes long.
+		// We don't care about the error here because we only use the cids
+		// for matching in URLs. If there's no v0 representation, it also
+		// won't appear in URLs
+		cidv0, _ = cid.Parse(c.Hash())
+		cidv1 = c
+	}
+
 	return &swProbe{
-		cidv0:   cid.NewCidV0(c.Hash()),
-		cidv1:   cid.NewCidV1(c.Type(), c.Hash()),
+		cidv0:   cidv0,
+		cidv1:   cidv1,
 		url:     url,
 		cdpHost: cdpHost,
 		cdpPort: cdpPort,
