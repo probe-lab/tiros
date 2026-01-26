@@ -31,8 +31,8 @@ type CIDProvider interface {
 }
 
 type StaticCIDProvider struct {
-	testCIDs   []cid.Cid
-	testCIDIdx int
+	cids []cid.Cid
+	idx  int
 }
 
 var _ CIDProvider = (*StaticCIDProvider)(nil)
@@ -47,13 +47,13 @@ func NewStaticCIDProvider(cids []string) (*StaticCIDProvider, error) {
 		testCIDs = append(testCIDs, parse)
 	}
 
-	return &StaticCIDProvider{testCIDs: testCIDs}, nil
+	return &StaticCIDProvider{cids: testCIDs}, nil
 }
 
 func (p *StaticCIDProvider) SelectCID(ctx context.Context, origin string) (cid.Cid, error) {
-	testCID := p.testCIDs[p.testCIDIdx]
-	p.testCIDIdx += 1
-	p.testCIDIdx %= len(p.testCIDs)
+	testCID := p.cids[p.idx]
+	p.idx += 1
+	p.idx %= len(p.cids)
 	return testCID, nil
 }
 
@@ -201,7 +201,7 @@ func NewControlledCIDProvider() (*ControlledCIDProvider, error) {
 
 		c, err := cid.Parse(strings.TrimSpace(line))
 		if err != nil {
-			slog.Warn("failed to parse CID from controlledcids file: %v", err)
+			slog.Warn("failed to parse CID from controlledcids file", "err", err)
 			continue
 		}
 		cids = append(cids, c)
