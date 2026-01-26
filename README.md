@@ -18,6 +18,8 @@ setup in detail and how the measurement can be run locally.
 <!-- TOC -->
 * [Tiros](#tiros)
   * [Table of Contents](#table-of-contents)
+  * [CID Provider Concept](#cid-provider-concept)
+  * [Traditional HTTP Gateway Performance](#traditional-http-gateway-performance)
   * [Measurement Methodology](#measurement-methodology)
     * [Content Routing Performance](#content-routing-performance)
       * [Run](#run)
@@ -40,7 +42,7 @@ setup in detail and how the measurement can be run locally.
 
 The Traditional HTTP Gateway Performance, Service Worker Gateway Performance,
 and Kubo Retrieval and Publication Performance measurements require a set of
-CIDs that they should request from the network. These CIDs are provided by a
+CIDs that they request from the network to take measurements. These CIDs are provided by a
 CID provider:
 
 ```go
@@ -68,7 +70,7 @@ be disabled with `--controlled.cids=false`.
 
 The traditional HTTP Gateway Performance experiment probes the performance of different
 HTTP Gateways. The list of gateways to probe can either be provided on the command line
-as a comma-separated list of hostnames for the `--gateways` flag or via a
+as a comma-separated list of hostnames via the `--gateways` flag or via a
 query to a Clickhouse database (default). Then you can provide a list of CIDs to probe
 via the `--cids` flag. By default 20% of requests will randomly be made for controlled CIDs.
 To disable this behavior, set `--controlled.cids=false` or `--controlled.share=0`. Conversely,
@@ -79,7 +81,7 @@ To run the traditional HTTP Gateway Performance experiment and store the results
 ```shell
 docker compose up clickhouse
 
-go run . probe gateways --iterations.max 1 --gateways ipfs.io,dweb.link --controlled.share 1 --cids QmUvSqPqYsjeab2JgsNc4PjbAGnCzfn5xid6piJgYYzehH
+go run ./cmd/tiros probe gateways --iterations.max 1 --gateways ipfs.io,dweb.link --controlled.share 1 --cids QmUvSqPqYsjeab2JgsNc4PjbAGnCzfn5xid6piJgYYzehH
 ```
 
 The docker command starts a clickhouse database which will get migrations automatically applied when tiros interacts with the db
@@ -122,6 +124,30 @@ GLOBAL OPTIONS:
    --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
    --aws.region string    On which path should the metrics endpoint listen [$AWS_REGION]
 ```
+
+## Service Worker Gateway Performance
+
+The Service Worker Gateway Performance experiment probes the performance of the
+[Service Worker Gateway](https://github.com/ipfs/service-worker-gateway)
+implementation. Tiros orchestrates a headless Chrome instance to load the
+Service Worker Gateway and measure the retrieval performance.
+
+To run the Service Worker Gateway Performance experiment and store the results
+in a Clickhouse database, run the following commands:
+
+```shell
+docker compose up clickhouse chrome
+
+go run ./cmd/tiros probe serviceworker --iterations.max 1 --gateways ipfs.io,dweb.link --controlled.share 1 --cids QmUvSqPqYsjeab2JgsNc4PjbAGnCzfn5xid6piJgYYzehH
+```
+
+The docker command starts a clickhouse database which will get migrations automatically applied when tiros interacts with the db
+for the first time. The user and database are `tiros_local` and the password is `password`. You can connect to the database with the following command:
+
+```shell
+clickhouse client --host localhost --password --user tiros_local
+```
+
 
 
 ## Measurement Methodology
