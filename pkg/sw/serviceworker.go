@@ -1,4 +1,4 @@
-package main
+package sw
 
 import (
 	"bytes"
@@ -74,7 +74,7 @@ type NetworkEventResponse struct {
 	Body            []byte
 }
 
-func newSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
+func NewSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
 	return &swProbe{
 		cidv0:   cid.NewCidV0(c.Hash()),
 		cidv1:   cid.NewCidV1(c.Type(), c.Hash()),
@@ -118,7 +118,7 @@ type swProbeResult struct {
 	ServedFromGateway bool
 
 	// Server timing data (from final response)
-	ServerTimings        map[string]serverTiming
+	ServerTimings        map[string]ServerTiming
 	DelegatedRouterTTFB  time.Duration
 	TrustlessGatewayTTFB time.Duration
 
@@ -258,7 +258,7 @@ func (r *swRequestTrace) isFinalRequest() bool {
 	return false
 }
 
-func (p *swProbe) run(ctx context.Context) (*swProbeResult, error) {
+func (p *swProbe) Run(ctx context.Context) (*swProbeResult, error) {
 	browserURL := url.URL{
 		Scheme: "ws",
 		Host:   net.JoinHostPort(p.cdpHost, strconv.Itoa(p.cdpPort)),
@@ -462,7 +462,7 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	defer p.listenMu.Unlock()
 
 	result := &swProbeResult{
-		ServerTimings:        make(map[string]serverTiming),
+		ServerTimings:        make(map[string]ServerTiming),
 		DelegatedRouterTTFB:  0,
 		TrustlessGatewayTTFB: 0,
 	}
@@ -769,18 +769,18 @@ func (r *swProbe) handleResponseReceived(e *network.EventResponseReceived) {
 	trace.responses = append(trace.responses, e.Response)
 }
 
-type serverTiming struct {
-	name  string
-	value time.Duration
-	desc  string
-	extra map[string]string
+type ServerTiming struct {
+	Name  string
+	Value time.Duration
+	Desc  string
+	Extra map[string]string
 }
 
 // parseServerTiming parses a server-timing header into a map of serverTiming.
 // Each entry represents a metric with its name, duration, description, and extras.
 // Parses strings like: custom-metric;dur=123.45;desc="My custom metric"
-func parseServerTiming(raw string) map[string]serverTiming {
-	serverTimings := map[string]serverTiming{}
+func parseServerTiming(raw string) map[string]ServerTiming {
+	serverTimings := map[string]ServerTiming{}
 
 	metrics := strings.Split(raw, ",")
 	for _, metric := range metrics {
@@ -789,9 +789,9 @@ func parseServerTiming(raw string) map[string]serverTiming {
 			continue
 		}
 
-		st := serverTiming{
-			name:  strings.TrimSpace(fields[0]),
-			extra: make(map[string]string),
+		st := ServerTiming{
+			Name:  strings.TrimSpace(fields[0]),
+			Extra: make(map[string]string),
 		}
 
 		for _, field := range fields[1:] {
@@ -806,23 +806,23 @@ func parseServerTiming(raw string) map[string]serverTiming {
 				if err != nil {
 					continue
 				}
-				st.value = dur
+				st.Value = dur
 			case "desc":
 				unquote, err := strconv.Unquote(kv[1])
 				if err != nil {
 					continue
 				}
-				st.desc = unquote
+				st.Desc = unquote
 			default:
 				unquote, err := strconv.Unquote(kv[1])
 				if err != nil {
 					continue
 				}
 
-				st.extra[kv[0]] = unquote
+				st.Extra[kv[0]] = unquote
 			}
 		}
-		serverTimings[st.name] = st
+		serverTimings[st.Name] = st
 	}
 
 	return serverTimings

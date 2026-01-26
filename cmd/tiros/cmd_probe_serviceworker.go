@@ -15,6 +15,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/ipfs/go-cid"
 	pllog "github.com/probe-lab/go-commons/log"
+	"github.com/probe-lab/tiros/pkg"
+	"github.com/probe-lab/tiros/pkg/db"
+	"github.com/probe-lab/tiros/pkg/sw"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -149,16 +152,16 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
 	// Initialize CID provider
-	var cidProvider CIDProvider
+	var cidProvider pkg.CIDProvider
 	var cidProviderName string
 	if len(probeServiceWorkerConfig.DownloadCIDs) > 0 {
-		cidProvider, err = NewStaticCIDProvider(probeServiceWorkerConfig.DownloadCIDs)
+		cidProvider, err = pkg.NewStaticCIDProvider(probeServiceWorkerConfig.DownloadCIDs)
 		if err != nil {
 			return fmt.Errorf("creating static cid provider: %w", err)
 		}
 		cidProviderName = "StaticCIDProvider"
 	} else {
-		cidProvider, err = NewBitswapSnifferClickhouseCIDProvider(dbClient)
+		cidProvider, err = pkg.NewBitswapSnifferClickhouseCIDProvider(dbClient)
 		if err != nil {
 			return fmt.Errorf("creating clickhouse cid provider: %w", err)
 		}
@@ -166,7 +169,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	slog.With("provider", cidProviderName).Info("Using CID provider for service worker probes")
 
-	controlledCIDsProvider, err := NewControlledCIDProvider()
+	controlledCIDsProvider, err := pkg.NewControlledCIDProvider()
 	if err != nil {
 		return fmt.Errorf("creating controlled cid provider: %w", err)
 	}
@@ -209,7 +212,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 			ciid, err = cidProvider.SelectCID(ctx, "dht")
 
 			cidSource = "bitsniffer_bitswap"
-			if _, ok := cidProvider.(*StaticCIDProvider); ok {
+			if _, ok := cidProvider.(*pkg.StaticCIDProvider); ok {
 				cidSource = "static"
 			}
 		}
@@ -232,10 +235,10 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 
 			// Create and run probe
 			slog.With("gateway", gateway).Info("Probing service worker gateway")
-			probe := newSwProbe(ciid, navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
+			probe := sw.NewSwProbe(ciid, navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
 
 			probeCtx, probeCancel := context.WithTimeout(ctx, probeServiceWorkerConfig.Timeout)
-			result, err := probe.run(probeCtx)
+			result, err := probe.Run(probeCtx)
 			probeCancel()
 
 			status := 0
@@ -255,7 +258,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				errStr = &errMsg
 			}
 
-			dbModel := &ServiceWorkerProbeModel{
+			dbModel := &db.ServiceWorkerProbeModel{
 				RunID:        runID.String(),
 				Region:       rootConfig.AWSRegion,
 				TirosVersion: cmd.Root().Version,
@@ -291,7 +294,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 					// clickhouse interprets these keys. Therefore, we replace
 					// them with an _.
 					k = strings.ReplaceAll(k, ".", "_")
-					serverTimings[k] = v.value.Seconds()
+					serverTimings[k] = v.Value.Seconds()
 				}
 				if data, err := json.Marshal(serverTimings); err == nil {
 					dbModel.ServerTimings = data

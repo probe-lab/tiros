@@ -1,4 +1,4 @@
-package main
+package ws
 
 import (
 	"context"
@@ -10,6 +10,9 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/proto"
+	"github.com/probe-lab/go-commons/ptr"
+	"github.com/probe-lab/tiros/pkg/db"
+	"github.com/probe-lab/tiros/pkg/js"
 )
 
 const websiteRequestTimeout = 15 * time.Second
@@ -20,56 +23,56 @@ var (
 	ErrNetworkIdleTimeout = errors.New("window.requestIdleCallback timed out")
 )
 
-type websiteProbe struct {
-	url       string
-	website   string
-	probeType WebsiteProbeProtocol
-	cdpPort   int
+type WebsiteProbe struct {
+	URL       string
+	Website   string
+	ProbeType db.WebsiteProbeProtocol
+	CDPPort   int
 
-	browser *rod.Browser
-	page    *rod.Page
+	Browser *rod.Browser
+	Page    *rod.Page
 
-	result          *websiteProbeResult
-	metricsStr      string
-	navPerfEntryStr string
+	Result          *WebsiteProbeResult
+	MetricsStr      string
+	NavPerfEntryStr string
 }
 
-type websiteProbeResult struct {
-	url     string
-	website string
+type WebsiteProbeResult struct {
+	URL     string
+	Website string
 
 	// measurement type (IPFS or HTTP)
-	protocol WebsiteProbeProtocol
-	try      int
+	Protocol db.WebsiteProbeProtocol
+	Try      int
 
-	ttfb       *float64
-	ttfbRating *string
+	TTFB       *float64
+	TTFBRating *string
 
-	fcp       *float64
-	fcpRating *string
+	FCP       *float64
+	FCPRating *string
 
-	lcp       *float64
-	lcpRating *string
+	LCP       *float64
+	LCPRating *string
 
-	tti       *float64
-	ttiRating *string
+	TTI       *float64
+	TTIRating *string
 
-	cls       *float64
-	clsRating *string
+	CLS       *float64
+	CLSRating *string
 
-	navPerf *PerformanceNavigationEntry
+	NavPerf *PerformanceNavigationEntry
 
-	httpStatus int
-	httpBody   *string
+	HTTPStatus int
+	HTTPBody   *string
 
-	err error
+	Err error
 }
 
-func (p *websiteProbe) logEntry() *slog.Logger {
-	return slog.With("url", p.url)
+func (p *WebsiteProbe) logEntry() *slog.Logger {
+	return slog.With("url", p.URL)
 }
 
-func (p *websiteProbe) run(ctx context.Context) (*websiteProbeResult, error) {
+func (p *WebsiteProbe) Run(ctx context.Context) (*WebsiteProbeResult, error) {
 	if err := p.initBrowser(ctx); err != nil {
 		return nil, err
 	}
@@ -83,39 +86,39 @@ func (p *websiteProbe) run(ctx context.Context) (*websiteProbeResult, error) {
 
 	if errors.Is(err, ErrNavigateTimeout) {
 		p.logEntry().With("err", ErrNavigateTimeout).Warn("Couldn't measure website performance.")
-		p.result.err = ErrNavigateTimeout
-		return p.result, nil
+		p.Result.Err = ErrNavigateTimeout
+		return p.Result, nil
 	} else if errors.Is(err, context.Canceled) {
 		return nil, err
 	} else if err != nil {
 		p.logEntry().With("err", err).Warn("Couldn't measure website performance.")
-		p.result.err = err
-		return p.result, nil
+		p.Result.Err = err
+		return p.Result, nil
 	}
 
-	return p.result, p.parseMetrics()
+	return p.Result, p.parseMetrics()
 }
 
-func (p *websiteProbe) initBrowser(ctx context.Context) error {
+func (p *WebsiteProbe) initBrowser(ctx context.Context) error {
 	// Initialize browser reference
-	p.browser = rod.New().
+	p.Browser = rod.New().
 		Context(ctx). // stop when outer ctx stops
-		ControlURL(fmt.Sprintf("ws://localhost:%d", p.cdpPort))
+		ControlURL(fmt.Sprintf("ws://localhost:%d", p.CDPPort))
 
 	// Connecting to headless chrome
 	p.logEntry().Debug("Connecting to browser...")
-	if err := p.browser.Connect(); err != nil {
+	if err := p.Browser.Connect(); err != nil {
 		return fmt.Errorf("connecting to browser: %w", err)
 	}
 
 	return nil
 }
 
-func (p *websiteProbe) mustInitPage(ctx context.Context) {
+func (p *WebsiteProbe) mustInitPage(ctx context.Context) {
 	p.logEntry().Debug("Initialize incognito browser")
 	// first defense to prevent hitting the cache.
 	// use an incognito browser
-	browser := p.browser.Context(ctx).MustIncognito()
+	browser := p.Browser.Context(ctx).MustIncognito()
 
 	p.logEntry().Debug("Clearing browser cookies")
 	// second defense to prevent hitting the cache
@@ -123,33 +126,33 @@ func (p *websiteProbe) mustInitPage(ctx context.Context) {
 	browser.MustSetCookies()
 
 	p.logEntry().Debug("Opening new page")
-	p.page = browser.MustPage()
+	p.Page = browser.MustPage()
 
 	p.logEntry().Debug("Attaching javascript")
 	// third defense to prevent hitting the cache
 	// clear local storage and attaching onerror listeners
-	p.page.MustEvalOnNewDocument(jsOnNewDocument)
+	p.Page.MustEvalOnNewDocument(js.OnNewDocument)
 
 	// disable cache
-	err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(p.page) // fourth defense to prevent hitting the cache
+	err := proto.NetworkSetCacheDisabled{CacheDisabled: true}.Call(p.Page) // fourth defense to prevent hitting the cache
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (p *websiteProbe) mustNavigate() {
+func (p *WebsiteProbe) mustNavigate() {
 	e := proto.NetworkResponseReceived{}
-	wait := p.page.Timeout(websiteRequestTimeout).WaitEvent(&e)
+	wait := p.Page.Timeout(websiteRequestTimeout).WaitEvent(&e)
 
 	p.logEntry().With("timeout", websiteRequestTimeout).Debug("Navigating...")
-	err := p.page.Timeout(websiteRequestTimeout).Navigate(p.url)
+	err := p.Page.Timeout(websiteRequestTimeout).Navigate(p.URL)
 
 	wait()
 
 	if e.Type == proto.NetworkResourceTypeDocument {
-		p.result.httpStatus = e.Response.Status
-		if p.result.httpStatus < 200 || p.result.httpStatus >= 300 {
-			p.result.httpBody = toPtr(p.page.MustElement("body").MustText())
+		p.Result.HTTPStatus = e.Response.Status
+		if p.Result.HTTPStatus < 200 || p.Result.HTTPStatus >= 300 {
+			p.Result.HTTPBody = ptr.From(p.Page.MustElement("body").MustText())
 		}
 	}
 
@@ -161,75 +164,75 @@ func (p *websiteProbe) mustNavigate() {
 
 	p.logEntry().With("timeout", websiteRequestTimeout).Debug("Waiting for onload event ...")
 	// load: fired when the whole page has loaded (including all dependent resources such as stylesheets, scripts, iframes, and images)
-	err = p.page.Timeout(websiteRequestTimeout).WaitLoad()
+	err = p.Page.Timeout(websiteRequestTimeout).WaitLoad()
 	if errors.Is(err, context.Canceled) {
 		panic(err)
 	} else if err != nil {
-		p.result.err = ErrOnLoadTimeout
+		p.Result.Err = ErrOnLoadTimeout
 	}
 
 	p.logEntry().With("timeout", websiteRequestTimeout).Debug("Waiting for network idle event ...")
 	// idle: fired when the network has come to a halt (1 Minute)
-	err = p.page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
+	err = p.Page.Timeout(websiteRequestTimeout).WaitIdle(time.Minute)
 	if errors.Is(err, context.Canceled) {
 		panic(err)
 	} else if err != nil {
-		if p.result.err != nil {
-			err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), p.result.err)
+		if p.Result.Err != nil {
+			err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), p.Result.Err)
 		}
-		p.result.err = ErrNetworkIdleTimeout
+		p.Result.Err = ErrNetworkIdleTimeout
 	}
 }
 
-func (p *websiteProbe) mustMeasure() {
+func (p *WebsiteProbe) mustMeasure() {
 	p.logEntry().Debug("Running polyfill JS ...")
-	p.page.MustEval(wrapInFn(jsTTIPolyfill))   // add TTI polyfill
-	p.page.MustEval(wrapInFn(jsWebVitalsIIFE)) // web-vitals
+	p.Page.MustEval(js.WrapInFn(js.TTIPolyfill))   // add TTI polyfill
+	p.Page.MustEval(js.WrapInFn(js.WebVitalsIIFE)) // web-vitals
 
 	p.logEntry().Debug("Running measurement ...")
-	p.metricsStr = p.page.MustEval(jsMeasurement).Str() // finally measure the stuff
+	p.MetricsStr = p.Page.MustEval(js.Measurement).Str() // finally measure the stuff
 
 	p.logEntry().Debug("Getting Performance Entry measurement ...")
-	rro, err := p.page.Eval(jsNavPerfEntry)
+	rro, err := p.Page.Eval(js.NavPerfEntry)
 	if err != nil {
 		p.logEntry().With("err", err).Warn("Couldn't get navigation performance entry")
 	} else {
-		p.navPerfEntryStr = rro.Value.Str()
+		p.NavPerfEntryStr = rro.Value.Str()
 	}
 }
 
-func (p *websiteProbe) parseMetrics() error {
-	vitals := WebVitals{}
-	if err := json.Unmarshal([]byte(p.metricsStr), &vitals); err != nil {
+func (p *WebsiteProbe) parseMetrics() error {
+	vitals := js.WebVitals{}
+	if err := json.Unmarshal([]byte(p.MetricsStr), &vitals); err != nil {
 		return fmt.Errorf("unmarshal web-vitals: %w", err)
 	}
 
-	if p.navPerfEntryStr != "" {
+	if p.NavPerfEntryStr != "" {
 		navPerfEntry := PerformanceNavigationEntry{}
-		if err := json.Unmarshal([]byte(p.navPerfEntryStr), &navPerfEntry); err != nil {
+		if err := json.Unmarshal([]byte(p.NavPerfEntryStr), &navPerfEntry); err != nil {
 			return fmt.Errorf("unmarshal navigation performance entry: %w", err)
 		}
-		p.result.navPerf = &navPerfEntry
+		p.Result.NavPerf = &navPerfEntry
 	}
 
 	for _, v := range vitals {
 		v := v
 		switch v.Name {
 		case "LCP":
-			p.result.lcp = &v.Value
-			p.result.lcpRating = &v.Rating
+			p.Result.LCP = &v.Value
+			p.Result.LCPRating = &v.Rating
 		case "FCP":
-			p.result.fcp = &v.Value
-			p.result.fcpRating = &v.Rating
+			p.Result.FCP = &v.Value
+			p.Result.FCPRating = &v.Rating
 		case "TTFB":
-			p.result.ttfb = &v.Value
-			p.result.ttfbRating = &v.Rating
+			p.Result.TTFB = &v.Value
+			p.Result.TTFBRating = &v.Rating
 		case "TTI":
-			p.result.tti = &v.Value
-			p.result.ttiRating = &v.Rating
+			p.Result.TTI = &v.Value
+			p.Result.TTIRating = &v.Rating
 		case "CLS":
-			p.result.cls = &v.Value
-			p.result.clsRating = &v.Rating
+			p.Result.CLS = &v.Value
+			p.Result.CLSRating = &v.Rating
 		default:
 			continue
 		}
@@ -238,16 +241,16 @@ func (p *websiteProbe) parseMetrics() error {
 	return nil
 }
 
-func (p *websiteProbe) close() {
+func (p *WebsiteProbe) close() {
 	p.logEntry().Debug("Closing page...")
-	if p.page != nil {
-		if err := p.page.Close(); err != nil && !errors.Is(err, context.Canceled) {
+	if p.Page != nil {
+		if err := p.Page.Close(); err != nil && !errors.Is(err, context.Canceled) {
 			p.logEntry().With("err", err).Warn("Error closing page")
 		}
 	}
 
 	p.logEntry().Debug("Closing browser connection...")
-	if err := p.browser.Close(); err != nil && !errors.Is(err, context.Canceled) {
+	if err := p.Browser.Close(); err != nil && !errors.Is(err, context.Canceled) {
 		p.logEntry().With("err", err).Warn("Error closing browser connection")
 	}
 }

@@ -4,7 +4,6 @@ go 1.25.1
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.3
-	github.com/aarondl/null/v8 v8.1.3
 	github.com/chromedp/cdproto v0.0.0-20250319231242-a755498943c8
 	github.com/chromedp/chromedp v0.13.2
 	github.com/go-rod/rod v0.116.2
@@ -17,7 +16,7 @@ require (
 	github.com/libp2p/go-libp2p v0.43.0
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/multiformats/go-multicodec v0.9.2
-	github.com/probe-lab/go-commons v0.0.0-20260116165921-15a81b326025
+	github.com/probe-lab/go-commons v0.0.0-20260126063519-20966cabcdb1
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.4.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
@@ -40,9 +39,6 @@ require (
 	github.com/ClickHouse/ch-go v0.68.0 // indirect
 	github.com/DataDog/zstd v1.5.6-0.20230824185856-869dae002e5e // indirect
 	github.com/Jorropo/jsync v1.0.1 // indirect
-	github.com/aarondl/inflect v0.0.2 // indirect
-	github.com/aarondl/randomize v0.0.2 // indirect
-	github.com/aarondl/strmangle v0.0.9 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
 	github.com/alexbrainman/goissue34681 v0.0.0-20191006012335-3fc7a47baff5 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
@@ -84,7 +80,6 @@ require (
 	github.com/filecoin-project/go-clock v0.1.0 // indirect
 	github.com/flynn/noise v1.1.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
-	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/gammazero/chanqueue v1.1.1 // indirect
@@ -99,7 +94,6 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-migrate/migrate/v4 v4.19.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect

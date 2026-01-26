@@ -1,4 +1,4 @@
-package main
+package kubo
 
 import (
 	"bytes"
@@ -39,7 +39,7 @@ func Test_parseUpload0Trace(t *testing.T) {
 	}
 
 	for i := 0; i < 3; i++ {
-		trace := loadTrace(t, fmt.Sprintf("./testdata/upload_0/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/upload_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
@@ -69,7 +69,7 @@ func Test_parseUpload1Trace(t *testing.T) {
 	}
 
 	for i := 0; i < 5; i++ {
-		trace := loadTrace(t, fmt.Sprintf("./testdata/upload_1/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/upload_1/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
@@ -94,7 +94,7 @@ func Test_parse_download_ipni_trace(t *testing.T) {
 	}
 
 	for i := 0; i < 4; i++ {
-		trace := loadTrace(t, fmt.Sprintf("./testdata/download_ipni/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_ipni/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
@@ -124,7 +124,7 @@ func Test_parse_download_dht_trace(t *testing.T) {
 	}
 
 	for i := 0; i < 1; i++ {
-		trace := loadTrace(t, fmt.Sprintf("./testdata/download_dht/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_dht/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
@@ -154,7 +154,7 @@ func Test_parse_download_bitswap_trace(t *testing.T) {
 	}
 
 	for i := 0; i < 1; i++ {
-		trace := loadTrace(t, fmt.Sprintf("./testdata/download_bitswap/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_bitswap/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 

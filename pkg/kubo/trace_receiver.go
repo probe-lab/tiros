@@ -1,4 +1,4 @@
-package main
+package kubo
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ type TraceReceiverConfig struct {
 // TraceReceiver implements the OTLP gRPC service
 type TraceReceiver struct {
 	coltracepb.UnimplementedTraceServiceServer
-	server *plgrpc.Server
+	Server *plgrpc.Server
 
 	mu sync.RWMutex
 
@@ -74,7 +74,7 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 	}
 
 	tr := &TraceReceiver{
-		server:         server,
+		Server:         server,
 		traceMatchChan: make(chan *ExportTraceServiceRequest),
 		traceMatchers:  make([]TraceMatcher, 0),
 		traceOut:       cfg.TraceOut,
@@ -103,7 +103,7 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 func (tr *TraceReceiver) Shutdown() {
 	close(tr.shutdown)
 	close(tr.traceMatchChan)
-	tr.server.Shutdown()
+	tr.Server.Shutdown()
 }
 
 func (tr *TraceReceiver) Reset() {
