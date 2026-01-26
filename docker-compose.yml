@@ -2,12 +2,13 @@ version: "3.9"
 name: tiros
 services:
   chrome:
-    image: ghcr.io/browserless/chromium:v2.38.3
+    image: ghcr.io/browserless/chromium:v2.38.4
     container_name: tiros-chrome
+    shm_size: '2gb'
     environment:
       - TIMEOUT=300000 # 5 minutes
     ports:
-      - "0.0.0.0:3000:3000"
+      - "3000:3000"
 
   kubo:
     image: ipfs/kubo:v0.38.2
