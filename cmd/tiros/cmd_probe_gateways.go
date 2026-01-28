@@ -22,7 +22,8 @@ import (
 	"github.com/ipfs/go-cid"
 	carv2 "github.com/ipld/go-car/v2"
 	pllog "github.com/probe-lab/go-commons/log"
-	main2 "github.com/probe-lab/tiros/pkg"
+	"github.com/probe-lab/go-commons/ptr"
+	"github.com/probe-lab/tiros/pkg"
 	"github.com/probe-lab/tiros/pkg/db"
 	"github.com/urfave/cli/v3"
 	"go.opentelemetry.io/otel"
@@ -179,16 +180,16 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	defer pllog.Defer(dbClient.Close, "Failed closing database client")
 
 	// Initialize CID provider
-	var cidProvider main2.CIDProvider
+	var cidProvider pkg.CIDProvider
 	var cidProviderName string
 	if len(probeGatewaysConfig.DownloadCIDs) > 0 {
-		cidProvider, err = main2.NewStaticCIDProvider(probeGatewaysConfig.DownloadCIDs)
+		cidProvider, err = pkg.NewStaticCIDProvider(probeGatewaysConfig.DownloadCIDs)
 		if err != nil {
 			return fmt.Errorf("creating static cid provider: %w", err)
 		}
 		cidProviderName = "StaticCIDProvider"
 	} else {
-		cidProvider, err = main2.NewBitswapSnifferClickhouseCIDProvider(dbClient)
+		cidProvider, err = pkg.NewBitswapSnifferClickhouseCIDProvider(dbClient)
 		if err != nil {
 			return fmt.Errorf("creating clickhouse cid provider: %w", err)
 		}
@@ -196,7 +197,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	slog.With("provider", cidProviderName).Info("Using CID provider for gateway probes")
 
-	controlledCIDsProvider, err := main2.NewControlledCIDProvider()
+	controlledCIDsProvider, err := pkg.NewControlledCIDProvider()
 	if err != nil {
 		return fmt.Errorf("creating controlled cid provider: %w", err)
 	}
@@ -361,7 +362,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 					ciid, err = cidProvider.SelectCID(gctx, "bitswap")
 
 					cidSource = "bitsniffer_bitswap"
-					if _, ok := cidProvider.(*main2.StaticCIDProvider); ok {
+					if _, ok := cidProvider.(*pkg.StaticCIDProvider); ok {
 						cidSource = "static"
 					}
 				}
@@ -417,7 +418,20 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 								}
 
 								if v := metrics.headers.Get("cf-cache-status"); v != "" {
-									cacheStatus = &v
+									status := strings.ToUpper(strings.TrimSpace(v))
+									switch status {
+									case "HIT", "STALE", "UPDATING":
+										// These were served from the Edge without waiting for the origin.
+										cacheStatus = ptr.From("HIT")
+
+									case "MISS", "EXPIRED", "REVALIDATED", "DYNAMIC", "BYPASS":
+										// These all required a round-trip to the origin server.
+										cacheStatus = ptr.From("MISS")
+
+									default:
+										// NONE, UNKNOWN, or empty
+										cacheStatus = &v
+									}
 								} else if v := metrics.headers.Get("x-filebase-edge-cache"); v != "" {
 									cacheStatus = &v
 								} else if v := metrics.headers.Get("x-cache"); v != "" {
