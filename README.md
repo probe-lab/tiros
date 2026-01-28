@@ -11,7 +11,7 @@ Tiros comprises four distinct IPFS performance measurements:
 
 Each of these measurements is supposed to be run in geographically distributed
 regions and requires a different deployment setup. This readme describes each
-setup in detail and how the measurement can be run locally.
+setup in detail and how the measurements can be run locally.
 
 ## Table of Contents
 
@@ -72,7 +72,7 @@ The traditional HTTP Gateway Performance experiment probes the performance of di
 HTTP Gateways. The list of gateways to probe can either be provided on the command line
 as a comma-separated list of hostnames via the `--gateways` flag or via a
 query to a Clickhouse database (default). Then you can provide a list of CIDs to probe
-via the `--cids` flag. By default 20% of requests will randomly be made for controlled CIDs.
+via the `--cids` flag. By default, 20% of requests will randomly be made for controlled CIDs.
 To disable this behavior, set `--controlled.cids=false` or `--controlled.share=0`. Conversely,
 if you only want to probe controlled CIDs, set `--controlled.share=1`.
 
@@ -148,27 +148,43 @@ for the first time. The user and database are `tiros_local` and the password is 
 clickhouse client --host localhost --password --user tiros_local
 ```
 
+These are the configuration flags that can be passed to the `probe serviceworker` command:
 
+```text
+NAME:
+   tiros probe serviceworker - Start probing IPFS Service Worker Gateway retrieval performance
 
-## Measurement Methodology
+USAGE:
+   tiros probe serviceworker [options]
 
-There are two measurement modes to Tiros:
+OPTIONS:
+   --interval duration                      How long to wait between each download iteration (default: 10s) [$TIROS_PROBE_GATEWAYS_INTERVAL]
+   --iterations.max int                     The number of iterations per concurrent worker to run. 0 means infinite. (default: 0) [$TIROS_PROBE_GATEWAYS_ITERATIONS_MAX]
+   --cids string [ --cids string ]          A static list of CIDs to download from the Gateways. [$TIROS_PROBE_GATEWAYS_DOWNLOAD_CIDS]
+   --gateways string [ --gateways string ]  A static list of gateways to probe (takes precedence over database) (default: "inbrowser.link") [$TIROS_PROBE_GATEWAYS_GATEWAYS]
+   --download.max.mb int                    Maximum download size in MiB before cancelling (default: 10) [$TIROS_PROBE_GATEWAYS_DOWNLOAD_MAX_MB]
+   --timeout duration                       Timeout for each gateway request (default: 2m0s) [$TIROS_PROBE_GATEWAYS_TIMEOUT]
+   --chrome.cdp.host string                 host at which the Chrome DevTools Protocol is reachable (default: "127.0.0.1") [$TIROS_PROBE_GATEWAYS_CHROME_CDP_HOST]
+   --chrome.cdp.port int                    port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_GATEWAYS_CHROME_CDP_PORT]
+   --controlled.cids                        Whether to use the ControlledCIDProvider to select CIDs to probe (default: true) [$TIROS_PROBE_GATEWAYS_CONTROLLED_CIDS]
+   --controlled.share float                 What share of requests should be made for controlled CIDs (default: 0.2) [$TIROS_PROBE_GATEWAYS_CONTROLLED_SHARE]
+   --help, -h                               show help
 
-1. Content routing performance measurements
-2. Website performance measurements
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen [$AWS_REGION]
+```
 
+## Kubo Retrieval and Publication Performance
 
-
-We, [ProbeLab](https://probelab.io), are running Tiros on AWS ECS task in four different AWS regions. These regions are:
-
-- `eu-central-1`
-- `us-east-2`
-- `us-west-1`
-- `ap-southeast-2`
-
-### Content Routing Performance
-
-The content routing performance measurements are also split into the "upload" and "download" parts.
+The content routing performance measurements are split into the "upload" and "download" parts.
 
 First, you cannot _upload_ anything to IPFS. Instead, what Tiros does is,
 it generates random data, calls `ipfs add` and then waits until the provider
@@ -197,7 +213,7 @@ To run the content routing performance measurement you could do the following:
 
 Terminal 1:
 ```shell
-docker compose -f docker-compose.kubo.yml up 
+OTEL_TRACES_EXPORTER=otlp docker compose up kubo 
 ```
 
 Terminal 2:
@@ -226,7 +242,45 @@ Then pass the following flags to the above Tiros command:
 
 That way you can inspect the traces that Tiros caught in Jaeger.
 
-### Website Performance
+
+These are the configuration flags that can be passed to the `probe kubo` command:
+
+```text
+NAME:
+   tiros probe kubo - Start probing Kubo publication and retrieval performance
+
+USAGE:
+   tiros probe kubo [options]
+
+OPTIONS:
+   --filesize int                                     File size in MiB to upload to kubo (default: 100) [$TIROS_PROBE_KUBO_UPLOAD_FILE_SIZE_MIB]
+   --interval duration                                How long to wait between each upload (default: 10s) [$TIROS_PROBE_KUBO_UPLOAD_INTERVAL]
+   --kubo.host string                                 Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_KUBO_KUBO_HOST]
+   --kubo.api.port int                                port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_KUBO_KUBO_API_PORT]
+   --iterations.max int                               The number of iterations to run. 0 means infinite. (default: 0) [$TIROS_PROBE_KUBO_ITERATIONS_MAX]
+   --traces.receiver.host string                      The host that the trace receiver is binding to (this is where Kubo should send the traces to) (default: "127.0.0.1") [$TIROS_PROBE_KUBO_TRACES_RECEIVER_HOST]
+   --traces.receiver.port int                         The port on which the trace receiver should listen on (this is where Kubo should send the traces to) (default: 4317) [$TIROS_PROBE_KUBO_TRACES_RECEIVER_PORT]
+   --traces.out string                                If set, where to write the traces to. [$TIROS_PROBE_KUBO_TRACES_OUT]
+   --traces.forward.host string                       The host to forward Kubo's traces to. [$TIROS_PROBE_KUBO_TRACES_FORWARD_HOST]
+   --traces.forward.port int                          The port to forward Kubo's traces to. (default: 0) [$TIROS_PROBE_KUBO_TRACES_FORWARD_PORT]
+   --cids string [ --static.cids string ]  A static list of CIDs to download from Kubo. [$TIROS_PROBE_KUBO_DOWNLOAD_CIDS]
+   --help, -h                                         show help
+   --download.only                                    Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_DOWNLOAD_ONLY]
+   --upload.only                                      Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_UPLOAD_ONLY]
+
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
+```
+
+## Kubo Website Performance
 
 Each ECS task consists of three containers:
 
@@ -406,6 +460,39 @@ for _, settle := range c.IntSlice("settle-times") {
 
 So in total, each run measures `settle-times * times * len([http, ipfs]) * len(websites)` website requests. In our case it's `2 * 5 * 2 * 14 = 280` requests. This takes around `1h` because some websites time out and the second settle time is configured to be `10m`
 
+These are the configuration flags that can be passed to the `probe website` command:
+
+```text
+NAME:
+   tiros probe websites - Start probing website performance.
+
+USAGE:
+   tiros probe websites [options]
+
+OPTIONS:
+   --probes int                             number of times to probe each URL (default: 3) [$TIROS_PROBE_WEBSITES_PROBES]
+   --websites string [ --websites string ]  list of websites to probe [$TIROS_PROBE_WEBSITES_WEBSITES]
+   --lookup.providers                       Whether to lookup website providers (default: true) [$TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS]
+   --kubo.host string                       Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_KUBO_HOST]
+   --kubo.api.port int                      port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_WEBSITES_KUBO_API_PORT]
+   --kubo.gateway.port int                  port at which to reach Kubo's HTTP gateway (default: 8080) [$TIROS_PROBE_WEBSITES_KUBO_GATEWAY_PORT]
+   --chrome.cdp.host string                 host at which the Chrome DevTools Protocol is reachable (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_CHROME_CDP_HOST]
+   --chrome.cdp.port int                    port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_WEBSITES_CHROME_CDP_PORT]
+   --chrome.kubo.host string                the kubo host from Chrome's perspective. This may be different from Tiros, especially if Chrome and Kubo are run with docker. (default: --kubo.host) [$TIROS_PROBE_WEBSITES_CHROME_KUBO_HOST]
+   --help, -h                               show help
+
+GLOBAL OPTIONS:
+   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
+   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
+   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
+   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
+   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
+   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
+   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
+   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
+   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
+```
+
 ### Measurement Metrics
 
 I read up on how to measure website performance and came across this list:
@@ -454,7 +541,9 @@ We could instead define `domContentLoaded` as the time difference between `start
 
 You need to provide many configuration parameters to `tiros`. See this help page:
 
-#### Global Configuration
+## Configuration
+
+### Global
 
 ```text
 NAME:
@@ -487,7 +576,7 @@ GLOBAL OPTIONS:
    --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
 ```
 
-#### Probe Configuration
+### Probe
 
 ```text
 NAME:
@@ -522,76 +611,6 @@ OPTIONS:
    --clickhouse.user string                           The ClickHouse user that has the right privileges (default: "tiros") [$TIROS_PROBE_CLICKHOUSE_USER]
 ```
 
-#### Website Configuration
-
-```text
-NAME:
-   tiros probe websites - Start probing website performance.
-
-USAGE:
-   tiros probe websites [options]
-
-OPTIONS:
-   --probes int                             number of times to probe each URL (default: 3) [$TIROS_PROBE_WEBSITES_PROBES]
-   --websites string [ --websites string ]  list of websites to probe [$TIROS_PROBE_WEBSITES_WEBSITES]
-   --lookup.providers                       Whether to lookup website providers (default: true) [$TIROS_PROBE_WEBSITES_LOOKUP_PROVIDERS]
-   --kubo.host string                       Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_KUBO_HOST]
-   --kubo.api.port int                      port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_WEBSITES_KUBO_API_PORT]
-   --kubo.gateway.port int                  port at which to reach Kubo's HTTP gateway (default: 8080) [$TIROS_PROBE_WEBSITES_KUBO_GATEWAY_PORT]
-   --chrome.cdp.host string                 host at which the Chrome DevTools Protocol is reachable (default: "127.0.0.1") [$TIROS_PROBE_WEBSITES_CHROME_CDP_HOST]
-   --chrome.cdp.port int                    port to reach the Chrome DevTools Protocol port (default: 3000) [$TIROS_PROBE_WEBSITES_CHROME_CDP_PORT]
-   --chrome.kubo.host string                the kubo host from Chrome's perspective. This may be different from Tiros, especially if Chrome and Kubo are run with docker. (default: --kubo.host) [$TIROS_PROBE_WEBSITES_CHROME_KUBO_HOST]
-   --help, -h                               show help
-
-GLOBAL OPTIONS:
-   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
-   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
-   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
-   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
-   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
-   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
-   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
-   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
-   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
-```
-
-#### Content Routing Performance Configuration
-
-```text
-NAME:
-   tiros probe kubo - Start probing Kubo publication and retrieval performance
-
-USAGE:
-   tiros probe kubo [options]
-
-OPTIONS:
-   --filesize int                                     File size in MiB to upload to kubo (default: 100) [$TIROS_PROBE_KUBO_UPLOAD_FILE_SIZE_MIB]
-   --interval duration                                How long to wait between each upload (default: 10s) [$TIROS_PROBE_KUBO_UPLOAD_INTERVAL]
-   --kubo.host string                                 Host at which to reach Kubo (default: "127.0.0.1") [$TIROS_PROBE_KUBO_KUBO_HOST]
-   --kubo.api.port int                                port to reach a Kubo-compatible RPC API (default: 5001) [$TIROS_PROBE_KUBO_KUBO_API_PORT]
-   --iterations.max int                               The number of iterations to run. 0 means infinite. (default: 0) [$TIROS_PROBE_KUBO_ITERATIONS_MAX]
-   --traces.receiver.host string                      The host that the trace receiver is binding to (this is where Kubo should send the traces to) (default: "127.0.0.1") [$TIROS_PROBE_KUBO_TRACES_RECEIVER_HOST]
-   --traces.receiver.port int                         The port on which the trace receiver should listen on (this is where Kubo should send the traces to) (default: 4317) [$TIROS_PROBE_KUBO_TRACES_RECEIVER_PORT]
-   --traces.out string                                If set, where to write the traces to. [$TIROS_PROBE_KUBO_TRACES_OUT]
-   --traces.forward.host string                       The host to forward Kubo's traces to. [$TIROS_PROBE_KUBO_TRACES_FORWARD_HOST]
-   --traces.forward.port int                          The port to forward Kubo's traces to. (default: 0) [$TIROS_PROBE_KUBO_TRACES_FORWARD_PORT]
-   --cids string [ --static.cids string ]  A static list of CIDs to download from Kubo. [$TIROS_PROBE_KUBO_DOWNLOAD_CIDS]
-   --help, -h                                         show help
-   --download.only                                    Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_DOWNLOAD_ONLY]
-   --upload.only                                      Only download the file from Kubo (default: false) [$TIROS_PROBE_KUBO_UPLOAD_ONLY]
-
-GLOBAL OPTIONS:
-   --log.level string     Sets an explicit logging level: debug, info, warn, error. (default: "info") [$TIROS_LOG_LEVEL]
-   --log.format string    Sets the format to output the log statements in: text, json (default: "text") [$TIROS_LOG_FORMAT]
-   --log.source           Compute the source code position of a log statement and add a SourceKey attribute to the output. (default: false) [$TIROS_LOG_SOURCE]
-   --metrics.enabled      Whether to expose metrics information (default: false) [$TIROS_METRICS_ENABLED]
-   --metrics.host string  Which network interface should the metrics endpoint bind to (default: "localhost") [$TIROS_METRICS_HOST]
-   --metrics.port int     On which port should the metrics endpoint listen (default: 6060) [$TIROS_METRICS_PORT]
-   --metrics.path string  On which path should the metrics endpoint listen (default: "/metrics") [$TIROS_METRICS_PATH]
-   --tracing.enabled      Whether to emit trace data (default: false) [$TIROS_TRACING_ENABLED]
-   --aws.region string    On which path should the metrics endpoint listen (default: "/metrics") [$AWS_REGION]
-```
-
 ### Migrations
 
 To create a new migration run:
@@ -606,6 +625,10 @@ Apply migrations by running:
 migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path cmd/tiros/migrations up
 ```
 
+The migrations will automatically be applied on startup of Tiros. Always define
+migrations as if they were applied in a clustered context. Tiros will figure
+out how to apply them for a local docker-clickhouse.
+
 ## Testing
 
 Tiros has a few end-to-end tests that can be run with:
@@ -614,20 +637,13 @@ Tiros has a few end-to-end tests that can be run with:
 just e2e website
 just e2e upload
 just e2e download
+just e2e serviceworker
+just e2e gateway
 ```
-
-## Alternative IPFS Implementation
-
-An alternative IPFS implementation needs to support a couple of things:
-
-1. The [`/api/v0/repo/gc`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-repo-gc) endpoint
-2. The [`/api/v0/version`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-version) endpoint
-3. The [`/api/v0/id`](https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-id) endpoint
-4. Expose a [rudimentary IPFS Gateway](https://docs.ipfs.tech/reference/http/gateway/) that at least supports resolving IPNS links
 
 ## Maintainers
 
-[@dennis-tra](https://github.com/dennis-tra).
+[@probe-lab](https://github.com/probe-lab).
 
 ## Contributing
 

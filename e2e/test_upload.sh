@@ -7,7 +7,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/test_common.sh"
 setup_test_env kubo
 
 # Run tiros with a single iteration and the JSON output option
-go run . probe --json.out $TEMP_DIR kubo --iterations.max 1 --upload.only --traces.receiver.host 0.0.0.0
+go run ./cmd/tiros probe --json.out $TEMP_DIR kubo --iterations.max 1 --upload.only --traces.receiver.host 0.0.0.0
 
 # Find the file suffixed with _upload.ndjson in the temp directory
 OUTPUT_FILE=$(find "$TEMP_DIR" -type f -name 'uploads.ndjson' | head -n 1)

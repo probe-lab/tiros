@@ -13,14 +13,19 @@ setup_test_env() {
     # omit the -p parameter to create a temporal directory in the default location
     TEMP_DIR=$(mktemp -d -p "$DIR")
     echo "Created temporary directory $TEMP_DIR"
+    
+    # if test_env is empty, return early
+    if [ -z "$test_env" ]; then
+        return 0
+    fi
 
     # start containers in the background
-    docker compose -f "$DIR/../docker-compose.$test_env.yml" up -d
+    OTEL_TRACES_EXPORTER=otlp docker compose up -d $test_env
 
     # deletes the temp directory
     function cleanup {
-        docker compose -f "$DIR/../docker-compose.$test_env.yml" down -v
-        docker compose -f "$DIR/../docker-compose.$test_env.yml" rm
+        docker compose down -v
+        docker compose rm
     }
 
     trap cleanup EXIT
