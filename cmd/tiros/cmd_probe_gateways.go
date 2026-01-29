@@ -22,7 +22,6 @@ import (
 	"github.com/ipfs/go-cid"
 	carv2 "github.com/ipld/go-car/v2"
 	pllog "github.com/probe-lab/go-commons/log"
-	"github.com/probe-lab/go-commons/ptr"
 	"github.com/probe-lab/tiros/pkg"
 	"github.com/probe-lab/tiros/pkg/db"
 	"github.com/urfave/cli/v3"
@@ -417,26 +416,12 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 									ipfsRoots = &v
 								}
 
-								if v := metrics.headers.Get("cf-cache-status"); v != "" {
-									status := strings.ToUpper(strings.TrimSpace(v))
-									switch status {
-									case "HIT", "STALE", "UPDATING":
-										// These were served from the Edge without waiting for the origin.
-										cacheStatus = ptr.From("HIT")
-
-									case "MISS", "EXPIRED", "REVALIDATED", "DYNAMIC", "BYPASS":
-										// These all required a round-trip to the origin server.
-										cacheStatus = ptr.From("MISS")
-
-									default:
-										// NONE, UNKNOWN, or empty
-										cacheStatus = &v
-									}
-								} else if v := metrics.headers.Get("x-filebase-edge-cache"); v != "" {
-									cacheStatus = &v
-								} else if v := metrics.headers.Get("x-cache"); v != "" {
-									cacheStatus = toPtr(strings.ToUpper(strings.Split(v, " ")[0]))
+								// convert header type
+								hdr := make(map[string]any, len(metrics.headers))
+								for k, v := range metrics.headers {
+									hdr[k] = v
 								}
+								cacheStatus = pkg.ParseCacheStatus(hdr)
 
 								if v := metrics.headers.Get("Content-Type"); v != "" {
 									contentType = &v

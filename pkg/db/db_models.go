@@ -172,6 +172,7 @@ type ServiceWorkerProbeModel struct {
 	// Provider and gateway metrics
 	FoundProviders        int      `ch:"found_providers"`          // Number of unique providers found via delegated routing
 	ServedFromGateway     bool     `ch:"served_from_gateway"`      // Whether content was successfully retrieved from a trustless gateway
+	GatewayCacheStatus    *string  `ch:"gateway_cache_status"`     // Whether the content was served from the gateway's cache'
 	DelegatedRouterTTFBS  *float64 `ch:"delegated_router_ttfb_s"`  // Fastest TTFB from any delegated router request (seconds)
 	TrustlessGatewayTTFBS *float64 `ch:"trustless_gateway_ttfb_s"` // Fastest TTFB from any successful trustless gateway request (seconds)
 
