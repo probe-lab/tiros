@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"log/slog"
 	"math/rand/v2"
+	"net"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/chromedp/chromedp"
 	"github.com/google/uuid"
 	"github.com/ipfs/go-cid"
 	pllog "github.com/probe-lab/go-commons/log"
@@ -178,6 +181,18 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 	gateways := probeServiceWorkerConfig.Gateways
 	slog.With("count", len(gateways), "gateways", gateways).Info("Using service worker gateways")
 
+	browserURL := url.URL{
+		Scheme: "ws",
+		Host: net.JoinHostPort(
+			probeServiceWorkerConfig.ChromeCDPHost,
+			strconv.Itoa(probeServiceWorkerConfig.ChromeCDPPort),
+		),
+	}
+
+	slog.With("url", browserURL.String()).Debug("Connecting to browser...")
+	ctx, cancel = chromedp.NewRemoteAllocator(ctx, browserURL.String())
+	defer cancel()
+
 	ticker := time.NewTimer(0)
 	iterationStart := time.Now()
 	maxIter := probeServiceWorkerConfig.MaxIterations
@@ -235,7 +250,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 
 			// Create and run probe
 			slog.With("gateway", gateway).Info("Probing service worker gateway")
-			probe := sw.NewSwProbe(ciid, navURL.String(), probeServiceWorkerConfig.ChromeCDPHost, probeServiceWorkerConfig.ChromeCDPPort)
+			probe := sw.NewSwProbe(ciid, navURL.String())
 
 			probeCtx, probeCancel := context.WithTimeout(ctx, probeServiceWorkerConfig.Timeout)
 			result, err := probe.Run(probeCtx)

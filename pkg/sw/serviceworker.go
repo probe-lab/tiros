@@ -27,11 +27,9 @@ import (
 )
 
 type swProbe struct {
-	url     string
-	cidv0   cid.Cid
-	cidv1   cid.Cid
-	cdpHost string
-	cdpPort int
+	url   string
+	cidv0 cid.Cid
+	cidv1 cid.Cid
 
 	listenMu sync.Mutex
 
@@ -74,7 +72,7 @@ type NetworkEventResponse struct {
 	Body            []byte
 }
 
-func NewSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
+func NewSwProbe(c cid.Cid, url string) *swProbe {
 	var (
 		cidv0 cid.Cid
 		cidv1 cid.Cid
@@ -95,11 +93,9 @@ func NewSwProbe(c cid.Cid, url string, cdpHost string, cdpPort int) *swProbe {
 	}
 
 	return &swProbe{
-		cidv0:   cidv0,
-		cidv1:   cidv1,
-		url:     url,
-		cdpHost: cdpHost,
-		cdpPort: cdpPort,
+		cidv0: cidv0,
+		cidv1: cidv1,
+		url:   url,
 
 		trustlessGateways: map[string]struct{}{"trustless-gateway.link": {}},
 		delegatedRouters:  map[string]struct{}{"delegated-ipfs.dev": {}},
@@ -278,19 +274,10 @@ func (r *swRequestTrace) isFinalRequest() bool {
 }
 
 func (p *swProbe) Run(ctx context.Context) (*swProbeResult, error) {
-	browserURL := url.URL{
-		Scheme: "ws",
-		Host:   net.JoinHostPort(p.cdpHost, strconv.Itoa(p.cdpPort)),
-	}
-
-	slog.With("url", browserURL.String()).Debug("Connecting to browser...")
-	allocCtx, allocCancel := chromedp.NewRemoteAllocator(ctx, browserURL.String())
-	defer allocCancel()
-
 	// Create a new browser context with incognito mode.
 	// chromedp.WithNewBrowserContext() forces the creation of a separate
 	// ephemeral browser context (incognito) on the remote browser.
-	browserCtx, browserCancel := chromedp.NewContext(allocCtx, chromedp.WithNewBrowserContext())
+	browserCtx, browserCancel := chromedp.NewContext(ctx, chromedp.WithNewBrowserContext())
 	defer browserCancel()
 
 	// Set up event listeners - dispatch to handler methods
