@@ -419,7 +419,10 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 								// convert header type
 								hdr := make(map[string]any, len(metrics.headers))
 								for k, v := range metrics.headers {
-									hdr[k] = v
+									if len(v) > 0 {
+										// drop multi-value header fields
+										hdr[strings.ToLower(k)] = v[0]
+									}
 								}
 								cacheStatus = pkg.ParseCacheStatus(hdr)
 
