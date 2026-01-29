@@ -62,7 +62,7 @@ func TestSwProbe_IsProbeDone(t *testing.T) {
 	assert.NoError(t, err)
 
 	// mock probe
-	p := NewSwProbe(c, "http://example.com", "localhost", 9222)
+	p := NewSwProbe(c, "http://example.com")
 
 	// 1. Initially not done
 	assert.False(t, p.isProbeDone())
@@ -135,7 +135,7 @@ func TestSwProbe_BuildProbeResult(t *testing.T) {
 	c, err := cid.Decode("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
 	assert.NoError(t, err)
 
-	p := NewSwProbe(c, "http://example.com", "localhost", 9222)
+	p := NewSwProbe(c, "http://example.com")
 
 	// Mock a successful flow
 	reqID := network.RequestID("req-1")
@@ -284,7 +284,7 @@ func TestSwProbe_DelegatedRouterStatus(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewSwProbe(c, "http://example.com", "localhost", 9222)
+			p := NewSwProbe(c, "http://example.com")
 
 			// Inject delegated router responses
 			for i, resp := range tt.responses {
