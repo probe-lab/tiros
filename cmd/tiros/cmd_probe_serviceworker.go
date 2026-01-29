@@ -299,6 +299,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				dbModel.IPFSRoots = toPtr(result.IPFSRoots)
 				dbModel.FoundProviders = result.FoundProviders
 				dbModel.ServedFromGateway = result.ServedFromGateway
+				dbModel.GatewayCacheStatus = result.GatewayCacheStatus
 				dbModel.DelegatedRouterTTFBS = toPtr(result.DelegatedRouterTTFB.Seconds())
 				dbModel.TrustlessGatewayTTFBS = toPtr(result.TrustlessGatewayTTFB.Seconds())
 

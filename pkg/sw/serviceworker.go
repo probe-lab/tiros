@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/url"
 	"strconv"
 	"strings"
@@ -24,6 +23,7 @@ import (
 	"github.com/ipfs/boxo/routing/http/types"
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/probe-lab/tiros/pkg"
 )
 
 type swProbe struct {
@@ -129,8 +129,9 @@ type swProbeResult struct {
 	IPFSRoots string // x-ipfs-roots
 
 	// Whether any delegated router returned any providers
-	FoundProviders    int
-	ServedFromGateway bool
+	FoundProviders     int
+	ServedFromGateway  bool
+	GatewayCacheStatus *string
 
 	// Server timing data (from final response)
 	ServerTimings        map[string]ServerTiming
@@ -542,6 +543,7 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 		ttfb := time.Duration(resp.Response.Timing.ReceiveHeadersStart * float64(time.Millisecond))
 		if result.TrustlessGatewayTTFB == 0 || ttfb < result.TrustlessGatewayTTFB {
 			result.TrustlessGatewayTTFB = ttfb
+			result.GatewayCacheStatus = pkg.ParseCacheStatus(resp.Response.Headers)
 		}
 	}
 
