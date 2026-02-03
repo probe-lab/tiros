@@ -1,21 +1,137 @@
 {
   "data": [
     {
-      "traceID": "ccb58bf33e622255aa65efd4516b5021",
+      "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
       "spans": [
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "550e343e27668f9d",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5b54642d3091bd63",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "a8c4cb64f941b5b2"
+            }
+          ],
+          "startTime": 1770117226160150,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "3185ec806c9fce3c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "1c2bcc24d66b75eb"
+            }
+          ],
+          "startTime": 1770117225432925,
+          "duration": 14,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "96c141ef4f247f12",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "4aa12e56905595e8"
+            }
+          ],
+          "startTime": 1770117225854432,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "bffd10b548a99601",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "032387843f83cf1d"
+            }
+          ],
+          "startTime": 1770117225975598,
+          "duration": 13,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "45a353f6abdd6af8",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560337359,
-          "duration": 985,
+          "startTime": 1770117225795303,
+          "duration": 2262,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -33,47 +149,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "8fbc432cacdea063",
-          "operationName": "CoreUnix.Adder.AddAllAndPin",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560212322,
-          "duration": 171506,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "Kubo"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "2c4c27c9fd69ef64",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a4099930c82835c4",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560271618,
-          "duration": 684,
+          "startTime": 1770117226224303,
+          "duration": 2401,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -91,482 +178,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6fa0afd3fa9479bf",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560310573,
-          "duration": 698,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "929d39b6e355b2e9",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560222388,
-          "duration": 720,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "cb7b2852f155eb7a",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560293018,
-          "duration": 1085,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "eaf2f89a55a3d344",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560279452,
-          "duration": 657,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "dda42769b20750c1",
-          "operationName": "CoreUnix.Adder.PinRoot",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "8fbc432cacdea063"
-            }
-          ],
-          "startTime": 1760467560345341,
-          "duration": 38482,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "Kubo"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a612dbfdb75ce6b5",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560261876,
-          "duration": 704,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "83a068bc05958e9b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560288527,
-          "duration": 1192,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "3dc883ff5135eebc",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560309477,
-          "duration": 817,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "4ab80330afa10023",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560245225,
-          "duration": 669,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "9508d6b901af4a72",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560323742,
-          "duration": 1100,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a66d4fe780156106",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560336349,
-          "duration": 665,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "2f14499291782404",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560250609,
-          "duration": 729,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "d12bc63d6ecb5c4a",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560264065,
-          "duration": 979,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "65056ccba1e30304",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560267034,
-          "duration": 1168,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "f24f059ba5be84b5",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560270576,
-          "duration": 680,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6828f0370209938b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560273845,
-          "duration": 728,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "1aa712211bc12c70",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "da86b4133acfce10",
           "operationName": "Blockservice.blockService.AddBlock",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560344969,
-          "duration": 11,
+          "startTime": 1770117226279491,
+          "duration": 145,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -584,18 +207,47 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "e2e198d75756638a",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ff03968ffc18f0b9",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "8a07369c3eb92b0e"
+            }
+          ],
+          "startTime": 1770117225668898,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a5d73fc92470f250",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560221107,
-          "duration": 756,
+          "startTime": 1770117225444937,
+          "duration": 2132,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -613,18 +265,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "b28ff7eed3064961",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9a24152ef86caa62",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560314401,
-          "duration": 1183,
+          "startTime": 1770117225728846,
+          "duration": 2265,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -642,18 +294,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "8c7df20328b837a7",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "2a3f42fb05501403",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560284406,
-          "duration": 892,
+          "startTime": 1770117225743720,
+          "duration": 2438,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -671,18 +323,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "824e89dd0060f032",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7fa00b9f682a6d1c",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560287338,
-          "duration": 979,
+          "startTime": 1770117225991014,
+          "duration": 2485,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -700,18 +352,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "e5f3105c360d4aaa",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "963ba326a89e90b9",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560342438,
-          "duration": 1920,
+          "startTime": 1770117226191075,
+          "duration": 2141,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -729,371 +381,23 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a778465a40339ade",
-          "operationName": "Blockservice.blockService.AddBlocks",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "87f1a08d03f32534",
+          "operationName": "Bitswap.NotifyNewBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "55de792493f2f388"
             }
           ],
-          "startTime": 1760467560216955,
-          "duration": 1399,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "910a61b56ae51eb8",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560252738,
-          "duration": 668,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "dd1b9841e7498a81",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560303091,
-          "duration": 975,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "1ef9a144d18199f7",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560338493,
-          "duration": 901,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "d2bdcfbc9a106f54",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560235556,
-          "duration": 749,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "4a440436d3a52f6d",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560240706,
-          "duration": 1175,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "8517a4996a764633",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560241785,
-          "duration": 974,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "863042db164748c9",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560291963,
-          "duration": 872,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a0e45889c6f1baa8",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560219813,
-          "duration": 797,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "09f1020b836bf8b6",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560225224,
-          "duration": 729,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "3a7752cebb994226",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560258360,
-          "duration": 792,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "942d868ef54c2589",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560282728,
-          "duration": 694,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "e8bd1e819b7503a6",
-          "operationName": "Blockservice.blockService.AddBlock",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560345327,
+          "startTime": 1770117225462677,
           "duration": 7,
           "tags": [
             {
               "key": "otel.scope.name",
               "type": "string",
-              "value": "blockservice"
+              "value": "go-bitswap"
             },
             {
               "key": "span.kind",
@@ -1106,18 +410,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "b056695843cbf9cd",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "032387843f83cf1d",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560278374,
-          "duration": 689,
+          "startTime": 1770117225973370,
+          "duration": 2246,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1135,18 +439,134 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "30f67b7723ff2f6e",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "62c0c51986870566",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "dafd57f809d2f4fc"
+            }
+          ],
+          "startTime": 1770117225714664,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a3f3d979c5ca645e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "db7a0bdd29555201"
+            }
+          ],
+          "startTime": 1770117226176925,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7f61859d58cb891e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "5fc450ebbc731e39"
+            }
+          ],
+          "startTime": 1770117225339525,
+          "duration": 19,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a63c2cf196f23200",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "7bfd080a97b8c3c6"
+            }
+          ],
+          "startTime": 1770117226066687,
+          "duration": 11,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "d73a46ce019d3fc0",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560248325,
-          "duration": 860,
+          "startTime": 1770117225318846,
+          "duration": 2838,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1164,18 +584,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6176ca218a6e6c5a",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "2d1577c1cb2508f6",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560259567,
-          "duration": 673,
+          "startTime": 1770117226139728,
+          "duration": 2324,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1193,18 +613,47 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "10db4b5ff1dff6a0",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ca4646f895effc7d",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "2fc43b42c89a877c"
+            }
+          ],
+          "startTime": 1770117225587499,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a7f36b579abd51aa",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560260812,
-          "duration": 847,
+          "startTime": 1770117226276472,
+          "duration": 2678,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1222,18 +671,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "bcfa9149c54b200d",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "e9a6e14e3251c1be",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560311649,
-          "duration": 656,
+          "startTime": 1770117226120549,
+          "duration": 2473,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1251,18 +700,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "5350a2b03ee7817e",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "0051961f762dc4ac",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560280477,
-          "duration": 679,
+          "startTime": 1770117225634338,
+          "duration": 2402,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1280,18 +729,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "955f5e6693ad245d",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "64afc1e44a07f1c7",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560341211,
-          "duration": 3394,
+          "startTime": 1770117225957858,
+          "duration": 2260,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1309,18 +758,76 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "24119aab00d261f6",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4aeca07d8c0f49e9",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "82586d8beba7a0e6"
+            }
+          ],
+          "startTime": 1770117226210681,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "3260c1b7e0117a19",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "43de81ccbdab7585"
+            }
+          ],
+          "startTime": 1770117225605347,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "fe120a6aac676fe5",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560223635,
-          "duration": 756,
+          "startTime": 1770117225510299,
+          "duration": 2799,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1338,18 +845,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "777d527ad4a4a767",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "2fc43b42c89a877c",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560243045,
-          "duration": 707,
+          "startTime": 1770117225584899,
+          "duration": 2615,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1367,18 +874,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "72d5f3b4e05c397c",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "33fcea334e3ed8c8",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560251686,
-          "duration": 902,
+          "startTime": 1770117226026476,
+          "duration": 2287,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1396,337 +903,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "3d06c5469479b315",
-          "operationName": "Blockservice.blockService.AddBlocks",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "3bafd5b8dfe4fb6c",
+          "operationName": "CoreUnix.Adder.PinRoot",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "982554a5cdf3b028"
             }
           ],
-          "startTime": 1760467560324465,
-          "duration": 887,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "514440ad7503a58b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560333147,
-          "duration": 998,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "9cfd0e950a0c6e40",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560268323,
-          "duration": 779,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "abe4638b805e0386",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560342656,
-          "duration": 2293,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "b0c8f1583a2ee6ef",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560275363,
-          "duration": 876,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "5aef27129cda53c3",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560277050,
-          "duration": 953,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "e611017c927d6179",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560269484,
-          "duration": 699,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "919f2472d6359630",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560297258,
-          "duration": 780,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "53eb166ee1319539",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560299492,
-          "duration": 750,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "eea62ce677e365f6",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560328851,
-          "duration": 844,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6627fb9a40d9fb34",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560329946,
-          "duration": 665,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "f87ed5d5ebd14b00",
-          "operationName": "CoreUnix.Adder.AddFileNode",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "8fbc432cacdea063"
-            }
-          ],
-          "startTime": 1760467560212323,
-          "duration": 132676,
+          "startTime": 1770117226279717,
+          "duration": 7763,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1744,18 +932,134 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "38e1d78d99f3e2a8",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "824dde7ae7951587",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "891c3d1eefad16e5"
+            }
+          ],
+          "startTime": 1770117225873901,
+          "duration": 16,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "427a2858f3a56add",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "74c1dfbb2ddd7181"
+            }
+          ],
+          "startTime": 1770117226279367,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9bcf13eec292d6bb",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "fbc97ea7253c40e2"
+            }
+          ],
+          "startTime": 1770117226279428,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "977ba0e12a5d2baf",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "4221211ad9248fe8"
+            }
+          ],
+          "startTime": 1770117225702815,
+          "duration": 12,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "8deaf9374dc5dd62",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560239377,
-          "duration": 1151,
+          "startTime": 1770117225819496,
+          "duration": 2610,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -1773,1468 +1077,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "9a2c451af49d63c6",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560247983,
-          "duration": 1093,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "81be6af2c00d01f1",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560300549,
-          "duration": 880,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "48631ff2b6e7fdad",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560315769,
-          "duration": 702,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "73e51f48a9818964",
-          "operationName": "Blockservice.blockService.AddBlock",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560345002,
-          "duration": 251,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "35d5836cf18af80f",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560215479,
-          "duration": 831,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "ecc6bec7875daa35",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560262930,
-          "duration": 729,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "eb033887f2b3acec",
-          "operationName": "Blockservice.blockService.AddBlock",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560344985,
-          "duration": 2,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "125d4b42a113151e",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560234320,
-          "duration": 864,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "95b6d51da5745a8b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560257201,
-          "duration": 1094,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "f52192fb553a60a2",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560285822,
-          "duration": 993,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "adeb1fe4f0ed99cf",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560295262,
-          "duration": 962,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "fa75aa783f6812c6",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560308357,
-          "duration": 755,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "01e390285370c278",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560331039,
-          "duration": 953,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a910074e418e98bf",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560255271,
-          "duration": 1003,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "fa8747a796a9606c",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560306235,
-          "duration": 1007,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "ad3a4b8fbe164a23",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560318030,
-          "duration": 672,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "5df9adc7eefd7bbc",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560335282,
-          "duration": 762,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "0f07686d3a25b145",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560296200,
-          "duration": 690,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "642e02dbc6c25ec5",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560304839,
-          "duration": 1205,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "4c74845d1ca4de89",
-          "operationName": "CoreUnix.Adder.MaybePauseForGC",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "f87ed5d5ebd14b00"
-            }
-          ],
-          "startTime": 1760467560212324,
-          "duration": 0,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "Kubo"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "47bba12d3dbf6e6a",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560298399,
-          "duration": 784,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "08a298f9ec1dffca",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560307307,
-          "duration": 821,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "af099e2a9a1c726b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560314414,
-          "duration": 1228,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "5af4a5449e7db607",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560320342,
-          "duration": 775,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "8373de86d1bd9ecc",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560316926,
-          "duration": 664,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "dd489be27f043397",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560214001,
-          "duration": 1080,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "b1d3d2a0770b52cb",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560265618,
-          "duration": 763,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "2f9e0a1d4a02a085",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560301809,
-          "duration": 988,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "cae408ffb9ee48ac",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560325530,
-          "duration": 658,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "4efd7cc0381d7592",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560334198,
-          "duration": 711,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "96e8e2e0b3d3a406",
-          "operationName": "Blockservice.blockService.GetBlock",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560345273,
-          "duration": 34,
-          "tags": [
-            {
-              "key": "CID",
-              "type": "string",
-              "value": "QmQbHBfRyypQERZR9cvAtkMZnwkSjic8JRuBExAFXQgnk6"
-            },
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "source",
-              "type": "string",
-              "value": "blockstore.gcBlockstore"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "cb335e73e54e6f57",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560228744,
-          "duration": 801,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6546f661900cac68",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560290787,
-          "duration": 821,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "0e0c73c52e20e894",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560327796,
-          "duration": 944,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "2cd34157f0fe6ae5",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560226607,
-          "duration": 985,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "30afcd3efdc2f7d4",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560289715,
-          "duration": 891,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "d218976406d8848a",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560326662,
-          "duration": 628,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "93f4a18582607d26",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560230930,
-          "duration": 852,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "f4e62592a3d61ec3",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560232147,
-          "duration": 682,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "7e6af32239413731",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560254004,
-          "duration": 710,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "5eb1fb2929cc3aae",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560281467,
-          "duration": 656,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "f321ad98cb784983",
-          "operationName": "Blockservice.blockService.AddBlock",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "dda42769b20750c1"
-            }
-          ],
-          "startTime": 1760467560345342,
-          "duration": 2,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "24cf8a81f74d9e67",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560244134,
-          "duration": 785,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "54239e030dcda61b",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560249541,
-          "duration": 677,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "48ecaaa79ddfe5be",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560321420,
-          "duration": 938,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "38cb8ee248fed95f",
-          "operationName": "corehttp.cmdsHandler",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "4cd2005a1f20ff3a"
-            }
-          ],
-          "startTime": 1760467560212211,
-          "duration": 171662,
-          "tags": [
-            {
-              "key": "client.address",
-              "type": "string",
-              "value": "127.0.0.1"
-            },
-            {
-              "key": "http.request.body.size",
-              "type": "int64",
-              "value": 104857839
-            },
-            {
-              "key": "http.request.method",
-              "type": "string",
-              "value": "POST"
-            },
-            {
-              "key": "http.response.body.size",
-              "type": "int64",
-              "value": 133
-            },
-            {
-              "key": "http.response.status_code",
-              "type": "int64",
-              "value": 200
-            },
-            {
-              "key": "http.route",
-              "type": "string",
-              "value": "/api/v0/"
-            },
-            {
-              "key": "network.peer.address",
-              "type": "string",
-              "value": "127.0.0.1"
-            },
-            {
-              "key": "network.peer.port",
-              "type": "int64",
-              "value": 60543
-            },
-            {
-              "key": "network.protocol.version",
-              "type": "string",
-              "value": "1.1"
-            },
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-            },
-            {
-              "key": "otel.scope.version",
-              "type": "string",
-              "value": "0.63.0"
-            },
-            {
-              "key": "server.address",
-              "type": "string",
-              "value": "127.0.0.1"
-            },
-            {
-              "key": "server.port",
-              "type": "int64",
-              "value": 5001
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "server"
-            },
-            {
-              "key": "url.path",
-              "type": "string",
-              "value": "/api/v0/add"
-            },
-            {
-              "key": "url.scheme",
-              "type": "string",
-              "value": "http"
-            },
-            {
-              "key": "user_agent.original",
-              "type": "string",
-              "value": "Go-http-client/1.1"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": [
-            "invalid parent span IDs=4cd2005a1f20ff3a; skipping clock skew adjustment"
-          ]
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "e7de4a24a210640e",
-          "operationName": "Blockservice.blockService.AddBlocks",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
-            }
-          ],
-          "startTime": 1760467560272689,
-          "duration": 926,
-          "tags": [
-            {
-              "key": "otel.scope.name",
-              "type": "string",
-              "value": "blockservice"
-            },
-            {
-              "key": "span.kind",
-              "type": "string",
-              "value": "internal"
-            }
-          ],
-          "logs": [],
-          "processID": "p1",
-          "warnings": null
-        },
-        {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "ed2aff5c4eae18e9",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ca4ee7f2fe1d8522",
           "operationName": "CoreAPI.UnixfsAPI.Add",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "38cb8ee248fed95f"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "a834b299d1b4f550"
             }
           ],
-          "startTime": 1760467560212309,
-          "duration": 171528,
+          "startTime": 1770117225280198,
+          "duration": 1007296,
           "tags": [
             {
               "key": "chunker",
@@ -3352,18 +1206,76 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "8695fa301ba0a69f",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a5eeaab2d184214d",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "d73a46ce019d3fc0"
+            }
+          ],
+          "startTime": 1770117225321659,
+          "duration": 19,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "514db8fea1bafd88",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "2d1577c1cb2508f6"
+            }
+          ],
+          "startTime": 1770117226142039,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "acab85f0a01e242d",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560233212,
-          "duration": 671,
+          "startTime": 1770117225531392,
+          "duration": 3280,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -3381,18 +1293,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "6d1dbe49ba74ebbd",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "8a07369c3eb92b0e",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560319111,
-          "duration": 675,
+          "startTime": 1770117225666170,
+          "duration": 2749,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -3410,18 +1322,18 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "b5da328c9675a06f",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9712838ace591df3",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560236719,
-          "duration": 872,
+          "startTime": 1770117225836949,
+          "duration": 3036,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -3439,18 +1351,2681 @@
           "warnings": null
         },
         {
-          "traceID": "ccb58bf33e622255aa65efd4516b5021",
-          "spanID": "a0dce211fb5a2693",
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "b4fa9fc96f863965",
           "operationName": "Blockservice.blockService.AddBlocks",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "ccb58bf33e622255aa65efd4516b5021",
-              "spanID": "ed2aff5c4eae18e9"
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
             }
           ],
-          "startTime": 1760467560339638,
-          "duration": 849,
+          "startTime": 1770117226241019,
+          "duration": 2652,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a647bf8fae25ba74",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "0c0ee67e5cf99791"
+            }
+          ],
+          "startTime": 1770117225417422,
+          "duration": 20,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5ffa17de9ab88ad4",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "7fa00b9f682a6d1c"
+            }
+          ],
+          "startTime": 1770117225993486,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "8ff0bc9a9c535139",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225295925,
+          "duration": 2430,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "43de81ccbdab7585",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225602751,
+          "duration": 2610,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "dafd57f809d2f4fc",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225711851,
+          "duration": 2825,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "c1ce053252e8de06",
+          "operationName": "Blockservice.blockService.AddBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226279705,
+          "duration": 4,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "6b4513e45ad6f0c3",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "85f08c4fe0c8d80c"
+            }
+          ],
+          "startTime": 1770117225360866,
+          "duration": 15,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4587785d6930b672",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "88e4c619dbf036f9"
+            }
+          ],
+          "startTime": 1770117225653465,
+          "duration": 45,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "b6ce269077380756",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "36eb7574730c2adf"
+            }
+          ],
+          "startTime": 1770117225894393,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "31c71707e53ffcd3",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "9305e2530b93201b"
+            }
+          ],
+          "startTime": 1770117225946554,
+          "duration": 13,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "01a9b312c6cc808d",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ef374bfdbd7984e2"
+            }
+          ],
+          "startTime": 1770117226049914,
+          "duration": 19,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7279920b92d134ef",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "b4fa9fc96f863965"
+            }
+          ],
+          "startTime": 1770117226243649,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "0730eda0fbff4293",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225395929,
+          "duration": 2610,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ddc047ddfc0ee2c5",
+          "operationName": "Blockservice.blockService.AddBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226279388,
+          "duration": 32,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "034e0b8b2d3a9d2a",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225683878,
+          "duration": 2718,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "36eb7574730c2adf",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225891498,
+          "duration": 2907,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "df0403bbf81e65a4",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226009079,
+          "duration": 2696,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "088357133377eb53",
+          "operationName": "CoreUnix.Adder.AddFileNode",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "982554a5cdf3b028"
+            }
+          ],
+          "startTime": 1770117225280219,
+          "duration": 999266,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "43d2e8d812579b8b",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "a5d73fc92470f250"
+            }
+          ],
+          "startTime": 1770117225447059,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "f79c5dec6af2c99e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "33fcea334e3ed8c8"
+            }
+          ],
+          "startTime": 1770117226028746,
+          "duration": 12,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "972e3b00e9d22a3d",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "c1ce053252e8de06"
+            }
+          ],
+          "startTime": 1770117226279709,
+          "duration": 0,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "f20753eb9d447eb1",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225549526,
+          "duration": 2998,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4221211ad9248fe8",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225698397,
+          "duration": 4434,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ad2db59c5e10f41c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "2a3f42fb05501403"
+            }
+          ],
+          "startTime": 1770117225746136,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ab3bcb610dfee099",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "d6ab70f72b120ec2"
+            }
+          ],
+          "startTime": 1770117225778156,
+          "duration": 14,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9716088ccb000af9",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "9712838ace591df3"
+            }
+          ],
+          "startTime": 1770117225839962,
+          "duration": 19,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "1ec19dc359b9d427",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "5db8aad72ddef9a4"
+            }
+          ],
+          "startTime": 1770117225927036,
+          "duration": 16,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "8dd62b150365f451",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225477259,
+          "duration": 2062,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9305e2530b93201b",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225941724,
+          "duration": 4847,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "b0cc748adc3cb8f0",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226102881,
+          "duration": 2610,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "412a26d3022720a4",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "acab85f0a01e242d"
+            }
+          ],
+          "startTime": 1770117225534657,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5f565261e9c0936e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "7887181ca4c347d9"
+            }
+          ],
+          "startTime": 1770117226262731,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "0c0ee67e5cf99791",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225414614,
+          "duration": 2832,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "88e4c619dbf036f9",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225650440,
+          "duration": 3077,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "6cb1e6d734f66190",
+          "operationName": "Blockservice.blockService.GetBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226279658,
+          "duration": 24,
+          "tags": [
+            {
+              "key": "CID",
+              "type": "string",
+              "value": "QmetLf6DRxa6rcJe6PeQCSy7g71JtxFZ1TUZu7YyAYTuTQ"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "0e8987a79189df6c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "b0cc748adc3cb8f0"
+            }
+          ],
+          "startTime": 1770117226105440,
+          "duration": 43,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "74c1dfbb2ddd7181",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226278630,
+          "duration": 741,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7741aabfedabb278",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "f20753eb9d447eb1"
+            }
+          ],
+          "startTime": 1770117225552497,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "141b3ba3f318ef9e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "034e0b8b2d3a9d2a"
+            }
+          ],
+          "startTime": 1770117225686567,
+          "duration": 24,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7121d8a8cc6afa97",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "8deaf9374dc5dd62"
+            }
+          ],
+          "startTime": 1770117225822092,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "228a3292f220378b",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "e9a6e14e3251c1be"
+            }
+          ],
+          "startTime": 1770117226123004,
+          "duration": 14,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "75ec4a3f2ff2b65b",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "da86b4133acfce10"
+            }
+          ],
+          "startTime": 1770117226279632,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "55de792493f2f388",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225460037,
+          "duration": 2651,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5e050820d3ddd4ad",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "8dd62b150365f451"
+            }
+          ],
+          "startTime": 1770117225479306,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "3691cb07cb9834ca",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225758054,
+          "duration": 2628,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4a7a6e8347e9a56c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "fe120a6aac676fe5"
+            }
+          ],
+          "startTime": 1770117225513086,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "82586d8beba7a0e6",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226208437,
+          "duration": 2255,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "bf6109d86dda05e2",
+          "operationName": "Blockservice.blockService.AddBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "3bafd5b8dfe4fb6c"
+            }
+          ],
+          "startTime": 1770117226279718,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "8e153d343ae79a6a",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "f8d9340744b32ce6"
+            }
+          ],
+          "startTime": 1770117226081556,
+          "duration": 18,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "1185eeca756c5721",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225567310,
+          "duration": 2526,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5db8aad72ddef9a4",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225924466,
+          "duration": 2592,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9d5fbfbffa277b7e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "578969f1ca080d01"
+            }
+          ],
+          "startTime": 1770117225378320,
+          "duration": 18,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "98ca00a92c70748a",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225492211,
+          "duration": 2491,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "ef374bfdbd7984e2",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226046359,
+          "duration": 3580,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a8c4cb64f941b5b2",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226157762,
+          "duration": 2403,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "b1aa884e7403ca40",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "a7f36b579abd51aa"
+            }
+          ],
+          "startTime": 1770117226279138,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "18250aac3a65224c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "8ff0bc9a9c535139"
+            }
+          ],
+          "startTime": 1770117225298339,
+          "duration": 11,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a2286db571dc476c",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "1185eeca756c5721"
+            }
+          ],
+          "startTime": 1770117225569813,
+          "duration": 18,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7625314405a7fa1f",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "9a24152ef86caa62"
+            }
+          ],
+          "startTime": 1770117225731100,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7bcb2a43b169f124",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "64afc1e44a07f1c7"
+            }
+          ],
+          "startTime": 1770117225960104,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "5fc450ebbc731e39",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225337253,
+          "duration": 2295,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "85f08c4fe0c8d80c",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225358229,
+          "duration": 2656,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "578969f1ca080d01",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225375600,
+          "duration": 2742,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "db7a0bdd29555201",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226174002,
+          "duration": 2936,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "a834b299d1b4f550",
+          "operationName": "corehttp.cmdsHandler",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "273f5c8e40e464b2"
+            }
+          ],
+          "startTime": 1770117225279234,
+          "duration": 1008330,
+          "tags": [
+            {
+              "key": "client.address",
+              "type": "string",
+              "value": "192.168.240.1"
+            },
+            {
+              "key": "http.request.body.size",
+              "type": "int64",
+              "value": 104857839
+            },
+            {
+              "key": "http.request.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.response.body.size",
+              "type": "int64",
+              "value": 133
+            },
+            {
+              "key": "http.response.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "http.route",
+              "type": "string",
+              "value": "/api/v0/"
+            },
+            {
+              "key": "network.peer.address",
+              "type": "string",
+              "value": "192.168.240.1"
+            },
+            {
+              "key": "network.peer.port",
+              "type": "int64",
+              "value": 43688
+            },
+            {
+              "key": "network.protocol.version",
+              "type": "string",
+              "value": "1.1"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+            },
+            {
+              "key": "otel.scope.version",
+              "type": "string",
+              "value": "0.63.0"
+            },
+            {
+              "key": "server.address",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "server.port",
+              "type": "int64",
+              "value": 5001
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "server"
+            },
+            {
+              "key": "url.path",
+              "type": "string",
+              "value": "/api/v0/add"
+            },
+            {
+              "key": "url.scheme",
+              "type": "string",
+              "value": "http"
+            },
+            {
+              "key": "user_agent.original",
+              "type": "string",
+              "value": "Go-http-client/1.1"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "invalid parent span IDs=273f5c8e40e464b2; skipping clock skew adjustment"
+          ]
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "737c6f98c8435fd8",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "0051961f762dc4ac"
+            }
+          ],
+          "startTime": 1770117225636720,
+          "duration": 15,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "1c2bcc24d66b75eb",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225430628,
+          "duration": 2314,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "497fa696db49ff1e",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225906321,
+          "duration": 2483,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "fbc97ea7253c40e2",
+          "operationName": "Blockservice.blockService.AddBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226279425,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "c96fe897abf7d89e",
+          "operationName": "CoreUnix.Adder.MaybePauseForGC",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "088357133377eb53"
+            }
+          ],
+          "startTime": 1770117225280220,
+          "duration": 0,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "982554a5cdf3b028",
+          "operationName": "CoreUnix.Adder.AddAllAndPin",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225280217,
+          "duration": 1007269,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "9625c511b813e510",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "98ca00a92c70748a"
+            }
+          ],
+          "startTime": 1770117225494685,
+          "duration": 14,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "899a88665d3be9b1",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "28e7b07ad4475fe1"
+            }
+          ],
+          "startTime": 1770117225620189,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "0e99f59a118d855a",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "3691cb07cb9834ca"
+            }
+          ],
+          "startTime": 1770117225760660,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "c5a9378f0ae34dcb",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "45a353f6abdd6af8"
+            }
+          ],
+          "startTime": 1770117225797547,
+          "duration": 13,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4aa12e56905595e8",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225852037,
+          "duration": 2407,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "891c3d1eefad16e5",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225871111,
+          "duration": 2811,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7bfd080a97b8c3c6",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226063903,
+          "duration": 2820,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "7887181ca4c347d9",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226259887,
+          "duration": 2856,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "f8d9340744b32ce6",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117226079220,
+          "duration": 2358,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "b5910a7ba9d75fa3",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "df0403bbf81e65a4"
+            }
+          ],
+          "startTime": 1770117226011763,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "4b19bad3e2bbd62b",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "963ba326a89e90b9"
+            }
+          ],
+          "startTime": 1770117226193194,
+          "duration": 19,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "d9e79644caf3ca03",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "a4099930c82835c4"
+            }
+          ],
+          "startTime": 1770117226226690,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "d844addf476446a0",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ddc047ddfc0ee2c5"
+            }
+          ],
+          "startTime": 1770117226279418,
+          "duration": 0,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "28e7b07ad4475fe1",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225617318,
+          "duration": 2884,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "dcaed9c8f4dfc1b5",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "0730eda0fbff4293"
+            }
+          ],
+          "startTime": 1770117225398509,
+          "duration": 25,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "40e622595a5bf892",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "497fa696db49ff1e"
+            }
+          ],
+          "startTime": 1770117225908790,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "25acc2a56ceb3cdd",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "bf6109d86dda05e2"
+            }
+          ],
+          "startTime": 1770117226279719,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+          "spanID": "d6ab70f72b120ec2",
+          "operationName": "Blockservice.blockService.AddBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "361fc226dcdfb58b7b911f4d5fb1d788",
+              "spanID": "ca4ee7f2fe1d8522"
+            }
+          ],
+          "startTime": 1770117225775896,
+          "duration": 2280,
           "tags": [
             {
               "key": "otel.scope.name",
@@ -3475,7 +4050,7 @@
             {
               "key": "service.version",
               "type": "string",
-              "value": "0.39.0-dev"
+              "value": "0.39.0"
             },
             {
               "key": "telemetry.sdk.language",

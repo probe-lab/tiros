@@ -190,12 +190,13 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, erro
 	k.cfg.Receiver.mu.Unlock()
 
 	result := &UploadResult{
-		CID:            imPath.RootCid(),
-		RawCID:         rawCID,
-		IPFSAddTraceID: uploadSpan.SpanContext().TraceID(),
-		IPFSAddStart:   uploadStart,
-		IPFSAddEnd:     time.Now(),
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+		CID:             imPath.RootCid(),
+		RawCID:          rawCID,
+		IPFSAddTraceID:  uploadSpan.SpanContext().TraceID(),
+		IPFSAddStart:    uploadStart,
+		IPFSAddEnd:      time.Now(),
+		ProvideTraceIDs: make([]trace.TraceID, 0),
+		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
 	}
 
 	// if an error occurred, log it and continue with the next iteration

@@ -24,18 +24,19 @@ func loadTrace(t *testing.T, name string) *ExportTraceServiceRequest {
 	return &ExportTraceServiceRequest{req}
 }
 
-func Test_parseUpload0Trace(t *testing.T) {
-	tid, err := trace.TraceIDFromHex("ccb58bf33e622255aa65efd4516b5021")
+func Test_parse_upload_0_trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("361fc226dcdfb58b7b911f4d5fb1d788")
 	require.NoError(t, err)
 
-	c := cid.MustParse("bafkreibbo27wv5l7jjquq6aec2ysvxb77riv4yctqn5aoomlr3oskdyrl4")
+	c := cid.MustParse("QmetLf6DRxa6rcJe6PeQCSy7g71JtxFZ1TUZu7YyAYTuTQ")
 	rawCID := cid.NewCidV1(uint64(multicodec.Raw), c.Hash())
 
 	res := UploadResult{
-		CID:            c,
-		RawCID:         rawCID,
-		IPFSAddTraceID: trace.TraceID(tid),
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+		CID:             c,
+		RawCID:          rawCID,
+		IPFSAddTraceID:  trace.TraceID(tid),
+		ProvideTraceIDs: make([]trace.TraceID, 0),
+		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
 	}
 
 	for i := 0; i < 3; i++ {
@@ -43,43 +44,45 @@ func Test_parseUpload0Trace(t *testing.T) {
 		res.parse(trace)
 	}
 
-	provTraceID, err := trace.TraceIDFromHex("bd3545bfea892e4919c5f476be5ef93e")
+	provTraceID, err := trace.TraceIDFromHex("26ca5ddc6c7f5e9d7668d0bbd0404be9")
 	require.NoError(t, err)
 
-	assert.True(t, bytes.Equal(res.ProvideTraceID[:], provTraceID[:]))
-	assert.Equal(t, res.IPFSAddStart.UnixNano(), int64(1760467560212211000))
-	assert.Equal(t, res.IPFSAddEnd.UnixNano(), int64(1760467560383873125))
-	assert.Equal(t, res.ProvideStart.UnixNano(), int64(1760467560383876000))
-	assert.Equal(t, res.ProvideEnd.UnixNano(), int64(1760467571513163084))
+	assert.True(t, bytes.Equal(res.ProvideTraceIDs[0][:], provTraceID[:]))
+	assert.Equal(t, res.IPFSAddStart.UnixNano(), int64(1770117225279234512))
+	assert.Equal(t, res.IPFSAddEnd.UnixNano(), int64(1770117226287565388))
+	assert.Equal(t, res.ProvideStart.UnixNano(), int64(1770117226287644304))
+	assert.Equal(t, res.ProvideEnd.UnixNano(), int64(1770117235288959849))
 	assert.True(t, res.isPopulated())
 }
 
-func Test_parseUpload1Trace(t *testing.T) {
-	tid, err := trace.TraceIDFromHex("aa4784875aff6a43c9f964105de0b184")
+func Test_parse_upload_1_trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("5a8c092976fe983aae6048e8015f3ec7")
 	require.NoError(t, err)
 
-	c := cid.MustParse("bafkreif7ndqkrhvnx4l7vsqmdrdis6u2nic4efdc2b53wwyrsobzrbtjwq")
+	c := cid.MustParse("QmWL7Nva8vovu5GZWCW8LtpcWvdUi3TDyHRpTrUQkfLZhe")
 	rawCID := cid.NewCidV1(uint64(multicodec.Raw), c.Hash())
 
 	res := UploadResult{
-		CID:            c,
-		RawCID:         rawCID,
-		IPFSAddTraceID: trace.TraceID(tid),
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+		CID:             c,
+		RawCID:          rawCID,
+		IPFSAddTraceID:  trace.TraceID(tid),
+		ProvideTraceIDs: make([]trace.TraceID, 0),
+		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 2; i++ {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/upload_1/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
-	provTraceID, err := trace.TraceIDFromHex("1469a7f3f0d6a68fe98767b31a1cde8a")
+	provTraceID, err := trace.TraceIDFromHex("81cf7be86352a2cbb82c00b728999f01")
+	require.NoError(t, err)
 
-	assert.True(t, bytes.Equal(res.ProvideTraceID[:], provTraceID[:]))
-	assert.Equal(t, res.IPFSAddStart.UnixNano(), int64(1760468570326433000))
-	assert.Equal(t, res.IPFSAddEnd.UnixNano(), int64(1760468570485462250))
-	assert.Equal(t, res.ProvideStart.UnixNano(), int64(1760468570485468000))
-	assert.Equal(t, res.ProvideEnd.UnixNano(), int64(1760468583575567542))
+	assert.True(t, bytes.Equal(res.ProvideTraceIDs[1][:], provTraceID[:]))
+	assert.Equal(t, res.IPFSAddStart.UnixNano(), int64(1770118410596956588))
+	assert.Equal(t, res.IPFSAddEnd.UnixNano(), int64(1770118411596593380))
+	assert.Equal(t, res.ProvideStart.UnixNano(), int64(1770118410394565463))
+	assert.Equal(t, res.ProvideEnd.UnixNano(), int64(1770118417215926508))
 	assert.True(t, res.isPopulated())
 }
 

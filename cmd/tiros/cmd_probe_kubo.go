@@ -327,6 +327,15 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 			} else {
 				slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
 			}
+
+			if err == nil && ur.ProvideHasErr {
+				if ur.ProvideErr != nil {
+					dbUpload.Error = toPtr(ur.ProvideErr.Error())
+				} else {
+					dbUpload.Error = toPtr("unknown error")
+				}
+			}
+
 			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
 				return fmt.Errorf("inserting upload into database: %w", err)
 			}

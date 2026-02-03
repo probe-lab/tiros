@@ -1,6 +1,7 @@
 package kubo
 
 import (
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -11,14 +12,16 @@ import (
 )
 
 type UploadResult struct {
-	CID            cid.Cid
-	RawCID         cid.Cid
-	IPFSAddTraceID trace.TraceID
-	ProvideTraceID trace.TraceID
-	IPFSAddStart   time.Time
-	IPFSAddEnd     time.Time
-	ProvideStart   time.Time
-	ProvideEnd     time.Time
+	CID             cid.Cid
+	RawCID          cid.Cid
+	IPFSAddTraceID  trace.TraceID
+	ProvideTraceIDs []trace.TraceID
+	IPFSAddStart    time.Time
+	IPFSAddEnd      time.Time
+	ProvideStart    time.Time
+	ProvideEnd      time.Time
+	ProvideHasErr   bool
+	ProvideErr      error
 
 	spansByTraceID map[trace.TraceID][]*v1.Span
 }
@@ -31,11 +34,6 @@ func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 			r.spansByTraceID[trace.TraceID(span.TraceId)] = []*v1.Span{span}
 		}
 
-		// if we already have a trace ID for the provide operation, we can skip
-		if r.ProvideTraceID.IsValid() {
-			continue
-		}
-
 		// if the span is not a provide operation, we can skip
 		if span.Name != "IpfsDHT.Provide" {
 			continue
@@ -43,8 +41,15 @@ func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 
 		// if the span does not have the attribute key set to the raw CID, we can skip
 		for _, attr := range span.Attributes {
-			if attr.Key == "key" && attr.Value.GetStringValue() == r.RawCID.String() {
-				r.ProvideTraceID = trace.TraceID(span.TraceId)
+			switch attr.Key {
+			case "key":
+				if attr.Value.GetStringValue() == r.RawCID.String() || attr.Value.GetStringValue() == r.CID.String() {
+					r.ProvideTraceIDs = append(r.ProvideTraceIDs, trace.TraceID(span.TraceId))
+				}
+			case "error":
+				r.ProvideHasErr = attr.Value.GetBoolValue()
+			case "otel.status_description":
+				r.ProvideErr = fmt.Errorf("%s", attr.Value.GetStringValue())
 			}
 		}
 	}
@@ -55,19 +60,26 @@ func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 		r.IPFSAddEnd = end
 	}
 
-	if !r.ProvideTraceID.IsValid() {
+	if len(r.ProvideTraceIDs) == 0 {
 		return
 	}
 
-	if spans, found := r.spansByTraceID[r.ProvideTraceID]; found {
-		start, end := extractTimeRange(spans)
-		r.ProvideStart = start
-		r.ProvideEnd = end
+	provideSpans := make([]*v1.Span, 0)
+	for _, traceID := range r.ProvideTraceIDs {
+		provideSpans = append(provideSpans, r.spansByTraceID[traceID]...)
 	}
+
+	if len(provideSpans) == 0 {
+		return
+	}
+
+	start, end := extractTimeRange(provideSpans)
+	r.ProvideStart = start
+	r.ProvideEnd = end
 }
 
 func (r *UploadResult) isPopulated() bool {
-	return r.IPFSAddTraceID.IsValid() && r.ProvideTraceID.IsValid() && !r.ProvideStart.IsZero() && !r.ProvideEnd.IsZero() && !r.IPFSAddStart.IsZero() && !r.IPFSAddEnd.IsZero()
+	return r.IPFSAddTraceID.IsValid() && len(r.ProvideTraceIDs) > 0 && !r.ProvideStart.IsZero() && !r.ProvideEnd.IsZero() && !r.IPFSAddStart.IsZero() && !r.IPFSAddEnd.IsZero()
 }
 
 type DownloadResult struct {
