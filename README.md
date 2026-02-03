@@ -20,19 +20,17 @@ setup in detail and how the measurements can be run locally.
   * [Table of Contents](#table-of-contents)
   * [CID Provider Concept](#cid-provider-concept)
   * [Traditional HTTP Gateway Performance](#traditional-http-gateway-performance)
-  * [Measurement Methodology](#measurement-methodology)
-    * [Content Routing Performance](#content-routing-performance)
+  * [Service Worker Gateway Performance](#service-worker-gateway-performance)
+  * [Kubo Retrieval and Publication Performance](#kubo-retrieval-and-publication-performance)
       * [Run](#run)
-    * [Website Performance](#website-performance)
+  * [Kubo Website Performance](#kubo-website-performance)
     * [Measurement Metrics](#measurement-metrics)
     * [Execution](#execution)
-      * [Global Configuration](#global-configuration)
-      * [Probe Configuration](#probe-configuration)
-      * [Website Configuration](#website-configuration)
-      * [Content Routing Performance Configuration](#content-routing-performance-configuration)
+  * [Configuration](#configuration)
+    * [Global](#global)
+    * [Probe](#probe)
     * [Migrations](#migrations)
   * [Testing](#testing)
-  * [Alternative IPFS Implementation](#alternative-ipfs-implementation)
   * [Maintainers](#maintainers)
   * [Contributing](#contributing)
   * [License](#license)
@@ -218,7 +216,7 @@ OTEL_TRACES_EXPORTER=otlp docker compose up kubo
 
 Terminal 2:
 ```shell
-go run . probe --json.out out kubo --iterations.max 1 --traces.receiver.host 0.0.0.0 --cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+go run ./cmd/tiros probe --json.out out kubo --iterations.max 1 --traces.receiver.host 0.0.0.0 --cids bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
 ```
 
 The `--json.out` flag instructs Tiros to write the output to newline-delimited
@@ -242,6 +240,61 @@ Then pass the following flags to the above Tiros command:
 
 That way you can inspect the traces that Tiros caught in Jaeger.
 
+### Updating to a new Kubo version
+
+Here are two different CIDs:
+
+- `bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu` This is a CID hosted on Pinata which isn't indexed in the DHT and instead only accessible via IPNI (unless the Kubo peer is already connected to a Pinata peer or Pinata starts indexing content in the DHT).
+- `QmcxHhN5oPuKw8CEmgeSjXeDfnM5o9by4x59xzcSBMnLh5` This is a CID hosted on our controlled Kubo node. This CID is indexed in the DHT and not in IPNI.
+
+Run the following command to gather new test data for IPNI retrievals:
+
+```shell
+# start Jaeger
+docker run --rm --name jaeger \
+  -e COLLECTOR_OTLP_ENABLED=true \
+  -p 16686:16686 \
+  -p 55680:4317 \
+  cr.jaegertracing.io/jaegertracing/jaeger:2.11.0
+ 
+# start Tiros
+go run ./cmd/tiros probe \
+  --json.out out/ipni \
+  kubo \
+  --download.only \
+  --iterations.max 1 \
+  --traces.receiver.host 0.0.0.0 \
+  --traces.forward.host 127.0.0.1 \
+  --traces.forward.port 55680 \
+  --cids bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu \
+  --traces.out out/ipni
+
+# start kubo
+OTEL_TRACES_EXPORTER=otlp docker compose up kubo
+```
+
+As soon as the download operation completes, you should see in the Tiros logs two retrievals.
+Next, navigate to the Jaeger UI at http://localhost:16686 where you should see 
+two `Kubo: corehttp.cmdsHandler` traces that took slightly longer than others.
+Take note of the trace IDs. Then convert them to base64 and search for all corresponding
+`out/ipni/trace-*.proto.json` files. When you have figured out in Jaeger that a certain
+set of traces belongs to, e.g., an IPNI retrieval, move them into the folder
+`./testdata/download_ipni_X` and create an appropriate test case for it in
+[`./pkg/kubo/trace_parse_test.go`](./pkg/kubo/trace_parse_test.go).
+
+On top, export the full trace as JSON from Jaeger, so that we can inspect the 
+trace again in the future in Jaeger to investigate differences.
+
+Try to find the trace IDs for both retrievals in the `out/ipni/trace-*.proto.json` files by
+searching for the CID `bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu`.
+
+Remove the temporary data by running:
+
+```shell
+rm -r out/ipni
+```
+
+### Configuration
 
 These are the configuration flags that can be passed to the `probe kubo` command:
 

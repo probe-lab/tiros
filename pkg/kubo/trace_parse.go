@@ -2,6 +2,7 @@ package kubo
 
 import (
 	"math"
+	"strings"
 	"time"
 
 	"github.com/ipfs/go-cid"
@@ -170,6 +171,19 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 						continue
 					}
 
+					isCorrectBlock := false
+					for _, attr := range evt.GetAttributes() {
+						if attr.Key != "cid" {
+							continue
+						}
+						isCorrectBlock = attr.GetValue().GetStringValue() == r.CID.String()
+						break
+					}
+
+					if !isCorrectBlock {
+						continue
+					}
+
 					blockReceivedAt := time.Unix(0, int64(evt.TimeUnixNano))
 					if blockReceivedAt.Before(r.FirstBlockReceivedAt) || r.FirstBlockReceivedAt.IsZero() {
 						r.FirstBlockReceivedAt = blockReceivedAt
@@ -181,6 +195,19 @@ func (r *DownloadResult) parse(req *ExportTraceServiceRequest) {
 					r.IdleBroadcastStartedAt = idleBroadcastStart
 				}
 			case span.Name == "DelegatedHTTPClient.FindProviders":
+				isCorrectOp := false
+				for _, attr := range span.GetAttributes() {
+					if attr.Key != "url.full" {
+						continue
+					}
+					isCorrectOp = strings.Contains(attr.GetValue().GetStringValue(), r.CID.String())
+					break
+				}
+
+				if !isCorrectOp {
+					continue
+				}
+
 				r.IPNIStart = time.Unix(0, int64(span.StartTimeUnixNano))
 				r.IPNIEnd = time.Unix(0, int64(span.EndTimeUnixNano))
 

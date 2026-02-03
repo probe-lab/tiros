@@ -1,0 +1,6516 @@
+{
+  "data": [
+    {
+      "traceID": "fec12bc67940d4104117d06bc5351de2",
+      "spans": [
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "21417c106b9d93b1",
+          "operationName": "Bitswap.Client.Getter.handleIncoming",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "539de111acebf8ff"
+            }
+          ],
+          "startTime": 1770113728549632,
+          "duration": 711408,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113729257038,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreiersza37r6feljyvp4zgnqheqlwoldbodutenrm7voxouo54zyjt4"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729257041,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729257806,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihy4udvck3oowalnqby7o3eu6ucqmzm2khs7wdy4pqbn753wyixnq"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729258091,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreibclup7mvl5ijvckg56xbvcqumwxtprrsdqhxgq5obxm245i7jxyu"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729258413,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreiektadhxg4ab4sezuwtvhtsdqvknllsmvp3sqdfa64vkh4n6ko3j4"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729258857,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreib57alt2kseiugpt4gvigivbdrgx6e23befvnomueqwyqvjsdoz3i"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729259283,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreie4tdvzspujsicrdu7nwyjo37ka6ao4yqewfil7kggssutccrmwrm"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729259671,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreieqm37774hh7vr264i2f66hewvp7vgcayvgs4fna5jhvjomwtg7pq"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729260085,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreifwsead742yeihbkpm23kn3pvjb5psm3tkpuc3qobakkwx7czn7vi"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729260407,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreidtzjuptfljeaqjntflv3rati3z7fkfywhnyls7xzjwgjawyduivq"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5c533564c66ecd7d",
+          "operationName": "ProviderQueryManager.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "972a191d587407a1"
+            }
+          ],
+          "startTime": 1770113728936132,
+          "duration": 1034992,
+          "tags": [
+            {
+              "key": "cid",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "routing"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728936144,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "NewProvideQuery"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728936149,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "NewQuery"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728936258,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "StartFindProvidersAsync"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980223,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "FoundProvider"
+                },
+                {
+                  "key": "peer",
+                  "type": "string",
+                  "value": "Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980236,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "ConnectedToProvider"
+                },
+                {
+                  "key": "peer",
+                  "type": "string",
+                  "value": "Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980261,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "ReceivedProvider"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+                },
+                {
+                  "key": "provider",
+                  "type": "string",
+                  "value": "{Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4: [/dnsaddr/bitswap-v3.pinata.cloud]}"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729971098,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "CancelRequest"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "be223c37ef9586a6",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729913651,
+          "duration": 44317,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWRB5Yxgwd82BgtuFmbUicWdpZvoqYsejctzJSJxwVTXUd"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "89b292fbcd74d5f7",
+          "operationName": "Bitswap.Client.Session.BroadcastOp",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "785ed5d5791d625d"
+            }
+          ],
+          "startTime": 1770113728935527,
+          "duration": 100,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "43c5cd38eed10718",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729261602,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -712.057439ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "72555940ad794558",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "e0a60b5e4726f132"
+            }
+          ],
+          "startTime": 1770113728983934,
+          "duration": 93466,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6082fb01bca99089",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729962095,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -693.637501ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "972a191d587407a1",
+          "operationName": "Bitswap.Client.Session.FindMorePeers",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "89b292fbcd74d5f7"
+            }
+          ],
+          "startTime": 1770113728936114,
+          "duration": 1035015,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728980268,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "FoundPeer"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "4ab99b5903c2080f",
+          "operationName": "Namesys.namesys.ResolveOnceAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "54b7c464ccca2abb"
+            }
+          ],
+          "startTime": 1770113728416614,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/namesys"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a59b16833f3bb807",
+          "operationName": "Namesys.Resolve",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "94879251d33a40cc"
+            }
+          ],
+          "startTime": 1770113728416609,
+          "duration": 26,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/namesys"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "39f95e591d0763f9",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "a35bda6b3f10a0b6"
+            }
+          ],
+          "startTime": 1770113728938630,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWCsNimJtnxKTmeU3CWbaqCYSK5StiSEzHkkZL3cy7p4uD"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "e0a60b5e4726f132",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728983925,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWKmuQnv7cbF3PFJaHqVz7bNGghVTGtT36yRf82nQjpFvw"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWT3Ye1Fo2bXoA4FrTc9B8TTQjw21RdTHLcT8NvZUjifXc"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ff20432b4b5a6e42",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "564a932a02e2e621"
+            }
+          ],
+          "startTime": 1770113729113007,
+          "duration": 790993,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWD6YqoCUDwrYPChmg1BcTGa1LRsRwScAy6C6WLy8oryqS"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "df7e9d18c8c778a5",
+          "operationName": "CoreAPI.UnixfsAPI.Get",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "b368eb69d193c89c"
+            }
+          ],
+          "startTime": 1770113728416602,
+          "duration": 132887,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "path",
+              "type": "string",
+              "value": "/ipfs/bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "d9cf630d064d3a8f",
+          "operationName": "KademliaDHT.IpfsDHT.FindProvidersAsyncRoutine",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "206236fd7c49a3f2"
+            }
+          ],
+          "startTime": 1770113728938040,
+          "duration": 1033401,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c4f181058032961d",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728985621,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWGtYg1rvT43CrNaVgM3g1jT1KSjhSrMzQxjFrdtqE8fkw"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWNgJyuz7CtAAjQahW9HeiBNizaYphDcAj2NysJNwuhQU6"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5f856e00e2c2a23b",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "6c9f845bba34b2be"
+            }
+          ],
+          "startTime": 1770113729057756,
+          "duration": 574307,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "72ba72708c8d13b3",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "1f9361d7bf3499e5"
+            }
+          ],
+          "startTime": 1770113729203304,
+          "duration": 767992,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c5d84875a22a2ab7",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938836,
+          "duration": 264244,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "017b3df31e96c3dd",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "de465a12d2834b08"
+            }
+          ],
+          "startTime": 1770113728938825,
+          "duration": 264394,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6e4599872f31446c",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728939010,
+          "duration": 1032240,
+          "tags": [
+            {
+              "key": "error",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "otel.status_code",
+              "type": "string",
+              "value": "ERROR"
+            },
+            {
+              "key": "otel.status_description",
+              "type": "string",
+              "value": "context canceled"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ec5f5e74bd68c02b",
+          "operationName": "KademliaDHT.IpfsDHT.Query.Run",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938231,
+          "duration": 1033191,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b1aacab0d3c6b16e",
+          "operationName": "Bitswap.Client.Session.GetBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "7c05bbf7304fb4bd"
+            }
+          ],
+          "startTime": 1770113728416692,
+          "duration": 132231,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ae693f969596cc6b",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729112842,
+          "duration": 9,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWAaoowtgzBCBVV3hKbHq28eTtDsvV1fmTf32wKZawVSvn"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "300c576450d0e5b2",
+          "operationName": "DelegatedHTTPClient.FindProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "630fd25109a67033"
+            }
+          ],
+          "startTime": 1770113728936998,
+          "duration": 43123,
+          "tags": [
+            {
+              "key": "http.request.method",
+              "type": "string",
+              "value": "GET"
+            },
+            {
+              "key": "http.response.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "network.protocol.version",
+              "type": "string",
+              "value": "1.1"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+            },
+            {
+              "key": "otel.scope.version",
+              "type": "string",
+              "value": "0.63.0"
+            },
+            {
+              "key": "server.address",
+              "type": "string",
+              "value": "cid.contact"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "client"
+            },
+            {
+              "key": "url.full",
+              "type": "string",
+              "value": "https://cid.contact/routing/v1/providers/bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e?filter-protocols=transport-bitswap,transport-ipfs-gateway-http,unknown"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a5077fbf286a311b",
+          "operationName": "Bitswap.NewSession",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df7e9d18c8c778a5"
+            }
+          ],
+          "startTime": 1770113728416663,
+          "duration": 28,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "8744400317a9ce8d",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729258005,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -708.459834ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "301187573811693f",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729961239,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -692.781375ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "97f9628f28a92bb6",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "b8a47d2b706478b8"
+            }
+          ],
+          "startTime": 1770113728938873,
+          "duration": 173891,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c8c3d27071759f14",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729112982,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWH7z39yiqmMV9Jr1FXmsj13WtxxC2G81QqfQBEGjydy2B"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWD6YqoCUDwrYPChmg1BcTGa1LRsRwScAy6C6WLy8oryqS"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "cff092b096da62d6",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ed5e2400eb53cf67"
+            }
+          ],
+          "startTime": 1770113728938760,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWGtYg1rvT43CrNaVgM3g1jT1KSjhSrMzQxjFrdtqE8fkw"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "0fd054cc4ae0022b",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "6971912c9cdfb167"
+            }
+          ],
+          "startTime": 1770113728939798,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWSLNiSEgwZRHWw3CRAVRjkR3ok65Sz2YbuAFxXxLYJhRD"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a786f05e8f2396dc",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729045059,
+          "duration": 32235,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWT3Ye1Fo2bXoA4FrTc9B8TTQjw21RdTHLcT8NvZUjifXc"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2a50ba14b7464944",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729917674,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWHT6RCRt6bYqqSwkfu2oHJwGieMnGVE4fWRLDYThGodZK"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWJw8bDFwhnuSgxM8UFPZiJbuMfXNa3ELMG8uUtG3NamVR"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "fd02ef014c8774da",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2a50ba14b7464944"
+            }
+          ],
+          "startTime": 1770113729917697,
+          "duration": 53444,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "bcc521f42324a74f",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938929,
+          "duration": 44057,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWCsFwFyFhr1AQtEj6NNLoACgh2PEWtJkjLGDPBak2Mycu"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "94879251d33a40cc",
+          "operationName": "CoreAPI.ResolvePath",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df62cd571d767f7d"
+            }
+          ],
+          "startTime": 1770113728416607,
+          "duration": 47,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "path",
+              "type": "string",
+              "value": "/ipfs/bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "19be06d4a5bb697e",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729258299,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -708.753563ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7a443ec6ac8a2743",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729258760,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -709.216231ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1195ae1b0c82a5cc",
+          "operationName": "KademliaDHT.IpfsDHT.RunQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5985fabd2f20f969"
+            }
+          ],
+          "startTime": 1770113728938188,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "d0de12b6fcc03efd",
+          "operationName": "KademliaDHT.IpfsDHT.FindProvidersAsyncRoutine",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "63fd71e37aa0f1ca"
+            }
+          ],
+          "startTime": 1770113728938131,
+          "duration": 66,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "e81b7292be04b66d",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938588,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWEo3dCsfjsMpXfP2gjnbsvPDEo7fq2XA5ZF5ATp7Njs6Y"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ea88c693758eccff",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938770,
+          "duration": 46717,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWGtYg1rvT43CrNaVgM3g1jT1KSjhSrMzQxjFrdtqE8fkw"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b0df47ee914b43c6",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938760,
+          "duration": 118822,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWDaneANubg1Zo4EBbaKnSXx7W6tKdU1drfSzk4dM2FmqC"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6c9f845bba34b2be",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729057729,
+          "duration": 12,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWDaneANubg1Zo4EBbaKnSXx7W6tKdU1drfSzk4dM2FmqC"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWAJCnZeEHUgkUMEYxGk7hq9gTLvQ1BRmyUfQ2Go3h6Yi6"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "0414d321991388d3",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "72ba72708c8d13b3"
+            }
+          ],
+          "startTime": 1770113729203308,
+          "duration": 767987,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "QmeEw6rzQgtxRfWVxXg16F5xoxYrWcsvnLWi5h1JiksLfZ"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b4106ddf190fe180",
+          "operationName": "Namesys.ResolveAsync.Worker",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "54b7c464ccca2abb"
+            }
+          ],
+          "startTime": 1770113728416633,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/namesys"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -18.25µs"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "992f391ac305250f",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729959537,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -691.080084ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "26caaafb5599ddfa",
+          "operationName": "Namesys.namesys.Resolve",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "a59b16833f3bb807"
+            }
+          ],
+          "startTime": 1770113728416611,
+          "duration": 24,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/namesys"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1204eb142212b59f",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2228d9f15d454033"
+            }
+          ],
+          "startTime": 1770113728984552,
+          "duration": 66074,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWH7z39yiqmMV9Jr1FXmsj13WtxxC2G81QqfQBEGjydy2B"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "4478cb71043c32cc",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "fd02ef014c8774da"
+            }
+          ],
+          "startTime": 1770113729917700,
+          "duration": 53434,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWJw8bDFwhnuSgxM8UFPZiJbuMfXNa3ELMG8uUtG3NamVR"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "f8b893109bbcb20d",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5506bedba2199971"
+            }
+          ],
+          "startTime": 1770113729077468,
+          "duration": 893790,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWL5u6LG26YhwjqtbPtTB51a9nSjKLzX4M3t4rDpWSe5C1"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2ef83fd3b69a29b9",
+          "operationName": "Bitswap.Client.Getter.handleIncoming",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "b8cf6a027888b460"
+            }
+          ],
+          "startTime": 1770113728416710,
+          "duration": 132202,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728548909,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a9174b07e85d49ed",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729260950,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -711.405043ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "856f95cf39fec7c8",
+          "operationName": "KademliaDHT.IpfsDHT.Query.Terminate",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729971269,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "Reason",
+              "type": "string",
+              "value": "cancelled"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "cb3f287f8ea0424e",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938804,
+          "duration": 115822,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWEo3dCsfjsMpXfP2gjnbsvPDEo7fq2XA5ZF5ATp7Njs6Y"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "d56cd04868543349",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729199076,
+          "duration": 4,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWSLNiSEgwZRHWw3CRAVRjkR3ok65Sz2YbuAFxXxLYJhRD"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWRfkNC4H7CqHW3w26XQEJrm7wCpt8Uag92nSe3BftvFHP"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7a9ca4ebe521f6a6",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729201051,
+          "duration": 54496,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWAaoowtgzBCBVV3hKbHq28eTtDsvV1fmTf32wKZawVSvn"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5fde46c80a8e5eea",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "1fce2e0c510ffbae"
+            }
+          ],
+          "startTime": 1770113729632154,
+          "duration": 88743,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "20defbed6978ee55",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "4036bfad13bcbb32"
+            }
+          ],
+          "startTime": 1770113728938729,
+          "duration": 1032528,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "112b14efd0a0ec90",
+          "operationName": "KademliaDHT.IpfsDHT.RunLookupWithFollowup",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d9cf630d064d3a8f"
+            }
+          ],
+          "startTime": 1770113728938178,
+          "duration": 1033261,
+          "tags": [
+            {
+              "key": "Target",
+              "type": "string",
+              "value": "zQmduU1khZaRyrqYX3FEwAaSjF9QaKG5H4TogBoz88nGeTS"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c6e6700e45c8c633",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728939807,
+          "duration": 259149,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWSLNiSEgwZRHWw3CRAVRjkR3ok65Sz2YbuAFxXxLYJhRD"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "fc535857f6e5d0d5",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ad0a5d0ed1c3ee7c"
+            }
+          ],
+          "startTime": 1770113728938924,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWCsFwFyFhr1AQtEj6NNLoACgh2PEWtJkjLGDPBak2Mycu"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "0b55314fb67d3eb2",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728983214,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWCsFwFyFhr1AQtEj6NNLoACgh2PEWtJkjLGDPBak2Mycu"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWD2ndTZ3R9GHUMB8emrft5zcS7xFau6FZEXvj79T4GZGY"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "918eefb1a4f04428",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729054775,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWEo3dCsfjsMpXfP2gjnbsvPDEo7fq2XA5ZF5ATp7Njs6Y"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWRmZNnERjxQ1RN5dxDQ2zRh9A1YqrMxNHGQ4iHSZuvqrT"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "4a750b46ed549081",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729904018,
+          "duration": 67172,
+          "tags": [
+            {
+              "key": "error",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "otel.status_code",
+              "type": "string",
+              "value": "ERROR"
+            },
+            {
+              "key": "otel.status_description",
+              "type": "string",
+              "value": "context canceled"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWD6YqoCUDwrYPChmg1BcTGa1LRsRwScAy6C6WLy8oryqS"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a498cfe445bd3f44",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "3ab4e87aa26fbb01"
+            }
+          ],
+          "startTime": 1770113729958175,
+          "duration": 13100,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "QmYYMkhYMh9BQxrFwhAk6CdeiVAL4swu3bNKwWDcuRQ4uj"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7c05bbf7304fb4bd",
+          "operationName": "Blockservice.Session.GetBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df62cd571d767f7d"
+            }
+          ],
+          "startTime": 1770113728416656,
+          "duration": 132779,
+          "tags": [
+            {
+              "key": "CID",
+              "type": "string",
+              "value": "bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "082d406d33b40e2d",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "20defbed6978ee55"
+            }
+          ],
+          "startTime": 1770113728939004,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c5d8a37482d34847",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "017b3df31e96c3dd"
+            }
+          ],
+          "startTime": 1770113728938831,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "3127615b8c66fb8d",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ae693f969596cc6b"
+            }
+          ],
+          "startTime": 1770113729112922,
+          "duration": 142837,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "9c89306632da63fd",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "f7171a33c65027f3"
+            }
+          ],
+          "startTime": 1770113729255865,
+          "duration": 332735,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWHT6RCRt6bYqqSwkfu2oHJwGieMnGVE4fWRLDYThGodZK"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "564a932a02e2e621",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "c8c3d27071759f14"
+            }
+          ],
+          "startTime": 1770113729113004,
+          "duration": 858189,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2008f86039fa991d",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d56cd04868543349"
+            }
+          ],
+          "startTime": 1770113729199097,
+          "duration": 772171,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6c2787a1d5b93ded",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729960360,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -691.902855ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "e17590ceb438ae5b",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729960805,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -692.347625ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5c8e5f7af7c98e26",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938332,
+          "duration": 65,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWCsFwFyFhr1AQtEj6NNLoACgh2PEWtJkjLGDPBak2Mycu"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "30bc4ccb594aae2a",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728984541,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWCsNimJtnxKTmeU3CWbaqCYSK5StiSEzHkkZL3cy7p4uD"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWH7z39yiqmMV9Jr1FXmsj13WtxxC2G81QqfQBEGjydy2B"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "f7171a33c65027f3",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "c0aa8bc11b1cc4ec"
+            }
+          ],
+          "startTime": 1770113729255860,
+          "duration": 661760,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "74f8857a10c84b0e",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "1c44e75d405d5e90"
+            }
+          ],
+          "startTime": 1770113728983249,
+          "duration": 987998,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWD2ndTZ3R9GHUMB8emrft5zcS7xFau6FZEXvj79T4GZGY"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6a5695e392761bc3",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729260344,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -710.798335ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c0c2af27f7037df1",
+          "operationName": "Bitswap.Client.Getter.handleIncoming",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "831ab531b515815e"
+            }
+          ],
+          "startTime": 1770113729268522,
+          "duration": 695293,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113729959009,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreid4qzvz4rju5fsmvxfnitfy2i37qp3suvxpssqmmztvdholfkkdvm"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729959011,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreiea3x5ddeou764amhgx566erdebms3kd3zkui3x4gpcgynqjytp5a"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729959689,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreib4brbm7qaje5r2glug6cxspnvhmrshnqrtulrvm4vpbsvcwnixwa"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729960035,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreiercr4xemanrz7exjhcd7vvdriqbvvgsamsorhbblb5umwv5owvxi"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729960409,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreiays64cnpnc5jaytoyw5qxszps5r4znsgxkckps2e5fg4b3nhw3xe"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729960853,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreicwfuyrhaf274szctokhqdpn6oblqwsfmzu2woeiavoemblnvcu5m"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729961309,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreigdxpo5en5frmloyajoqjgdl3zkhlzuwkft2arnn4dhfzevyz3xby"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729961714,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreifgyijw2ffkjoiqqn4si3axb7bq32fsakwordblsis4hgmr2xgvdq"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729962159,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreid62iosdt54xjt7syafaczqxtigv7hh4wtvuqhstkgkdyzvkp2veq"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729962690,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "received block"
+                },
+                {
+                  "key": "cid",
+                  "type": "string",
+                  "value": "bafkreihqhgaswgat7wj4l5hddwfe6wf5leu3w6gyqgrptp2rquyhekpi6u"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "842f8d7f17a36eb2",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "97f9628f28a92bb6"
+            }
+          ],
+          "startTime": 1770113728938879,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1fce2e0c510ffbae",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729632134,
+          "duration": 4,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWAJCnZeEHUgkUMEYxGk7hq9gTLvQ1BRmyUfQ2Go3h6Yi6"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWMXUhPg1UHWSq1KP1yHMZWuYBcUTYahecqUstLj3ZWzoT"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "53b5b1c8bb236c78",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "7ff5e3f0458fb966"
+            }
+          ],
+          "startTime": 1770113729721004,
+          "duration": 192633,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWRB5Yxgwd82BgtuFmbUicWdpZvoqYsejctzJSJxwVTXUd"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "06a784fc1c8a6105",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "cf9b2d2bea7aa5e3"
+            }
+          ],
+          "startTime": 1770113729054800,
+          "duration": 916617,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWRmZNnERjxQ1RN5dxDQ2zRh9A1YqrMxNHGQ4iHSZuvqrT"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "206236fd7c49a3f2",
+          "operationName": "IpfsDHT.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d1ef4b51831a6d06"
+            }
+          ],
+          "startTime": 1770113728937662,
+          "duration": 1033787,
+          "tags": [
+            {
+              "key": "count",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728937669,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ed002b96d17f6818",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "7c05bbf7304fb4bd"
+            }
+          ],
+          "startTime": 1770113728549422,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "edf0e6ed67945080",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729260011,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -710.466376ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "6971912c9cdfb167",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d3ed6d19762cc472"
+            }
+          ],
+          "startTime": 1770113728939789,
+          "duration": 259246,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "eb2d4fa7333e9393",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729259603,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -710.058147ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "832f07f92ffce302",
+          "operationName": "Blockservice.Session.GetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df7e9d18c8c778a5"
+            }
+          ],
+          "startTime": 1770113728549540,
+          "duration": 12,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -66.500583ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2c74adf0a6b6ec28",
+          "operationName": "Blockservice.Session.GetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df7e9d18c8c778a5"
+            }
+          ],
+          "startTime": 1770113729268455,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "blockservice"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -785.412667ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "48ed3c118ca3e2ba",
+          "operationName": "Compose.worker",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "98c117d71e09c951"
+            }
+          ],
+          "startTime": 1770113728936700,
+          "duration": 1034435,
+          "tags": [
+            {
+              "key": "blocking",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-routing-helpers"
+            },
+            {
+              "key": "routingNumber",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "type",
+              "type": "string",
+              "value": "*routinghelpers.composableParallel"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728980185,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980203,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "got result"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "d1ef4b51831a6d06",
+          "operationName": "KademliaDHT.Dual.worker",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2876a4513ea4e0e6"
+            }
+          ],
+          "startTime": 1770113728937660,
+          "duration": 1033793,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728938217,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "lan finished"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113729971452,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "wan finished"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "d3ed6d19762cc472",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938563,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWSLNiSEgwZRHWw3CRAVRjkR3ok65Sz2YbuAFxXxLYJhRD"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "caa68d0165c17cc8",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938640,
+          "duration": 45827,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWCsNimJtnxKTmeU3CWbaqCYSK5StiSEzHkkZL3cy7p4uD"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ed5e2400eb53cf67",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ea491d5c2ec83c47"
+            }
+          ],
+          "startTime": 1770113728938750,
+          "duration": 46837,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "da4fc4dbe2437731",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729588618,
+          "duration": 328814,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWHT6RCRt6bYqqSwkfu2oHJwGieMnGVE4fWRLDYThGodZK"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5506bedba2199971",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "90842c226f038ae3"
+            }
+          ],
+          "startTime": 1770113729077465,
+          "duration": 893795,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "8e17bc203481efac",
+          "operationName": "Path.basicResolver.ResolveToLastNode",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "94879251d33a40cc"
+            }
+          ],
+          "startTime": 1770113728416638,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "Path",
+              "type": "string",
+              "value": "/ipfs/bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/path/resolver"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "834181e8b04caaa5",
+          "operationName": "KademliaDHT.ProviderManager.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d0de12b6fcc03efd"
+            }
+          ],
+          "startTime": 1770113728938135,
+          "duration": 39,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "903b903026c90f9c",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938605,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWCsNimJtnxKTmeU3CWbaqCYSK5StiSEzHkkZL3cy7p4uD"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "0637b8e5cab7fefb",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "48cca33a085fd543"
+            }
+          ],
+          "startTime": 1770113728938755,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWDaneANubg1Zo4EBbaKnSXx7W6tKdU1drfSzk4dM2FmqC"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5ee72c73afa24d67",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "7d22e2acfa53b64a"
+            }
+          ],
+          "startTime": 1770113728938967,
+          "duration": 44944,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "539de111acebf8ff",
+          "operationName": "Bitswap.Client.Getter.AsyncGetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "68c0412444f14785"
+            }
+          ],
+          "startTime": 1770113728549580,
+          "duration": 16,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "28b9b64920ffaac6",
+          "operationName": "Bitswap.Client.Session.GetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729268503,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "98c117d71e09c951",
+          "operationName": "ComposableParallel.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5c533564c66ecd7d"
+            }
+          ],
+          "startTime": 1770113728936353,
+          "duration": 1034786,
+          "tags": [
+            {
+              "key": "count",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-routing-helpers"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728980206,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980211,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "found provider"
+                },
+                {
+                  "key": "addrs",
+                  "type": "string",
+                  "value": "[\"/dnsaddr/bitswap-v3.pinata.cloud\"]"
+                },
+                {
+                  "key": "id",
+                  "type": "string",
+                  "value": "Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -118.021µs"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2876a4513ea4e0e6",
+          "operationName": "Dual.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "3d0f4c03f8640489"
+            }
+          ],
+          "startTime": 1770113728937643,
+          "duration": 1033817,
+          "tags": [
+            {
+              "key": "count",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht/dual"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728937680,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -597.979µs"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ea491d5c2ec83c47",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938548,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWGtYg1rvT43CrNaVgM3g1jT1KSjhSrMzQxjFrdtqE8fkw"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "976911a5c3a95e31",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "72555940ad794558"
+            }
+          ],
+          "startTime": 1770113728983937,
+          "duration": 61107,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWT3Ye1Fo2bXoA4FrTc9B8TTQjw21RdTHLcT8NvZUjifXc"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "da060f74d2c5b9cc",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "3127615b8c66fb8d"
+            }
+          ],
+          "startTime": 1770113729112926,
+          "duration": 88120,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWAaoowtgzBCBVV3hKbHq28eTtDsvV1fmTf32wKZawVSvn"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "df62cd571d767f7d",
+          "operationName": "CoreAPI.ResolveNode",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "df7e9d18c8c778a5"
+            }
+          ],
+          "startTime": 1770113728416606,
+          "duration": 132866,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "Kubo"
+            },
+            {
+              "key": "path",
+              "type": "string",
+              "value": "/ipfs/bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a577cc42d3cf2835",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729959960,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -691.503292ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "3d0f4c03f8640489",
+          "operationName": "Compose.worker",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5bc89c321ee337f5"
+            }
+          ],
+          "startTime": 1770113728936754,
+          "duration": 1034398,
+          "tags": [
+            {
+              "key": "blocking",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-routing-helpers"
+            },
+            {
+              "key": "routingNumber",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "type",
+              "type": "string",
+              "value": "*dual.DHT"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728937682,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a35bda6b3f10a0b6",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "903b903026c90f9c"
+            }
+          ],
+          "startTime": 1770113728938624,
+          "duration": 45902,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "90842c226f038ae3",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729077439,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWT3Ye1Fo2bXoA4FrTc9B8TTQjw21RdTHLcT8NvZUjifXc"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWL5u6LG26YhwjqtbPtTB51a9nSjKLzX4M3t4rDpWSe5C1"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "44e1d2728b4def7d",
+          "operationName": "Bitswap.Client.Getter.SyncGetBlock",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "b1aacab0d3c6b16e"
+            }
+          ],
+          "startTime": 1770113728416693,
+          "duration": 132230,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5985fabd2f20f969",
+          "operationName": "KademliaDHT.IpfsDHT.RunLookupWithFollowup",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d0de12b6fcc03efd"
+            }
+          ],
+          "startTime": 1770113728938186,
+          "duration": 8,
+          "tags": [
+            {
+              "key": "Target",
+              "type": "string",
+              "value": "zQmduU1khZaRyrqYX3FEwAaSjF9QaKG5H4TogBoz88nGeTS"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "de465a12d2834b08",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938307,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7d22e2acfa53b64a",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938408,
+          "duration": 18,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWKmuQnv7cbF3PFJaHqVz7bNGghVTGtT36yRf82nQjpFvw"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "c0aa8bc11b1cc4ec",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729255816,
+          "duration": 17,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWAaoowtgzBCBVV3hKbHq28eTtDsvV1fmTf32wKZawVSvn"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWHT6RCRt6bYqqSwkfu2oHJwGieMnGVE4fWRLDYThGodZK"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ae8f29f5e6e59967",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5fde46c80a8e5eea"
+            }
+          ],
+          "startTime": 1770113729632158,
+          "duration": 60794,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWMXUhPg1UHWSq1KP1yHMZWuYBcUTYahecqUstLj3ZWzoT"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "dbe750f52673d788",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729958143,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWRB5Yxgwd82BgtuFmbUicWdpZvoqYsejctzJSJxwVTXUd"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "QmYYMkhYMh9BQxrFwhAk6CdeiVAL4swu3bNKwWDcuRQ4uj"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "3ab4e87aa26fbb01",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "dbe750f52673d788"
+            }
+          ],
+          "startTime": 1770113729958172,
+          "duration": 13108,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "54b7c464ccca2abb",
+          "operationName": "Namesys.ResolveAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "26caaafb5599ddfa"
+            }
+          ],
+          "startTime": 1770113728416612,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "boxo/namesys"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b8a47d2b706478b8",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938319,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ad0a5d0ed1c3ee7c",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5c8e5f7af7c98e26"
+            }
+          ],
+          "startTime": 1770113728938918,
+          "duration": 44233,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "a122a0ec7411737a",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938884,
+          "duration": 173782,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "441f49fc9f979cd7",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729050640,
+          "duration": 62148,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWH7z39yiqmMV9Jr1FXmsj13WtxxC2G81QqfQBEGjydy2B"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "785ed5d5791d625d",
+          "operationName": "Bitswap.Client.SessionManager.NewSession",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "a5077fbf286a311b"
+            }
+          ],
+          "startTime": 1770113728416665,
+          "duration": 25,
+          "tags": [
+            {
+              "key": "ID",
+              "type": "string",
+              "value": "2"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "8ef9a4af4607e1ac",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729964407,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "5bc89c321ee337f5",
+          "operationName": "ComposableParallel.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "48ed3c118ca3e2ba"
+            }
+          ],
+          "startTime": 1770113728936748,
+          "duration": 1034405,
+          "tags": [
+            {
+              "key": "count",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-routing-helpers"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728980180,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980203,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "found provider"
+                },
+                {
+                  "key": "addrs",
+                  "type": "string",
+                  "value": "[\"/dnsaddr/bitswap-v3.pinata.cloud\"]"
+                },
+                {
+                  "key": "id",
+                  "type": "string",
+                  "value": "Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -33.375µs"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "48cca33a085fd543",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "737c2c679e4d0e34"
+            }
+          ],
+          "startTime": 1770113728938747,
+          "duration": 118942,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2228d9f15d454033",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "30bc4ccb594aae2a"
+            }
+          ],
+          "startTime": 1770113728984549,
+          "duration": 128331,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "be2b66bd1f2cdc37",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729440439,
+          "duration": 191491,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWAJCnZeEHUgkUMEYxGk7hq9gTLvQ1BRmyUfQ2Go3h6Yi6"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "cf9c68052045433a",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729720960,
+          "duration": 11,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMXUhPg1UHWSq1KP1yHMZWuYBcUTYahecqUstLj3ZWzoT"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWRB5Yxgwd82BgtuFmbUicWdpZvoqYsejctzJSJxwVTXUd"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7aab7370d862100c",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "c4f181058032961d"
+            }
+          ],
+          "startTime": 1770113728985641,
+          "duration": 985541,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "ccce537107788114",
+          "operationName": "Bitswap.Client.Session.GetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "44e1d2728b4def7d"
+            }
+          ],
+          "startTime": 1770113728416694,
+          "duration": 7,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "68c0412444f14785",
+          "operationName": "Bitswap.Client.Session.GetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113728549579,
+          "duration": 18,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "630fd25109a67033",
+          "operationName": "Compose.worker",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5bc89c321ee337f5"
+            }
+          ],
+          "startTime": 1770113728936759,
+          "duration": 43525,
+          "tags": [
+            {
+              "key": "blocking",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-routing-helpers"
+            },
+            {
+              "key": "routingNumber",
+              "type": "int64",
+              "value": 1
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "type",
+              "type": "string",
+              "value": "*routing.Composer"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728980141,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            },
+            {
+              "timestamp": 1770113728980177,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "got result"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "9aa6bf93a6205a4b",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5ee72c73afa24d67"
+            }
+          ],
+          "startTime": 1770113728938973,
+          "duration": 2,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWKmuQnv7cbF3PFJaHqVz7bNGghVTGtT36yRf82nQjpFvw"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "29dfaa039305015e",
+          "operationName": "KademliaDHT.ProviderManager.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d9cf630d064d3a8f"
+            }
+          ],
+          "startTime": 1770113728938047,
+          "duration": 117,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "63fd71e37aa0f1ca",
+          "operationName": "IpfsDHT.FindProvidersAsync",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "d1ef4b51831a6d06"
+            }
+          ],
+          "startTime": 1770113728937673,
+          "duration": 534,
+          "tags": [
+            {
+              "key": "count",
+              "type": "int64",
+              "value": 0
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "bafkreihhi5qhyfnarhalfmj7paqhe7pkqcrnqgjpvuvhtki5jnexeawx7e"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [
+            {
+              "timestamp": 1770113728937676,
+              "fields": [
+                {
+                  "key": "event",
+                  "type": "string",
+                  "value": "started streaming"
+                }
+              ]
+            }
+          ],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "2ece36fed8cf27ff",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "12c5606e5a2e57a9"
+            }
+          ],
+          "startTime": 1770113728938799,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWEo3dCsfjsMpXfP2gjnbsvPDEo7fq2XA5ZF5ATp7Njs6Y"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "68e158d9cc7bb9a1",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113728938978,
+          "duration": 44855,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWKmuQnv7cbF3PFJaHqVz7bNGghVTGtT36yRf82nQjpFvw"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b89436399c08924e",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "5f856e00e2c2a23b"
+            }
+          ],
+          "startTime": 1770113729057759,
+          "duration": 382664,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWAJCnZeEHUgkUMEYxGk7hq9gTLvQ1BRmyUfQ2Go3h6Yi6"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1ca9a32334555ca1",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2008f86039fa991d"
+            }
+          ],
+          "startTime": 1770113729199100,
+          "duration": 772168,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWRfkNC4H7CqHW3w26XQEJrm7wCpt8Uag92nSe3BftvFHP"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "cf9b2d2bea7aa5e3",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "918eefb1a4f04428"
+            }
+          ],
+          "startTime": 1770113729054797,
+          "duration": 916622,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "737c2c679e4d0e34",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938575,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "12D3KooWDaneANubg1Zo4EBbaKnSXx7W6tKdU1drfSzk4dM2FmqC"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b8cf6a027888b460",
+          "operationName": "Bitswap.Client.Getter.AsyncGetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ccce537107788114"
+            }
+          ],
+          "startTime": 1770113728416695,
+          "duration": 4,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "21364286b22ee9eb",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729259182,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -709.637126ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "cced2d52af869534",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729962543,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -694.085105ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1f9361d7bf3499e5",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113729203279,
+          "duration": 10,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "QmeEw6rzQgtxRfWVxXg16F5xoxYrWcsvnLWi5h1JiksLfZ"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "70dee42f663cfc1c",
+          "operationName": "KademliaDHT.ProtocolMessenger.GetProviders",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "16698aee8c4d3b83"
+            }
+          ],
+          "startTime": 1770113729692967,
+          "duration": 27808,
+          "tags": [
+            {
+              "key": "closestPeers",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "key",
+              "type": "string",
+              "value": "1220e747607c15a089c0b2b13f7820727dea80a2d8192fad2a79a91d4b497202d7f9"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "provs",
+              "type": "string",
+              "value": "[]"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            },
+            {
+              "key": "to",
+              "type": "string",
+              "value": "12D3KooWMXUhPg1UHWSq1KP1yHMZWuYBcUTYahecqUstLj3ZWzoT"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "831ab531b515815e",
+          "operationName": "Bitswap.Client.Getter.AsyncGetBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "28b9b64920ffaac6"
+            }
+          ],
+          "startTime": 1770113729268505,
+          "duration": 6,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "90a42442aa958da8",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729961656,
+          "duration": 1,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -693.198584ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "4036bfad13bcbb32",
+          "operationName": "KademliaDHT.IpfsDHT.SpawnQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "ec5f5e74bd68c02b"
+            }
+          ],
+          "startTime": 1770113728938292,
+          "duration": 5,
+          "tags": [
+            {
+              "key": "Cause",
+              "type": "string",
+              "value": "12D3KooWMH9sUkY1roT9V72UzsPjDmJURqvnX8XU9M3Z6eQzo1zZ"
+            },
+            {
+              "key": "QueryPeer",
+              "type": "string",
+              "value": "QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "12c5606e5a2e57a9",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "e81b7292be04b66d"
+            }
+          ],
+          "startTime": 1770113728938793,
+          "duration": 115942,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "7ff5e3f0458fb966",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "cf9c68052045433a"
+            }
+          ],
+          "startTime": 1770113729720996,
+          "duration": 237097,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "16698aee8c4d3b83",
+          "operationName": "KademliaDHT.IpfsDHT.RunQuery",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "112b14efd0a0ec90"
+            }
+          ],
+          "startTime": 1770113728938181,
+          "duration": 1033257,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "b368eb69d193c89c",
+          "operationName": "corehttp.cmdsHandler",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "e93d7d93442d5dca"
+            }
+          ],
+          "startTime": 1770113728416560,
+          "duration": 1554501,
+          "tags": [
+            {
+              "key": "client.address",
+              "type": "string",
+              "value": "192.168.240.1"
+            },
+            {
+              "key": "http.request.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.response.body.size",
+              "type": "int64",
+              "value": 5188854
+            },
+            {
+              "key": "http.response.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "http.route",
+              "type": "string",
+              "value": "/api/v0/"
+            },
+            {
+              "key": "network.peer.address",
+              "type": "string",
+              "value": "192.168.240.1"
+            },
+            {
+              "key": "network.peer.port",
+              "type": "int64",
+              "value": 53966
+            },
+            {
+              "key": "network.protocol.version",
+              "type": "string",
+              "value": "1.1"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+            },
+            {
+              "key": "otel.scope.version",
+              "type": "string",
+              "value": "0.63.0"
+            },
+            {
+              "key": "server.address",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "server.port",
+              "type": "int64",
+              "value": 5001
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "server"
+            },
+            {
+              "key": "url.path",
+              "type": "string",
+              "value": "/api/v0/cat"
+            },
+            {
+              "key": "url.scheme",
+              "type": "string",
+              "value": "http"
+            },
+            {
+              "key": "user_agent.original",
+              "type": "string",
+              "value": "Go-http-client/1.1"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "invalid parent span IDs=e93d7d93442d5dca; skipping clock skew adjustment"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "8471e1f7c6c342d9",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "832f07f92ffce302"
+            }
+          ],
+          "startTime": 1770113729257724,
+          "duration": 3,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -708.179334ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "629594d73e742e11",
+          "operationName": "Bitswap.NotifyNewBlocks",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "2c74adf0a6b6ec28"
+            }
+          ],
+          "startTime": 1770113729963580,
+          "duration": 4,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-bitswap"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": [
+            "clock skew adjustment disabled; not applying calculated delta of -695.124647ms"
+          ]
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1949d94f07a1e03b",
+          "operationName": "KademliaDHT.IpfsDHT.DialPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "7aab7370d862100c"
+            }
+          ],
+          "startTime": 1770113728985644,
+          "duration": 985537,
+          "tags": [
+            {
+              "key": "PeerID",
+              "type": "string",
+              "value": "12D3KooWNgJyuz7CtAAjQahW9HeiBNizaYphDcAj2NysJNwuhQU6"
+            },
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "fec12bc67940d4104117d06bc5351de2",
+          "spanID": "1c44e75d405d5e90",
+          "operationName": "KademliaDHT.IpfsDHT.QueryPeer",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "fec12bc67940d4104117d06bc5351de2",
+              "spanID": "0b55314fb67d3eb2"
+            }
+          ],
+          "startTime": 1770113728983245,
+          "duration": 988006,
+          "tags": [
+            {
+              "key": "otel.scope.name",
+              "type": "string",
+              "value": "go-libp2p-kad-dht"
+            },
+            {
+              "key": "span.kind",
+              "type": "string",
+              "value": "internal"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        }
+      ],
+      "processes": {
+        "p1": {
+          "serviceName": "Kubo",
+          "tags": [
+            {
+              "key": "service.version",
+              "type": "string",
+              "value": "0.39.0"
+            },
+            {
+              "key": "telemetry.sdk.language",
+              "type": "string",
+              "value": "go"
+            },
+            {
+              "key": "telemetry.sdk.name",
+              "type": "string",
+              "value": "opentelemetry"
+            },
+            {
+              "key": "telemetry.sdk.version",
+              "type": "string",
+              "value": "1.38.0"
+            }
+          ]
+        }
+      },
+      "warnings": null
+    }
+  ],
+  "total": 0,
+  "limit": 0,
+  "offset": 0,
+  "errors": null
+}

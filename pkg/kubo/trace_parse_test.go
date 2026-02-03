@@ -83,78 +83,18 @@ func Test_parseUpload1Trace(t *testing.T) {
 	assert.True(t, res.isPopulated())
 }
 
-func Test_parse_download_ipni_trace(t *testing.T) {
-	tid, err := trace.TraceIDFromHex("bce4af7b2a835c3186d36d8743d712f9")
+func Test_parse_download_bitswap_0_trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("fec12bc67940d4104117d06bc5351de2")
 	require.NoError(t, err)
 
 	res := DownloadResult{
-		CID:            cid.MustParse("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"),
-		IPFSCatTraceID: trace.TraceID(tid),
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
-	}
-
-	for i := 0; i < 4; i++ {
-		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_ipni/trace-%d.proto.json", i))
-		res.parse(trace)
-	}
-
-	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryMethod, "ipni")
-	assert.Equal(t, res.FoundProvidersCount, 66)
-	assert.Equal(t, res.ConnectedProvidersCount, 10)
-	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1761817428807744000))
-	assert.Equal(t, res.FirstConnectedProviderFoundAt.UnixNano(), int64(1761817428919332000))
-	assert.Equal(t, res.FirstProviderConnectedAt.UnixNano(), int64(1761817429051385000))
-	assert.Equal(t, res.FirstConnectedProviderPeerID, "QmUA9D3H7HeCYsirB3KmPSvZh3dNXMZas6Lwgr4fv1HTTp")
-	assert.Equal(t, res.IPNIStart.UnixNano(), int64(1761817428808716000))
-	assert.Equal(t, res.IPNIEnd.UnixNano(), int64(1761817428918260500))
-	assert.Equal(t, res.IPNIStatus, 200)
-	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1761817429773012000))
-	assert.True(t, res.cmdHandlerDone)
-}
-
-func Test_parse_download_dht_trace(t *testing.T) {
-	tid, err := trace.TraceIDFromHex("a5634cefd8b561f00501fa0e6cecefa3")
-	require.NoError(t, err)
-
-	res := DownloadResult{
-		CID:            cid.MustParse("QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJ1"),
+		CID:            cid.MustParse("bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"),
 		IPFSCatTraceID: trace.TraceID(tid),
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
 	for i := 0; i < 1; i++ {
-		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_dht/trace-%d.proto.json", i))
-		res.parse(trace)
-	}
-
-	assert.True(t, res.isPopulated())
-	assert.Equal(t, res.DiscoveryMethod, "dht")
-	assert.Equal(t, res.FoundProvidersCount, 1)
-	assert.Equal(t, res.ConnectedProvidersCount, 1)
-	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1761818996452685000))
-	assert.Equal(t, res.FirstConnectedProviderFoundAt.UnixNano(), int64(1761818996637816000))
-	assert.Equal(t, res.FirstProviderConnectedAt.UnixNano(), int64(1761818996701550000))
-	assert.Equal(t, res.FirstConnectedProviderPeerID, "12D3KooWJ4kRKuTsCNGF8FzBcmFMVXu4iLvvUiW4EQ2fyU6sVEth")
-	assert.Equal(t, res.IPNIStart.UnixNano(), int64(1761818996452973000))
-	assert.Equal(t, res.IPNIEnd.UnixNano(), int64(1761818996911612834))
-	assert.Equal(t, res.IPNIStatus, 0) // was canceled before response came in
-	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1761818996730472000))
-	assert.True(t, res.cmdHandlerDone)
-}
-
-func Test_parse_download_bitswap_trace(t *testing.T) {
-	tid, err := trace.TraceIDFromHex("4aa8efb4adc78e4266cbc314e1b7be75")
-	require.NoError(t, err)
-
-	res := DownloadResult{
-		CID:            cid.MustParse("QmUZipvzKLssPTHxUnDwef3a8cPZGL8BwX7urzmNFNtTJi"),
-		IPFSCatTraceID: trace.TraceID(tid),
-		spansByTraceID: map[trace.TraceID][]*v1.Span{},
-	}
-
-	for i := 0; i < 1; i++ {
-		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_bitswap/trace-%d.proto.json", i))
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_bitswap_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
 
@@ -168,6 +108,66 @@ func Test_parse_download_bitswap_trace(t *testing.T) {
 	assert.True(t, res.IPNIStart.IsZero())
 	assert.True(t, res.IPNIEnd.IsZero())
 	assert.Zero(t, res.IPNIStatus)
-	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1761819000552233000))
+	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1770113728548909463))
+	assert.True(t, res.cmdHandlerDone)
+}
+
+func Test_parse_download_ipni_0_trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("9ee539fca7d18d4279ff9ff26bd3c245")
+	require.NoError(t, err)
+
+	res := DownloadResult{
+		CID:            cid.MustParse("bafybeigvylgfkdzxw2nxlzlij23ocx73yg77dxtlnb37bg6lo5n34nrrpu"),
+		IPFSCatTraceID: trace.TraceID(tid),
+		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	for i := 0; i < 2; i++ {
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_ipni_0/trace-%d.proto.json", i))
+		res.parse(trace)
+	}
+
+	assert.True(t, res.isPopulated())
+	assert.Equal(t, res.DiscoveryMethod, "ipni")
+	assert.Equal(t, res.FoundProvidersCount, 1)
+	assert.Equal(t, res.ConnectedProvidersCount, 1)
+	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1770113721993393585))
+	assert.Equal(t, res.FirstConnectedProviderFoundAt.UnixNano(), int64(1770113722100654460))
+	assert.Equal(t, res.FirstProviderConnectedAt.UnixNano(), int64(1770113722831927043))
+	assert.Equal(t, res.FirstConnectedProviderPeerID, "Qmdv6yNikmUWUWXufLJLRNkv6Y9sY5cmgeX5RVWA4WNMz4")
+	assert.Equal(t, res.IPNIStart.UnixNano(), int64(1770113721993679376))
+	assert.Equal(t, res.IPNIEnd.UnixNano(), int64(1770113722100527959))
+	assert.Equal(t, res.IPNIStatus, 200)
+	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1770113722958984460))
+	assert.True(t, res.cmdHandlerDone)
+}
+
+func Test_parse_download_dht_0_trace(t *testing.T) {
+	tid, err := trace.TraceIDFromHex("fcadc115cd766d3d6fec0046976b263b")
+	require.NoError(t, err)
+
+	res := DownloadResult{
+		CID:            cid.MustParse("QmcxHhN5oPuKw8CEmgeSjXeDfnM5o9by4x59xzcSBMnLh5"),
+		IPFSCatTraceID: trace.TraceID(tid),
+		spansByTraceID: map[trace.TraceID][]*v1.Span{},
+	}
+
+	for i := 0; i < 2; i++ {
+		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_dht_0/trace-%d.proto.json", i))
+		res.parse(trace)
+	}
+
+	assert.True(t, res.isPopulated())
+	assert.Equal(t, res.DiscoveryMethod, "dht")
+	assert.Equal(t, res.FoundProvidersCount, 1)
+	assert.Equal(t, res.ConnectedProvidersCount, 1)
+	assert.Equal(t, res.IdleBroadcastStartedAt.UnixNano(), int64(1770116364157658835))
+	assert.Equal(t, res.FirstConnectedProviderFoundAt.UnixNano(), int64(1770116369784640338))
+	assert.Equal(t, res.FirstProviderConnectedAt.UnixNano(), int64(1770116370110620130))
+	assert.Equal(t, res.FirstConnectedProviderPeerID, "12D3KooWSa9ut1hY4nTDH7Bq4HUFLj1Q1yBCt9k7jv1HCuzWDTgM")
+	assert.Equal(t, res.IPNIStart.UnixNano(), int64(1770116364158600960))
+	assert.Equal(t, res.IPNIEnd.UnixNano(), int64(1770116365200769919))
+	assert.Equal(t, res.IPNIStatus, 404) // 0 if it was canceled before the response came in
+	assert.Equal(t, res.FirstBlockReceivedAt.UnixNano(), int64(1770116370219123838))
 	assert.True(t, res.cmdHandlerDone)
 }

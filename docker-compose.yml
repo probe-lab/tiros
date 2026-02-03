@@ -11,7 +11,7 @@ services:
       - "3000:3000"
 
   kubo:
-    image: ipfs/kubo:v0.38.2
+    image: ipfs/kubo:v0.39.0
     container_name: tiros-kubo
     # in our measurement setup we require the `roots` provide strategy to make
     # sure to have predictable results. Here we set this strategy explicitly
