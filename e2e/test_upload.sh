@@ -6,6 +6,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/test_common.sh"
 # Setup test environment
 setup_test_env kubo
 
+echo "Sleeping for 2 minutes for kubo to warm up..."
+sleep 2m
+
 # Run tiros with a single iteration and the JSON output option
 go run ./cmd/tiros probe --json.out $TEMP_DIR kubo --iterations.max 1 --upload.only --traces.receiver.host 0.0.0.0
 
@@ -18,7 +21,7 @@ parse_json_output "$OUTPUT_FILE"
 # Assertions on fields
 echo "Asserting..."
 assert_not_empty "RunID"
-assert_eq "KuboVersion" "0.38.2"
+assert_eq "KuboVersion" "0.39.0"
 assert_gt "FileSizeB" "0" "Filesize is not greater than 0"
 assert_gt "IPFSAddDurationS" "0"
 assert_gt "ProvideDurationS" "0"
