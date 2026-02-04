@@ -12,74 +12,68 @@ import (
 )
 
 type UploadResult struct {
-	CID             cid.Cid
-	RawCID          cid.Cid
-	IPFSAddTraceID  trace.TraceID
-	ProvideTraceIDs []trace.TraceID
-	IPFSAddStart    time.Time
-	IPFSAddEnd      time.Time
-	ProvideStart    time.Time
-	ProvideEnd      time.Time
-	ProvideHasErr   bool
-	ProvideErr      error
-
-	spansByTraceID map[trace.TraceID][]*v1.Span
+	CID            cid.Cid
+	RawCID         cid.Cid
+	IPFSAddTraceID trace.TraceID
+	IPFSAddStart   time.Time
+	IPFSAddEnd     time.Time
+	ProvideStart   time.Time
+	ProvideEnd     time.Time
+	ProvideHasErr  bool
+	ProvideErr     error
+	UploadStart    time.Time
+	UploadEnd      time.Time
 }
 
 func (r *UploadResult) parse(req *ExportTraceServiceRequest) {
 	for span := range req.Spans() {
-		if _, found := r.spansByTraceID[trace.TraceID(span.TraceId)]; found {
-			r.spansByTraceID[trace.TraceID(span.TraceId)] = append(r.spansByTraceID[trace.TraceID(span.TraceId)], span)
-		} else {
-			r.spansByTraceID[trace.TraceID(span.TraceId)] = []*v1.Span{span}
+		switch span.Name {
+		case "CoreAPI.UnixfsAPI.Add":
+			r.parseUnixfsAdd(span)
+		case "IpfsDHT.Provide":
+			r.parseProvide(span)
 		}
+	}
+}
 
-		// if the span is not a provide operation, we can skip
-		if span.Name != "IpfsDHT.Provide" {
-			continue
-		}
+func (r *UploadResult) parseUnixfsAdd(span *v1.Span) {
+	r.IPFSAddStart = time.Unix(0, int64(span.StartTimeUnixNano))
+	r.IPFSAddEnd = time.Unix(0, int64(span.EndTimeUnixNano))
+}
 
-		// if the span does not have the attribute key set to the raw CID, we can skip
-		for _, attr := range span.Attributes {
-			switch attr.Key {
-			case "key":
-				if attr.Value.GetStringValue() == r.RawCID.String() || attr.Value.GetStringValue() == r.CID.String() {
-					r.ProvideTraceIDs = append(r.ProvideTraceIDs, trace.TraceID(span.TraceId))
-				}
-			case "error":
-				r.ProvideHasErr = attr.Value.GetBoolValue()
-			case "otel.status_description":
-				r.ProvideErr = fmt.Errorf("%s", attr.Value.GetStringValue())
-			}
+func (r *UploadResult) parseProvide(span *v1.Span) {
+	// create a map of attributes
+	attrs := make(map[string]any, len(span.Attributes))
+	for _, attr := range span.Attributes {
+		switch attr.Key {
+		case "error", "announce":
+			attrs[attr.Key] = attr.Value.GetBoolValue()
+		default:
+			attrs[attr.Key] = attr.Value.GetStringValue()
 		}
 	}
 
-	if spans, found := r.spansByTraceID[r.IPFSAddTraceID]; found {
-		start, end := extractTimeRange(spans)
-		r.IPFSAddStart = start
-		r.IPFSAddEnd = end
-	}
-
-	if len(r.ProvideTraceIDs) == 0 {
+	// ensure provide operation is for the correct CID
+	if attrs["key"] != r.CID.String() {
 		return
 	}
 
-	provideSpans := make([]*v1.Span, 0)
-	for _, traceID := range r.ProvideTraceIDs {
-		provideSpans = append(provideSpans, r.spansByTraceID[traceID]...)
-	}
-
-	if len(provideSpans) == 0 {
+	// ensure that the provide operation is an announce operation
+	if announce, ok := attrs["announce"]; !ok || !announce.(bool) {
 		return
 	}
 
-	start, end := extractTimeRange(provideSpans)
-	r.ProvideStart = start
-	r.ProvideEnd = end
+	if hasErr, ok := attrs["error"]; ok {
+		r.ProvideHasErr = hasErr.(bool)
+		r.ProvideErr = fmt.Errorf("%s", attrs["otel.status_description"])
+	}
+
+	r.ProvideStart = time.Unix(0, int64(span.StartTimeUnixNano))
+	r.ProvideEnd = time.Unix(0, int64(span.EndTimeUnixNano))
 }
 
 func (r *UploadResult) isPopulated() bool {
-	return r.IPFSAddTraceID.IsValid() && len(r.ProvideTraceIDs) > 0 && !r.ProvideStart.IsZero() && !r.ProvideEnd.IsZero() && !r.IPFSAddStart.IsZero() && !r.IPFSAddEnd.IsZero()
+	return r.IPFSAddTraceID.IsValid() && !r.ProvideStart.IsZero() && !r.ProvideEnd.IsZero() && !r.IPFSAddStart.IsZero() && !r.IPFSAddEnd.IsZero()
 }
 
 type DownloadResult struct {

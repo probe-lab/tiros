@@ -295,7 +295,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 		if !probeKuboConfig.DownloadOnly {
 			slog.Info("Starting upload measurement")
 
-			ur, err := kubo.Upload(ctx, probeKuboConfig.FileSizeMiB)
+			ur, err := kubo.Upload(ctx)
 			uploadCounter.Add(ctx, 1, metric.WithAttributes(
 				attribute.Bool("success", err == nil),
 			))
@@ -316,16 +316,23 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				IPFSAddStart:     ur.IPFSAddStart,
 				IPFSAddDurationS: ur.IPFSAddEnd.Sub(ur.IPFSAddStart).Seconds(),
 				ProvideStart:     toPtr(ur.ProvideStart),
-				ProvideDurationS: toPtr(ur.ProvideEnd.Sub(ur.ProvideStart).Seconds()),
-				ProvideDelayS:    toPtr(ur.ProvideStart.Sub(ur.IPFSAddEnd).Seconds()),
-				UploadDurationS:  toPtr(ur.ProvideEnd.Sub(ur.IPFSAddStart).Seconds()),
+			}
+
+			if !ur.ProvideEnd.IsZero() && !ur.ProvideStart.IsZero() {
+				dbUpload.ProvideDurationS = toPtr(ur.ProvideEnd.Sub(ur.ProvideStart).Seconds())
+			}
+
+			if !ur.ProvideStart.IsZero() && !ur.IPFSAddEnd.IsZero() {
+				dbUpload.ProvideDelayS = toPtr(ur.ProvideStart.Sub(ur.IPFSAddEnd).Seconds())
+			}
+
+			if !ur.ProvideEnd.IsZero() && !ur.IPFSAddStart.IsZero() {
+				dbUpload.UploadDurationS = toPtr(ur.ProvideEnd.Sub(ur.IPFSAddStart).Seconds())
 			}
 
 			if err != nil {
 				slog.With("err", err).Warn("Error uploading file to Kubo")
 				dbUpload.Error = toPtr(err.Error())
-			} else {
-				slog.Info(fmt.Sprintf("Upload finished in %s", ur.ProvideEnd.Sub(ur.IPFSAddStart)))
 			}
 
 			if err == nil && ur.ProvideHasErr {
@@ -335,6 +342,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 					dbUpload.Error = toPtr("unknown error")
 				}
 			}
+			slog.Info(fmt.Sprintf("Upload finished in %s", ur.UploadEnd.Sub(ur.UploadStart)))
 
 			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
 				return fmt.Errorf("inserting upload into database: %w", err)
@@ -414,6 +422,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
+	time.Sleep(15 * time.Second)
 	return nil
 }
 

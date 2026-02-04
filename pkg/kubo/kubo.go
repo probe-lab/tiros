@@ -13,14 +13,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/go-cid"
 	ipfs "github.com/ipfs/kubo"
 	kuboclient "github.com/ipfs/kubo/client/rpc"
 	"github.com/ipfs/kubo/core/commands"
 	iface "github.com/ipfs/kubo/core/coreiface"
-	"github.com/ipfs/kubo/core/coreiface/options"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/multiformats/go-multiaddr"
@@ -34,6 +32,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"golang.org/x/sync/errgroup"
 )
 
 type KuboConfig struct {
@@ -149,85 +148,107 @@ func (k *Kubo) Reset(ctx context.Context) {
 	}
 }
 
-func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, error) {
+func (k *Kubo) Upload(ctx context.Context) (*UploadResult, error) {
+	slog.Info(fmt.Sprintf("Uploading %dMiB to Kubo", k.cfg.FileSizeMiB))
+
 	// Generate random data
 	size := k.cfg.FileSizeMiB * 1024 * 1024
 	data := make([]byte, size)
 	rand.Read(data)
 
+	// Determine root CID of the random data blob
+	rootCID, err := k.GetCID(ctx, files.NewBytesFile(data))
+	if err != nil {
+		return nil, fmt.Errorf("determine root CID: %w", err)
+	}
+
+	// acquire lock here to prevent that the upload start is delayed by the lock
+	// acquisition (which is measured by the trace start below.
+	k.cfg.Receiver.mu.Lock()
+
+	// Start a trace span to get a traceID to match traces for
 	uploadCtx, uploadCancel := context.WithTimeout(ctx, time.Minute)
+	defer uploadCancel()
+
 	uploadCtx, uploadSpan := k.tracer.Start(uploadCtx, "Upload")
-	logEntry := slog.With(
-		"size", size,
-		"traceID", uploadSpan.SpanContext().TraceID().String(),
-	)
+	slog.Info("Determined root CID of random data: " + rootCID.String())
 
 	// take the trace receiver lock before uploading the file
 	// so that we won't miss any trace data
-	k.cfg.Receiver.mu.Lock()
-
-	logEntry.Info("Adding file to Kubo")
-	uploadStart := time.Now()
-	imPath, err := k.Unixfs().Add(
-		uploadCtx,
-		files.NewBytesFile(data),
-		options.Unixfs.Pin(true, uuid.NewString()),
-		options.Unixfs.FsCache(false),
-	)
-	uploadSpan.RecordError(err)
-	uploadSpan.End()
-	uploadCancel()
-	logEntry = logEntry.With("cid", imPath.RootCid().String())
-	logEntry.Info("Done adding file to Kubo")
-
-	// register trace ID as well as the CID of the uploaded file
-
-	rawCID := cid.NewCidV1(uint64(multicodec.Raw), imPath.RootCid().Hash())
 	k.cfg.Receiver.traceMatchers = []TraceMatcher{
 		traceIDMatcher(uploadSpan.SpanContext().TraceID()),
-		strAttrMatcher("key", rawCID.String()),
 	}
 	k.cfg.Receiver.mu.Unlock()
+	defer k.cfg.Receiver.Reset()
 
+	// initialize the upload result
 	result := &UploadResult{
-		CID:             imPath.RootCid(),
-		RawCID:          rawCID,
-		IPFSAddTraceID:  uploadSpan.SpanContext().TraceID(),
-		IPFSAddStart:    uploadStart,
-		IPFSAddEnd:      time.Now(),
-		ProvideTraceIDs: make([]trace.TraceID, 0),
-		spansByTraceID:  map[trace.TraceID][]*v1.Span{},
+		CID:            rootCID,
+		RawCID:         cid.NewCidV1(uint64(multicodec.Raw), rootCID.Hash()),
+		IPFSAddTraceID: uploadSpan.SpanContext().TraceID(),
 	}
+
+	// start listening for trace events
+
+	parseTimeout := time.NewTimer(time.Minute)
+	defer parseTimeout.Stop()
+	errg, ectx := errgroup.WithContext(ctx)
+	errg.Go(func() error {
+		slog.Info("Waiting for trace data...")
+		for {
+			select {
+			case <-parseTimeout.C:
+				return context.DeadlineExceeded
+			case <-ectx.Done():
+				return ectx.Err()
+			case req, more := <-k.cfg.Receiver.traceMatchChan:
+				if !more {
+					return errors.New("trace receiver closed")
+				}
+
+				slog.Info("Received relevant traces from Kubo...")
+				result.parse(req)
+				if result.isPopulated() {
+					return nil
+				}
+			}
+		}
+	})
+
+	slog.With("sizeMiB", k.cfg.FileSizeMiB, "traceID", uploadSpan.SpanContext().TraceID().String()).Info("Adding file to Kubo")
+
+	uploadStart := time.Now()
+	rootCID, err = k.Add(uploadCtx, files.NewBytesFile(data))
+	uploadEnd := time.Now()
+
+	uploadSpan.RecordError(err) // noop if err is nil
+	uploadSpan.End()
+
+	slog.Info("Done adding file to Kubo")
 
 	// if an error occurred, log it and continue with the next iteration
 	if err != nil {
+		parseTimeout.Stop()
+		if err2 := errg.Wait(); !errors.Is(err2, context.DeadlineExceeded) {
+			slog.Warn("Failed to wait for traces", "err", err2)
+		}
+
+		result.UploadStart = uploadStart
+		result.UploadEnd = uploadEnd
+
 		return result, fmt.Errorf("add file to kubo: %w", err)
 	}
 
-	logEntry.Info("Waiting for trace data...")
-	parseTimeout := time.NewTimer(time.Minute)
-loop:
-	for {
-		select {
-		case <-parseTimeout.C:
-			break loop
-		case <-ctx.Done():
-			return result, ctx.Err()
-		case req, more := <-k.cfg.Receiver.traceMatchChan:
-			if !more {
-				return result, errors.New("trace receiver closed")
-			}
-			result.parse(req)
-			if result.isPopulated() {
-				break loop
-			}
-		}
-	}
-	parseTimeout.Stop()
+	// after the upload has finished, wait the most 30s for all traces to arrive
+	parseTimeout.Reset(30 * time.Second)
 
-	k.cfg.Receiver.Reset()
+	errgErr := errg.Wait()
 
-	return result, nil
+	result.UploadStart = uploadStart
+	result.UploadEnd = uploadEnd
+
+	// wait for all traces to have been parsed
+	return result, errgErr
 }
 
 func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error) {
@@ -513,4 +534,69 @@ func isRelayed(maddrs []multiaddr.Multiaddr) *bool {
 	}
 	out := true
 	return &out
+}
+
+func (k *Kubo) Add(ctx context.Context, body io.Reader) (cid.Cid, error) {
+	resp, err := k.Request("add").
+		Option("pin", true).
+		Option("fast-provide-wait", true).
+		Option("fast-provide-root", true).
+		Option("fscache", false).
+		FileBody(body).
+		Send(ctx)
+	if err != nil {
+		return cid.Undef, err
+	}
+
+	if resp.Error != nil {
+		return cid.Undef, err
+	}
+	defer pllog.Defer(resp.Close, "Failed closing response output")
+
+	var evt commands.AddEvent
+	dec := json.NewDecoder(resp.Output)
+	for dec.More() {
+		if err := dec.Decode(&evt); err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+
+			return cid.Undef, err
+		}
+	}
+
+	c, err := cid.Decode(evt.Hash)
+	if err != nil {
+		return cid.Undef, err
+	}
+
+	return c, ctx.Err()
+}
+
+func (k *Kubo) GetCID(ctx context.Context, body io.Reader) (cid.Cid, error) {
+	resp, err := k.Request("add").
+		Option("only-hash", true).
+		FileBody(body).
+		Send(ctx)
+	if err != nil {
+		return cid.Undef, err
+	}
+
+	if resp.Error != nil {
+		return cid.Undef, err
+	}
+	defer pllog.Defer(resp.Close, "Failed closing response output")
+
+	var evt commands.AddEvent
+	dec := json.NewDecoder(resp.Output)
+	for dec.More() {
+		if err := dec.Decode(&evt); err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return cid.Undef, err
+		}
+	}
+
+	return cid.Decode(evt.Hash)
 }
