@@ -1,6 +1,7 @@
 package kubo
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -11,7 +12,9 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/h2non/filetype"
 	"github.com/ipfs/boxo/files"
@@ -355,8 +358,12 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	// Only the first 262 bytes representing the max file header are required
 	// Src: https://github.com/h2non/filetype - if err != nil, t is types.Unknown
 	// where t.MIME.Value is the empty string.
-	t, _ := filetype.Get(data[:min(262, len(data))])
-	result.MIMEType = t.MIME.Value
+	t, err := filetype.Get(data[:min(262, len(data))])
+	if err != nil && looksLikeJSON(data) {
+		result.MIMEType = "application/json"
+	} else {
+		result.MIMEType = t.MIME.Value
+	}
 
 	// the FirstBlockReceivedAt field is only used to determine
 	// the discovery method. This field will only be set though,
@@ -606,4 +613,34 @@ func (k *Kubo) GetCID(ctx context.Context, body io.Reader) (cid.Cid, error) {
 	}
 
 	return cid.Decode(evt.Hash)
+}
+
+func looksLikeJSON(data []byte) bool {
+	if len(data) == 0 {
+		return false
+	}
+
+	if bytes.IndexByte(data, 0) >= 0 {
+		return false
+	}
+
+	if !utf8.Valid(data) {
+		return false
+	}
+
+	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF}) // UTF-8 BOM
+	s := strings.TrimSpace(string(data))
+	if s == "" {
+		return false
+	}
+
+	dec := json.NewDecoder(strings.NewReader(s))
+	dec.UseNumber()
+
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		return false
+	}
+
+	return true
 }
