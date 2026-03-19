@@ -84,6 +84,7 @@ type DownloadResult struct {
 	IPFSCatEnd   time.Time
 	IPFSCatTTFB  time.Duration
 	FileSize     int
+	MIMEType     string
 
 	IdleBroadcastStartedAt        time.Time
 	FoundProvidersCount           int

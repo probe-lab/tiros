@@ -29,6 +29,7 @@ type DownloadModel struct {
 	KuboVersion          string     `ch:"kubo_version"`
 	KuboPeerID           string     `ch:"kubo_peer_id"`
 	FileSizeB            int32      `ch:"file_size_b"`
+	MIMEType             string     `ch:"mime_type"`
 	CID                  string     `ch:"cid"`
 	IPFSCatStart         time.Time  `ch:"ipfs_cat_start"`
 	IPFSCatDurationS     float64    `ch:"ipfs_cat_duration_s"`
