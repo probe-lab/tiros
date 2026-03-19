@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/h2non/filetype"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/go-cid"
 	ipfs "github.com/ipfs/kubo"
@@ -330,7 +331,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	logEntry.Info("Read first byte")
 	ttfb := time.Since(result.IPFSCatStart)
 
-	r := io.LimitReader(resp.Output, 100*1024*1024) // read at most 20 MiB
+	r := io.LimitReader(resp.Output, 100*1024*1024) // read at most 100 MiB
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return result, err
@@ -350,6 +351,12 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	result.IPFSCatEnd = downloadEnd
 	result.IPFSCatTTFB = ttfb
 	result.FileSize = len(data)
+
+	// Only the first 262 bytes representing the max file header are required
+	// Src: https://github.com/h2non/filetype - if err != nil, t is types.Unknown
+	// where t.MIME.Value is the empty string.
+	t, _ := filetype.Get(data[:min(262, len(data))])
+	result.MIMEType = t.MIME.Value
 
 	// the FirstBlockReceivedAt field is only used to determine
 	// the discovery method. This field will only be set though,

@@ -380,6 +380,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 					KuboVersion:          kuboVersion.Version,
 					KuboPeerID:           kuboID.ID,
 					FileSizeB:            int32(dr.FileSize),
+					MIMEType:             dr.MIMEType,
 					CID:                  ciid.String(),
 					IPFSCatStart:         dr.IPFSCatStart,
 					IPFSCatDurationS:     dr.IPFSCatEnd.Sub(dr.IPFSCatStart).Seconds(),
