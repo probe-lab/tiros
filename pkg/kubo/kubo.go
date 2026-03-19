@@ -338,7 +338,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	}
 	downloadEnd := time.Now()
 
-	data = append(data, buf[:]...)
+	data = append(buf[:], data...)
 	downloadSpan.End()
 
 	logEntry.With("size", len(data)).Info("Read all data")
