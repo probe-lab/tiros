@@ -16,7 +16,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/h2non/filetype"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/go-cid"
 	ipfs "github.com/ipfs/kubo"
@@ -354,16 +354,7 @@ func (k *Kubo) Download(ctx context.Context, c cid.Cid) (*DownloadResult, error)
 	result.IPFSCatEnd = downloadEnd
 	result.IPFSCatTTFB = ttfb
 	result.FileSize = len(data)
-
-	// Only the first 262 bytes representing the max file header are required
-	// Src: https://github.com/h2non/filetype - if err != nil, t is types.Unknown
-	// where t.MIME.Value is the empty string.
-	t, err := filetype.Get(data[:min(262, len(data))])
-	if err != nil && looksLikeJSON(data) {
-		result.MIMEType = "application/json"
-	} else {
-		result.MIMEType = t.MIME.Value
-	}
+	result.MIMEType = mimetype.Detect(data).String()
 
 	// the FirstBlockReceivedAt field is only used to determine
 	// the discovery method. This field will only be set though,
