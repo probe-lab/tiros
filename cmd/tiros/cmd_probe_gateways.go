@@ -586,6 +586,9 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 		return metrics
 	}
 
+	// According to: https://probelab-analytics.slack.com/archives/C08MY2YENG3/p1776796611945589
+	req.Header.Set("X-Requested-With", "tiros")
+
 	// Set appropriate Accept header for CAR format
 	switch format {
 	case db.GatewayProbeFormatNone:
