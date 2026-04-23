@@ -42,7 +42,7 @@ var probeGatewaysConfig = struct {
 	Concurrency     int
 	ControlledCIDs  bool
 	ControlledShare float32
-	RequestedWith   string
+	AuthKeys        []string
 }{
 	Interval:        10 * time.Second,
 	MaxIterations:   0,
@@ -54,7 +54,7 @@ var probeGatewaysConfig = struct {
 	Concurrency:     10,
 	ControlledCIDs:  true,
 	ControlledShare: 0.2,
-	RequestedWith:   "tiros",
+	AuthKeys:        []string{},
 }
 
 var probeGatewaysFlags = []cli.Flag{
@@ -128,12 +128,12 @@ var probeGatewaysFlags = []cli.Flag{
 		Value:       probeGatewaysConfig.ControlledShare,
 		Destination: &probeGatewaysConfig.ControlledShare,
 	},
-	&cli.StringFlag{
-		Name:        "requested.with",
-		Usage:       "Which value to send in the 'X-Requested-With' header",
-		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_REQUESTED_WITH"),
-		Value:       probeGatewaysConfig.RequestedWith,
-		Destination: &probeGatewaysConfig.RequestedWith,
+	&cli.StringSliceFlag{
+		Name:        "auth.keys",
+		Usage:       "Per-gateway auth keys as 'gateway=key' entries (e.g. 'ipfs.io=abc,dweb.link=xyz'). Sends 'Tiros-Auth: <key>' for matching gateways.",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_AUTH_KEYS"),
+		Value:       probeGatewaysConfig.AuthKeys,
+		Destination: &probeGatewaysConfig.AuthKeys,
 	},
 }
 
@@ -178,6 +178,17 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	runID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("creating run id: %w", err)
+	}
+
+	authKeys := make(map[string]string, len(probeGatewaysConfig.AuthKeys))
+	for _, entry := range probeGatewaysConfig.AuthKeys {
+		gateway, key, ok := strings.Cut(entry, "=")
+		gateway = strings.TrimSpace(gateway)
+		key = strings.TrimSpace(key)
+		if !ok || gateway == "" || key == "" {
+			return fmt.Errorf("invalid auth.keys entry %q: expected 'gateway=key' with non-empty values", entry)
+		}
+		authKeys[gateway] = key
 	}
 
 	// Initialize the db client
@@ -399,12 +410,12 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 							logEntry.With("cid", ciid.String(), "gateway", gateway, "format", format).Debug("Probing gateway")
 
 							pgc := gatewayProbeConfig{
-								gateway:       gateway,
-								cid:           ciid,
-								format:        format,
-								maxBytes:      int64(probeGatewaysConfig.MaxDownloadMB) * 1024 * 1024,
-								timeout:       probeGatewaysConfig.Timeout,
-								requestedWith: probeGatewaysConfig.RequestedWith,
+								gateway:  gateway,
+								cid:      ciid,
+								format:   format,
+								maxBytes: int64(probeGatewaysConfig.MaxDownloadMB) * 1024 * 1024,
+								timeout:  probeGatewaysConfig.Timeout,
+								authKey:  authKeys[gateway],
 							}
 
 							metrics := pgc.probe(ctx)
@@ -516,12 +527,12 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 }
 
 type gatewayProbeConfig struct {
-	gateway       string
-	cid           cid.Cid
-	format        db.GatewayProbeFormat
-	maxBytes      int64
-	timeout       time.Duration
-	requestedWith string
+	gateway  string
+	cid      cid.Cid
+	format   db.GatewayProbeFormat
+	maxBytes int64
+	timeout  time.Duration
+	authKey  string
 }
 
 func (g *gatewayProbeConfig) probe(ctx context.Context) *gatewayMetrics {
@@ -613,8 +624,17 @@ func (g *gatewayProbeConfig) probe(ctx context.Context) *gatewayMetrics {
 		return metrics
 	}
 
-	// According to: https://probelab-analytics.slack.com/archives/C08MY2YENG3/p1776796611945589
-	req.Header.Set("X-Requested-With", g.requestedWith)
+	// Identify tiros to gateway operators so they can correlate traffic in logs.
+	req.Header.Set("User-Agent", "Tiros")
+
+	// Optional shared secret so trusted gateways can distinguish tiros probes
+	// from arbitrary clients (e.g. to bypass rate limits or bot protection).
+	// Configure the auth key in the tiros deployment and mirror the same value
+	// on the gateway side. If unset, the header is omitted and the probe still
+	// works against public gateways.
+	if g.authKey != "" {
+		req.Header.Set("Tiros-Auth", g.authKey)
+	}
 
 	// Set appropriate Accept header for CAR format
 	switch g.format {
