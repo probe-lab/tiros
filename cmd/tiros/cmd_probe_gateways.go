@@ -42,6 +42,7 @@ var probeGatewaysConfig = struct {
 	Concurrency     int
 	ControlledCIDs  bool
 	ControlledShare float32
+	RequestedWith   string
 }{
 	Interval:        10 * time.Second,
 	MaxIterations:   0,
@@ -53,6 +54,7 @@ var probeGatewaysConfig = struct {
 	Concurrency:     10,
 	ControlledCIDs:  true,
 	ControlledShare: 0.2,
+	RequestedWith:   "tiros",
 }
 
 var probeGatewaysFlags = []cli.Flag{
@@ -125,6 +127,13 @@ var probeGatewaysFlags = []cli.Flag{
 		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_CONTROLLED_SHARE"),
 		Value:       probeGatewaysConfig.ControlledShare,
 		Destination: &probeGatewaysConfig.ControlledShare,
+	},
+	&cli.StringFlag{
+		Name:        "requested.with",
+		Usage:       "Which value to send in the 'X-Requested-With' header",
+		Sources:     cli.EnvVars("TIROS_PROBE_GATEWAYS_REQUESTED_WITH"),
+		Value:       probeGatewaysConfig.RequestedWith,
+		Destination: &probeGatewaysConfig.RequestedWith,
 	},
 }
 
@@ -389,7 +398,16 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 						for j := 0; j < 2; j++ {
 							logEntry.With("cid", ciid.String(), "gateway", gateway, "format", format).Debug("Probing gateway")
 
-							metrics := probeGateway(gctx, gateway, ciid, format, int64(probeGatewaysConfig.MaxDownloadMB)*1024*1024, probeGatewaysConfig.Timeout)
+							pgc := gatewayProbeConfig{
+								gateway:       gateway,
+								cid:           ciid,
+								format:        format,
+								maxBytes:      int64(probeGatewaysConfig.MaxDownloadMB) * 1024 * 1024,
+								timeout:       probeGatewaysConfig.Timeout,
+								requestedWith: probeGatewaysConfig.RequestedWith,
+							}
+
+							metrics := pgc.probe(ctx)
 
 							downloadCounter.Add(gctx, 1, metric.WithAttributes(
 								attribute.String("source", cidSource),
@@ -497,31 +515,40 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 	return g.Wait()
 }
 
-func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.GatewayProbeFormat, maxBytes int64, timeout time.Duration) *gatewayMetrics {
+type gatewayProbeConfig struct {
+	gateway       string
+	cid           cid.Cid
+	format        db.GatewayProbeFormat
+	maxBytes      int64
+	timeout       time.Duration
+	requestedWith string
+}
+
+func (g *gatewayProbeConfig) probe(ctx context.Context) *gatewayMetrics {
 	metrics := &gatewayMetrics{
 		reqStart: time.Now(),
 	}
 
 	// Create request context with timeout
-	reqCtx, cancel := context.WithTimeout(ctx, timeout)
+	reqCtx, cancel := context.WithTimeout(ctx, g.timeout)
 	defer cancel()
 
 	// Construct URL based on format
 	var url string
-	if !strings.HasPrefix(gateway, "http://") && !strings.HasPrefix(gateway, "https://") {
-		gateway = "https://" + gateway
+	if !strings.HasPrefix(g.gateway, "http://") && !strings.HasPrefix(g.gateway, "https://") {
+		g.gateway = "https://" + g.gateway
 	}
-	gateway = strings.TrimSuffix(gateway, "/")
+	g.gateway = strings.TrimSuffix(g.gateway, "/")
 
-	switch format {
+	switch g.format {
 	case db.GatewayProbeFormatNone:
-		url = fmt.Sprintf("%s/ipfs/%s", gateway, ciid.String())
+		url = fmt.Sprintf("%s/ipfs/%s", g.gateway, g.cid.String())
 	case db.GatewayProbeFormatRaw:
-		url = fmt.Sprintf("%s/ipfs/%s?format=raw", gateway, ciid.String())
+		url = fmt.Sprintf("%s/ipfs/%s?format=raw", g.gateway, g.cid.String())
 	case db.GatewayProbeFormatCAR:
-		url = fmt.Sprintf("%s/ipfs/%s?format=car", gateway, ciid.String())
+		url = fmt.Sprintf("%s/ipfs/%s?format=car", g.gateway, g.cid.String())
 	default:
-		panic(fmt.Sprintf("unknown gateway probe format: %s", format))
+		panic(fmt.Sprintf("unknown gateway probe format: %s", g.format))
 	}
 
 	// Create HTTP client with detailed tracing
@@ -563,7 +590,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 			MaxIdleConns:          10,
 			IdleConnTimeout:       30 * time.Second,
 		},
-		Timeout: timeout,
+		Timeout: g.timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			// Track redirect chain
 			metrics.redirectCount = len(via)
@@ -587,10 +614,10 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 	}
 
 	// According to: https://probelab-analytics.slack.com/archives/C08MY2YENG3/p1776796611945589
-	req.Header.Set("X-Requested-With", "tiros")
+	req.Header.Set("X-Requested-With", g.requestedWith)
 
 	// Set appropriate Accept header for CAR format
-	switch format {
+	switch g.format {
 	case db.GatewayProbeFormatNone:
 		// none
 	case db.GatewayProbeFormatRaw:
@@ -598,7 +625,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 	case db.GatewayProbeFormatCAR:
 		req.Header.Set("Accept", "application/vnd.ipld.car")
 	default:
-		panic(fmt.Sprintf("unknown gateway probe format: %s", format))
+		panic(fmt.Sprintf("unknown gateway probe format: %s", g.format))
 	}
 
 	// Execute request
@@ -627,7 +654,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 
 	// Read response body up to maxBytes, always capturing bytes in buffer
 	var buf bytes.Buffer
-	teeReader := io.TeeReader(io.LimitReader(resp.Body, maxBytes), &buf)
+	teeReader := io.TeeReader(io.LimitReader(resp.Body, g.maxBytes), &buf)
 
 	bytesRead, err := io.Copy(io.Discard, teeReader)
 	metrics.bytesReceived = bytesRead
@@ -639,7 +666,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 	}
 
 	// Validate CAR format if applicable
-	if format != db.GatewayProbeFormatCAR || resp.StatusCode != 200 {
+	if g.format != db.GatewayProbeFormatCAR || resp.StatusCode != 200 {
 		return metrics
 	}
 
@@ -658,7 +685,7 @@ func probeGateway(ctx context.Context, gateway string, ciid cid.Cid, format db.G
 
 	// Check if requested CID is in the roots
 	for _, root := range carReader.Roots {
-		if root.Equals(ciid) {
+		if root.Equals(g.cid) {
 			metrics.carValidated = toPtr(true)
 			break
 		}
