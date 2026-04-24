@@ -1,11 +1,12 @@
 module github.com/probe-lab/tiros
 
-go 1.25.1
+go 1.26.1
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.3
 	github.com/chromedp/cdproto v0.0.0-20250319231242-a755498943c8
 	github.com/chromedp/chromedp v0.13.2
+	github.com/dennis-tra/go-server-timing v0.0.0-20260424074312-0a76ef9fc7a7
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0

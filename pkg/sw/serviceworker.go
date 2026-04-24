@@ -20,6 +20,7 @@ import (
 	"github.com/chromedp/cdproto/serviceworker"
 	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
+	servertiming "github.com/dennis-tra/go-server-timing"
 	"github.com/ipfs/boxo/routing/http/types"
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -134,7 +135,7 @@ type swProbeResult struct {
 	GatewayCacheStatus *string
 
 	// Server timing data (from final response)
-	ServerTimings        map[string]ServerTiming
+	ServerTimings        []*servertiming.Metric
 	DelegatedRouterTTFB  time.Duration
 	TrustlessGatewayTTFB time.Duration
 
@@ -469,7 +470,7 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	defer p.listenMu.Unlock()
 
 	result := &swProbeResult{
-		ServerTimings:        make(map[string]ServerTiming),
+		ServerTimings:        make([]*servertiming.Metric, 0),
 		DelegatedRouterTTFB:  0,
 		TrustlessGatewayTTFB: 0,
 	}
@@ -620,8 +621,13 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	}
 
 	// Parse server-timing header
-	if serverTimingHeader, ok := finalResp.Headers["server-timing"].(string); ok {
-		result.ServerTimings = parseServerTiming(serverTimingHeader)
+	if serverTimingHeader, ok := finalResp.Headers[strings.ToLower(servertiming.HeaderName)].(string); ok {
+		stHdr, err := servertiming.ParseHeader(serverTimingHeader)
+		if err != nil {
+			slog.Warn("Failed to parse server-timing header", "err", err)
+		}
+		// stHdr is always non-nil, even if there was an error
+		result.ServerTimings = stHdr.Metrics()
 	}
 
 	// Calculate timing metrics using ResourceTiming exclusively
@@ -775,63 +781,4 @@ func (r *swProbe) handleResponseReceived(e *network.EventResponseReceived) {
 
 	trace.currentURL = e.Response.URL
 	trace.responses = append(trace.responses, e.Response)
-}
-
-type ServerTiming struct {
-	Name  string
-	Value time.Duration
-	Desc  string
-	Extra map[string]string
-}
-
-// parseServerTiming parses a server-timing header into a map of serverTiming.
-// Each entry represents a metric with its name, duration, description, and extras.
-// Parses strings like: custom-metric;dur=123.45;desc="My custom metric"
-func parseServerTiming(raw string) map[string]ServerTiming {
-	serverTimings := map[string]ServerTiming{}
-
-	metrics := strings.Split(raw, ",")
-	for _, metric := range metrics {
-		fields := strings.Split(metric, ";")
-		if len(fields) < 2 {
-			continue
-		}
-
-		st := ServerTiming{
-			Name:  strings.TrimSpace(fields[0]),
-			Extra: make(map[string]string),
-		}
-
-		for _, field := range fields[1:] {
-			kv := strings.Split(field, "=")
-			if len(kv) != 2 {
-				continue
-			}
-
-			switch kv[0] {
-			case "dur":
-				dur, err := time.ParseDuration(kv[1] + "ms")
-				if err != nil {
-					continue
-				}
-				st.Value = dur
-			case "desc":
-				unquote, err := strconv.Unquote(kv[1])
-				if err != nil {
-					continue
-				}
-				st.Desc = unquote
-			default:
-				unquote, err := strconv.Unquote(kv[1])
-				if err != nil {
-					continue
-				}
-
-				st.Extra[kv[0]] = unquote
-			}
-		}
-		serverTimings[st.Name] = st
-	}
-
-	return serverTimings
 }

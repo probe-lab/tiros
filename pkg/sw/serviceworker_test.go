@@ -9,53 +9,8 @@ import (
 	"github.com/chromedp/cdproto/page"
 	"github.com/ipfs/go-cid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
-func Test_parseServerTiming(t *testing.T) {
-	tests := []struct {
-		raw  string
-		want map[string]ServerTiming
-	}{
-		{
-			raw: "ipfs.resolve;dur=0.0;desc=\"\",exporter-dir;dur=0.0;desc=\"\"",
-			want: map[string]ServerTiming{
-				"ipfs.resolve": {Name: "ipfs.resolve", Value: 0, Desc: "", Extra: map[string]string{}},
-				"exporter-dir": {Name: "exporter-dir", Value: 0, Desc: "", Extra: map[string]string{}},
-			},
-		},
-		{
-			raw: "custom-metric;dur=123.45;desc=\"My custom metric\"",
-			want: map[string]ServerTiming{
-				"custom-metric": {Name: "custom-metric", Value: 123450 * time.Microsecond, Desc: "My custom metric", Extra: map[string]string{}},
-			},
-		},
-		{
-			raw: "cpu;dur=2.4",
-			want: map[string]ServerTiming{
-				"cpu": {Name: "cpu", Value: 2400 * time.Microsecond, Extra: map[string]string{}},
-			},
-		},
-		{
-			raw: "cache;desc=\"Cache Read\";dur=23.2",
-			want: map[string]ServerTiming{
-				"cache": {Name: "cache", Value: 23200 * time.Microsecond, Desc: "Cache Read", Extra: map[string]string{}},
-			},
-		},
-		{
-			raw: "db;dur=53, app;dur=47.2",
-			want: map[string]ServerTiming{
-				"db":  {Name: "db", Value: 53000 * time.Microsecond, Extra: map[string]string{}},
-				"app": {Name: "app", Value: 47200 * time.Microsecond, Extra: map[string]string{}},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.raw, func(t *testing.T) {
-			got := parseServerTiming(tt.raw)
-			assert.Equalf(t, tt.want, got, "parseServerTiming(%v)", tt.raw)
-		})
-	}
-}
 
 func TestSwProbe_IsProbeDone(t *testing.T) {
 	c, err := cid.Decode("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
@@ -202,12 +157,13 @@ func TestSwProbe_BuildProbeResult(t *testing.T) {
 	// TotalTTFB: (1001-1000)*1000 + 50 = 1050ms
 	assert.Equal(t, 1050*time.Millisecond, result.TotalTTFB)
 
-	// Server Timing
-	assert.Contains(t, result.ServerTimings, "ipfs.resolve")
-	assert.Equal(t, 100*time.Millisecond, result.ServerTimings["ipfs.resolve"].Value)
-
 	// Trustless Gateway TTFB
 	assert.Equal(t, 20*time.Millisecond, result.TrustlessGatewayTTFB)
+
+	// Server Timing
+	require.Len(t, result.ServerTimings, 1)
+	assert.Equal(t, "ipfs.resolve", result.ServerTimings[0].Name)
+	assert.Equal(t, 100*time.Millisecond, result.ServerTimings[0].Duration)
 }
 
 func TestSwProbe_DelegatedRouterStatus(t *testing.T) {
