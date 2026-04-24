@@ -16,7 +16,9 @@
       "WebFetch(domain:chromedevtools.github.io)",
       "WebSearch",
       "Bash(./tiros:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(gh pr:*)",
+      "Bash(go vet *)"
     ],
     "deny": [],
     "ask": []
