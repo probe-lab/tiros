@@ -21,16 +21,14 @@ const (
 	metricBlock          = "block"
 )
 
-// Router: h|l.
+// Subsystem values. Routers (h|l) apply to provider/find_providers metrics;
+// brokers (t|b) apply to connect/block metrics. The abbreviations don't
+// collide across those positions, so a single unified lookup table is safe.
 const (
-	routerHTTPGateway = "http_gateway"
-	routerLibp2p      = "libp2p"
-)
-
-// Block broker: t|b.
-const (
-	brokerTrustlessGateway = "trustless_gateway"
-	brokerBitswap          = "bitswap"
+	systemHTTPGateway      = "http_gateway"
+	systemLibp2p           = "libp2p"
+	systemTrustlessGateway = "trustless_gateway"
+	systemBitswap          = "bitswap"
 )
 
 var metricNames = map[string]string{
@@ -43,14 +41,11 @@ var metricNames = map[string]string{
 	"b": metricBlock,
 }
 
-var routerNames = map[string]string{
-	"h": routerHTTPGateway,
-	"l": routerLibp2p,
-}
-
-var brokerNames = map[string]string{
-	"t": brokerTrustlessGateway,
-	"b": brokerBitswap,
+var systemNames = map[string]string{
+	"h": systemHTTPGateway,      // router, only valid for p/f
+	"l": systemLibp2p,           // router, only valid for p/f
+	"t": systemTrustlessGateway, // broker, only valid for c/b
+	"b": systemBitswap,          // broker, only valid for c/b
 }
 
 var transportNames = map[string]string{
@@ -77,11 +72,13 @@ var transportNames = map[string]string{
 //	f     : desc="router,count"  // find-providers total per routing system
 //	c     : desc="broker,pid,t"  // connect (broker: t|b, t: transport)
 //	b     : desc="broker,pid,cid"// block retrieved
+//
+// router and broker are merged into a single `system` column since they never
+// co-occur on the same metric; the metric name carries the lifecycle stage.
 type ServerTimingRow struct {
 	NameArr       []string
 	DurSArr       []float64
-	RouterArr     []string
-	BrokerArr     []string
+	SystemArr     []string
 	ProviderIDArr []string
 	TransportArr  []string
 	ExtraArr      []string
@@ -93,7 +90,7 @@ type ServerTimingRow struct {
 	FirstBlockS              *float64
 	ProviderCountHTTPGateway uint16
 	ProviderCountLibp2p      uint16
-	FastestBlockBroker       string
+	FastestBlockSystem       string
 }
 
 // ParseServerTimings converts a slice of server-timing metrics into a ServerTimingRow.
@@ -104,8 +101,7 @@ func ParseServerTimings(metrics []*servertiming.Metric) ServerTimingRow {
 	row := ServerTimingRow{
 		NameArr:       make([]string, 0, len(metrics)),
 		DurSArr:       make([]float64, 0, len(metrics)),
-		RouterArr:     make([]string, 0, len(metrics)),
-		BrokerArr:     make([]string, 0, len(metrics)),
+		SystemArr:     make([]string, 0, len(metrics)),
 		ProviderIDArr: make([]string, 0, len(metrics)),
 		TransportArr:  make([]string, 0, len(metrics)),
 		ExtraArr:      make([]string, 0, len(metrics)),
@@ -118,27 +114,27 @@ func ParseServerTimings(metrics []*servertiming.Metric) ServerTimingRow {
 
 		name := expand(metricNames, m.Name)
 		dur := m.Duration.Seconds()
-		var router, broker, providerID, transport, extra string
+		var system, providerID, transport, extra string
 
 		// desc semantics depend on the raw metric name (the single letter).
 		parts := splitDesc(m.Description)
 		switch m.Name {
 		case "p":
 			// desc="router,providerId"
-			router = expand(routerNames, get(parts, 0))
+			system = expand(systemNames, get(parts, 0))
 			providerID = get(parts, 1)
 		case "f":
 			// desc="router,count"
-			router = expand(routerNames, get(parts, 0))
+			system = expand(systemNames, get(parts, 0))
 			extra = get(parts, 1)
 		case "c":
 			// desc="broker,providerId,transport"
-			broker = expand(brokerNames, get(parts, 0))
+			system = expand(systemNames, get(parts, 0))
 			providerID = get(parts, 1)
 			transport = expand(transportNames, get(parts, 2))
 		case "b":
 			// desc="broker,providerId,cid"
-			broker = expand(brokerNames, get(parts, 0))
+			system = expand(systemNames, get(parts, 0))
 			providerID = get(parts, 1)
 			extra = get(parts, 2)
 		default:
@@ -147,8 +143,7 @@ func ParseServerTimings(metrics []*servertiming.Metric) ServerTimingRow {
 
 		row.NameArr = append(row.NameArr, name)
 		row.DurSArr = append(row.DurSArr, dur)
-		row.RouterArr = append(row.RouterArr, router)
-		row.BrokerArr = append(row.BrokerArr, broker)
+		row.SystemArr = append(row.SystemArr, system)
 		row.ProviderIDArr = append(row.ProviderIDArr, providerID)
 		row.TransportArr = append(row.TransportArr, transport)
 		row.ExtraArr = append(row.ExtraArr, extra)
@@ -174,13 +169,13 @@ func ParseServerTimings(metrics []*servertiming.Metric) ServerTimingRow {
 		case "b":
 			if row.FirstBlockS == nil || dur < *row.FirstBlockS {
 				row.FirstBlockS = new(dur)
-				row.FastestBlockBroker = broker
+				row.FastestBlockSystem = system
 			}
 		case "p":
-			switch router {
-			case routerHTTPGateway:
+			switch system {
+			case systemHTTPGateway:
 				row.ProviderCountHTTPGateway++
-			case routerLibp2p:
+			case systemLibp2p:
 				row.ProviderCountLibp2p++
 			}
 		}
