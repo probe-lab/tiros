@@ -306,8 +306,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				stRow := sw.ParseServerTimings(result.ServerTimings)
 				dbModel.ServerTimingName = stRow.NameArr
 				dbModel.ServerTimingDurS = stRow.DurSArr
-				dbModel.ServerTimingRouter = stRow.RouterArr
-				dbModel.ServerTimingBroker = stRow.BrokerArr
+				dbModel.ServerTimingSystem = stRow.SystemArr
 				dbModel.ServerTimingProviderID = stRow.ProviderIDArr
 				dbModel.ServerTimingTransport = stRow.TransportArr
 				dbModel.ServerTimingExtra = stRow.ExtraArr
@@ -318,7 +317,7 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				dbModel.STFirstBlockS = stRow.FirstBlockS
 				dbModel.STProviderCountHTTPGateway = stRow.ProviderCountHTTPGateway
 				dbModel.STProviderCountLibp2p = stRow.ProviderCountLibp2p
-				dbModel.STFastestBlockBroker = stRow.FastestBlockBroker
+				dbModel.STFastestBlockSystem = stRow.FastestBlockSystem
 			}
 
 			slog.With(

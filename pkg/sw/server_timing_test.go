@@ -34,7 +34,7 @@ func TestParseServerTimings(t *testing.T) {
 		wantFirstBlockS              *float64
 		wantProviderCountHTTPGateway uint16
 		wantProviderCountLibp2p      uint16
-		wantFastestBlockBroker       string
+		wantFastestBlockSystem       string
 
 		// Spot checks on parsed sub-fields at particular indices.
 		checks []fieldCheck
@@ -48,27 +48,27 @@ func TestParseServerTimings(t *testing.T) {
 			wantIPNSResolveS:             nil,
 			wantFirstConnectS:            fptr(0.206),
 			wantFirstBlockS:              fptr(1.0),
-			wantProviderCountHTTPGateway: 4, // 4 'p' entries, all router=http_gateway
+			wantProviderCountHTTPGateway: 4, // 4 'p' entries, all system=http_gateway
 			wantProviderCountLibp2p:      0,
-			wantFastestBlockBroker:       "trustless_gateway",
+			wantFastestBlockSystem:       "trustless_gateway",
 			checks: []fieldCheck{
 				// Entry 0: i;dur=0
 				{idx: 0, name: "ipfs_resolve", durS: 0},
 				// Entry 1: p;dur=0;desc="h,bagqbeaawn"
-				{idx: 1, name: "provider", durS: 0, router: "http_gateway", providerID: "bagqbeaawn"},
+				{idx: 1, name: "provider", durS: 0, system: "http_gateway", providerID: "bagqbeaawn"},
 				// Entry 7: f;dur=144;desc="l,0"
-				{idx: 7, name: "find_providers", durS: 0.144, router: "libp2p", extra: "0"},
+				{idx: 7, name: "find_providers", durS: 0.144, system: "libp2p", extra: "0"},
 				// Entry 9: c;dur=206;desc="t,bagqbeaa7n,h"
-				{idx: 9, name: "connect", durS: 0.206, broker: "trustless_gateway", providerID: "bagqbeaa7n", transport: "http"},
+				{idx: 9, name: "connect", durS: 0.206, system: "trustless_gateway", providerID: "bagqbeaa7n", transport: "http"},
 				// Entry 10: b;dur=1000;desc="t,bagqbeaa7n,bafybeigoc"
-				{idx: 10, name: "block", durS: 1.0, broker: "trustless_gateway", providerID: "bagqbeaa7n", extra: "bafybeigoc"},
+				{idx: 10, name: "block", durS: 1.0, system: "trustless_gateway", providerID: "bagqbeaa7n", extra: "bafybeigoc"},
 			},
 		},
 		{
 			name:                   "empty",
 			metrics:                nil,
 			wantLen:                0,
-			wantFastestBlockBroker: "",
+			wantFastestBlockSystem: "",
 		},
 		{
 			name:                   "only_resolve_metrics_no_desc",
@@ -77,7 +77,7 @@ func TestParseServerTimings(t *testing.T) {
 			wantDNSLinkResolveS:    fptr(0.012),
 			wantIPFSResolveS:       fptr(0),
 			wantIPNSResolveS:       fptr(0.034),
-			wantFastestBlockBroker: "",
+			wantFastestBlockSystem: "",
 			checks: []fieldCheck{
 				{idx: 0, name: "dnslink_resolve", durS: 0.012},
 				{idx: 1, name: "ipfs_resolve", durS: 0},
@@ -85,12 +85,12 @@ func TestParseServerTimings(t *testing.T) {
 			},
 		},
 		{
-			name: "multiple_blocks_picks_fastest_broker",
+			name: "multiple_blocks_picks_fastest_system",
 			metrics: mustParse(t,
 				`b;dur=500;desc="t,prov1,cidX",b;dur=100;desc="b,prov2,cidY",b;dur=900;desc="t,prov3,cidZ"`),
 			wantLen:                3,
 			wantFirstBlockS:        fptr(0.1),
-			wantFastestBlockBroker: "bitswap",
+			wantFastestBlockSystem: "bitswap",
 		},
 		{
 			name:                         "libp2p_and_http_provider_counts",
@@ -98,14 +98,15 @@ func TestParseServerTimings(t *testing.T) {
 			wantLen:                      3,
 			wantProviderCountHTTPGateway: 1,
 			wantProviderCountLibp2p:      2,
-			wantFastestBlockBroker:       "",
+			wantFastestBlockSystem:       "",
 		},
 		{
 			name:    "unknown_abbrev_passes_through",
 			metrics: mustParse(t, `x;dur=5;desc="z,pid1"`),
 			wantLen: 1,
 			checks: []fieldCheck{
-				// Unknown metric code 'x' and unknown router 'z' pass through verbatim.
+				// Unknown metric code 'x' passes through verbatim. The 'z' system code
+				// is unmapped for any m.Name, so system stays empty (x isn't p/f/c/b).
 				{idx: 0, name: "x", durS: 0.005},
 			},
 		},
@@ -122,8 +123,7 @@ func TestParseServerTimings(t *testing.T) {
 			// ClickHouse enforces on Nested columns on insert.
 			assertLen(t, "NameArr", got.NameArr, tt.wantLen)
 			assertLen(t, "DurSArr", got.DurSArr, tt.wantLen)
-			assertLen(t, "RouterArr", got.RouterArr, tt.wantLen)
-			assertLen(t, "BrokerArr", got.BrokerArr, tt.wantLen)
+			assertLen(t, "SystemArr", got.SystemArr, tt.wantLen)
 			assertLen(t, "ProviderIDArr", got.ProviderIDArr, tt.wantLen)
 			assertLen(t, "TransportArr", got.TransportArr, tt.wantLen)
 			assertLen(t, "ExtraArr", got.ExtraArr, tt.wantLen)
@@ -140,8 +140,8 @@ func TestParseServerTimings(t *testing.T) {
 			if got.ProviderCountLibp2p != tt.wantProviderCountLibp2p {
 				t.Errorf("ProviderCountLibp2p: got %d, want %d", got.ProviderCountLibp2p, tt.wantProviderCountLibp2p)
 			}
-			if got.FastestBlockBroker != tt.wantFastestBlockBroker {
-				t.Errorf("FastestBlockBroker: got %q, want %q", got.FastestBlockBroker, tt.wantFastestBlockBroker)
+			if got.FastestBlockSystem != tt.wantFastestBlockSystem {
+				t.Errorf("FastestBlockSystem: got %q, want %q", got.FastestBlockSystem, tt.wantFastestBlockSystem)
 			}
 
 			for _, c := range tt.checks {
@@ -168,8 +168,7 @@ type fieldCheck struct {
 	idx        int
 	name       string
 	durS       float64
-	router     string
-	broker     string
+	system     string
 	providerID string
 	transport  string
 	extra      string
@@ -186,11 +185,8 @@ func (c fieldCheck) assert(t *testing.T, got ServerTimingRow) {
 	if !floatsClose(got.DurSArr[c.idx], c.durS) {
 		t.Errorf("idx %d durS: got %v, want %v", c.idx, got.DurSArr[c.idx], c.durS)
 	}
-	if got.RouterArr[c.idx] != c.router {
-		t.Errorf("idx %d router: got %q, want %q", c.idx, got.RouterArr[c.idx], c.router)
-	}
-	if got.BrokerArr[c.idx] != c.broker {
-		t.Errorf("idx %d broker: got %q, want %q", c.idx, got.BrokerArr[c.idx], c.broker)
+	if got.SystemArr[c.idx] != c.system {
+		t.Errorf("idx %d system: got %q, want %q", c.idx, got.SystemArr[c.idx], c.system)
 	}
 	if got.ProviderIDArr[c.idx] != c.providerID {
 		t.Errorf("idx %d providerID: got %q, want %q", c.idx, got.ProviderIDArr[c.idx], c.providerID)

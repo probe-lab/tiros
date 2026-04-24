@@ -171,8 +171,7 @@ type ServiceWorkerProbeModel struct {
 	// Single-letter abbreviations from the wire format are expanded to readable names.
 	ServerTimingName       []string  `ch:"server_timing.name"`        // Metric: dnslink_resolve|ipfs_resolve|ipns_resolve|provider|find_providers|connect|block
 	ServerTimingDurS       []float64 `ch:"server_timing.dur_s"`       // Metric duration in seconds
-	ServerTimingRouter     []string  `ch:"server_timing.router"`      // http_gateway|libp2p for provider/find_providers; empty otherwise
-	ServerTimingBroker     []string  `ch:"server_timing.broker"`      // trustless_gateway|bitswap for connect/block; empty otherwise
+	ServerTimingSystem     []string  `ch:"server_timing.system"`      // Subsystem: http_gateway|libp2p (for provider/find_providers) or trustless_gateway|bitswap (for connect/block); empty otherwise
 	ServerTimingProviderID []string  `ch:"server_timing.provider_id"` // Provider ID for provider/connect/block; empty otherwise
 	ServerTimingTransport  []string  `ch:"server_timing.transport"`   // tcp|http|websockets|webrtc|webrtc_direct|quic|webtransport|unknown for connect; empty otherwise
 	ServerTimingExtra      []string  `ch:"server_timing.extra"`       // Trailing desc payload: count for find_providers, cid for block; empty otherwise
@@ -184,9 +183,9 @@ type ServiceWorkerProbeModel struct {
 	STIPNSResolveS             *float64 `ch:"st_ipns_resolve_s"`              // Duration of the ipns_resolve metric (seconds)
 	STFirstConnectS            *float64 `ch:"st_first_connect_s"`             // Fastest connect duration across providers (seconds)
 	STFirstBlockS              *float64 `ch:"st_first_block_s"`               // Fastest block retrieval duration across providers (seconds)
-	STProviderCountHTTPGateway uint16   `ch:"st_provider_count_http_gateway"` // Number of provider metrics with router=http_gateway
-	STProviderCountLibp2p      uint16   `ch:"st_provider_count_libp2p"`       // Number of provider metrics with router=libp2p
-	STFastestBlockBroker       string   `ch:"st_fastest_block_broker"`        // Broker of the fastest block metric (trustless_gateway|bitswap); empty if none
+	STProviderCountHTTPGateway uint16   `ch:"st_provider_count_http_gateway"` // Number of provider metrics with system=http_gateway
+	STProviderCountLibp2p      uint16   `ch:"st_provider_count_libp2p"`       // Number of provider metrics with system=libp2p
+	STFastestBlockSystem       string   `ch:"st_fastest_block_system"`        // System of the fastest block metric (trustless_gateway|bitswap); empty if none
 
 	// Provider and gateway metrics
 	FoundProviders        int      `ch:"found_providers"`          // Number of unique providers found via delegated routing
