@@ -1,8 +1,7 @@
 ALTER TABLE service_worker_probes
-    DROP COLUMN IF EXISTS server_timings,
-    ADD COLUMN IF NOT EXISTS server_timing Nested(
+    ADD COLUMN IF NOT EXISTS server_timing_metrics Nested(
         name        LowCardinality(String),
-        dur_s       Float64,
+        duration_s  Float64,
         system      LowCardinality(String),
         provider_id String,
         transport   LowCardinality(String),
