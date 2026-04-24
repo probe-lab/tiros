@@ -166,15 +166,15 @@ type ServiceWorkerProbeModel struct {
 	IPFSPath  *string `ch:"ipfs_path"`  // IPFS path of the content (from "x-ipfs-path" header)
 	IPFSRoots *string `ch:"ipfs_roots"` // IPFS root CIDs involved in resolution (from "x-ipfs-roots" header)
 
-	// Server timing data — parallel arrays bound to the Nested `server_timing` column.
+	// Server timing data — parallel arrays bound to the Nested `server_timing_metrics` column.
 	// All slices must have the same length; absent sub-fields use "" / 0 sentinels.
 	// Single-letter abbreviations from the wire format are expanded to readable names.
-	ServerTimingName       []string  `ch:"server_timing.name"`        // Metric: dnslink_resolve|ipfs_resolve|ipns_resolve|provider|find_providers|connect|block
-	ServerTimingDurS       []float64 `ch:"server_timing.dur_s"`       // Metric duration in seconds
-	ServerTimingSystem     []string  `ch:"server_timing.system"`      // Subsystem: http_gateway|libp2p (for provider/find_providers) or trustless_gateway|bitswap (for connect/block); empty otherwise
-	ServerTimingProviderID []string  `ch:"server_timing.provider_id"` // Provider ID for provider/connect/block; empty otherwise
-	ServerTimingTransport  []string  `ch:"server_timing.transport"`   // tcp|http|websockets|webrtc|webrtc_direct|quic|webtransport|unknown for connect; empty otherwise
-	ServerTimingExtra      []string  `ch:"server_timing.extra"`       // Trailing desc payload: count for find_providers, cid for block; empty otherwise
+	ServerTimingName       []string  `ch:"server_timing_metrics.name"`        // Metric: dnslink_resolve|ipfs_resolve|ipns_resolve|provider|find_providers|connect|block
+	ServerTimingDurS       []float64 `ch:"server_timing_metrics.duration_s"`  // Metric duration in seconds
+	ServerTimingSystem     []string  `ch:"server_timing_metrics.system"`      // Subsystem: http_gateway|libp2p (for provider/find_providers) or trustless_gateway|bitswap (for connect/block); empty otherwise
+	ServerTimingProviderID []string  `ch:"server_timing_metrics.provider_id"` // Provider ID for provider/connect/block; empty otherwise
+	ServerTimingTransport  []string  `ch:"server_timing_metrics.transport"`   // tcp|http|websockets|webrtc|webrtc_direct|quic|webtransport|unknown for connect; empty otherwise
+	ServerTimingExtra      []string  `ch:"server_timing_metrics.extra"`       // Trailing desc payload: count for find_providers, cid for block; empty otherwise
 
 	// Hot-path scalar projections of the server timings for cheap dashboard queries.
 	// All st_* columns are derived from the Server-Timing header above.
