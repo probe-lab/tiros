@@ -166,9 +166,27 @@ type ServiceWorkerProbeModel struct {
 	IPFSPath  *string `ch:"ipfs_path"`  // IPFS path of the content (from "x-ipfs-path" header)
 	IPFSRoots *string `ch:"ipfs_roots"` // IPFS root CIDs involved in resolution (from "x-ipfs-roots" header)
 
-	// Server timing data (map of timing metrics from service worker)
-	// Contains internal service worker metrics
-	ServerTimings json.RawMessage `ch:"server_timings"`
+	// Server timing data — parallel arrays bound to the Nested `server_timing` column.
+	// All slices must have the same length; absent sub-fields use "" / 0 sentinels.
+	// Single-letter abbreviations from the wire format are expanded to readable names.
+	ServerTimingName       []string  `ch:"server_timing.name"`        // Metric: dnslink_resolve|ipfs_resolve|ipns_resolve|provider|find_providers|connect|block
+	ServerTimingDurS       []float64 `ch:"server_timing.dur_s"`       // Metric duration in seconds
+	ServerTimingRouter     []string  `ch:"server_timing.router"`      // http_gateway|libp2p for provider/find_providers; empty otherwise
+	ServerTimingBroker     []string  `ch:"server_timing.broker"`      // trustless_gateway|bitswap for connect/block; empty otherwise
+	ServerTimingProviderID []string  `ch:"server_timing.provider_id"` // Provider ID for provider/connect/block; empty otherwise
+	ServerTimingTransport  []string  `ch:"server_timing.transport"`   // tcp|http|websockets|webrtc|webrtc_direct|quic|webtransport|unknown for connect; empty otherwise
+	ServerTimingExtra      []string  `ch:"server_timing.extra"`       // Trailing desc payload: count for find_providers, cid for block; empty otherwise
+
+	// Hot-path scalar projections of the server timings for cheap dashboard queries.
+	// All st_* columns are derived from the Server-Timing header above.
+	STIPFSResolveS             *float64 `ch:"st_ipfs_resolve_s"`              // Duration of the ipfs_resolve metric (seconds)
+	STDNSLinkResolveS          *float64 `ch:"st_dnslink_resolve_s"`           // Duration of the dnslink_resolve metric (seconds)
+	STIPNSResolveS             *float64 `ch:"st_ipns_resolve_s"`              // Duration of the ipns_resolve metric (seconds)
+	STFirstConnectS            *float64 `ch:"st_first_connect_s"`             // Fastest connect duration across providers (seconds)
+	STFirstBlockS              *float64 `ch:"st_first_block_s"`               // Fastest block retrieval duration across providers (seconds)
+	STProviderCountHTTPGateway uint16   `ch:"st_provider_count_http_gateway"` // Number of provider metrics with router=http_gateway
+	STProviderCountLibp2p      uint16   `ch:"st_provider_count_libp2p"`       // Number of provider metrics with router=libp2p
+	STFastestBlockBroker       string   `ch:"st_fastest_block_broker"`        // Broker of the fastest block metric (trustless_gateway|bitswap); empty if none
 
 	// Provider and gateway metrics
 	FoundProviders        int      `ch:"found_providers"`          // Number of unique providers found via delegated routing

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -11,7 +10,6 @@ import (
 	"net"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -303,18 +301,24 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				dbModel.DelegatedRouterTTFBS = toPtr(result.DelegatedRouterTTFB.Seconds())
 				dbModel.TrustlessGatewayTTFBS = toPtr(result.TrustlessGatewayTTFB.Seconds())
 
-				// Server timings as JSON
-				serverTimings := make(map[string]float64, len(result.ServerTimings))
-				for k, v := range result.ServerTimings {
-					// every dot in the key increases the nesting level in how
-					// clickhouse interprets these keys. Therefore, we replace
-					// them with an _.
-					k = strings.ReplaceAll(k, ".", "_")
-					serverTimings[k] = v.Value.Seconds()
-				}
-				if data, err := json.Marshal(serverTimings); err == nil {
-					dbModel.ServerTimings = data
-				}
+				// Parse server timings into parallel arrays for the Nested column
+				// and compute hot-path scalar projections.
+				stRow := sw.ParseServerTimings(result.ServerTimings)
+				dbModel.ServerTimingName = stRow.NameArr
+				dbModel.ServerTimingDurS = stRow.DurSArr
+				dbModel.ServerTimingRouter = stRow.RouterArr
+				dbModel.ServerTimingBroker = stRow.BrokerArr
+				dbModel.ServerTimingProviderID = stRow.ProviderIDArr
+				dbModel.ServerTimingTransport = stRow.TransportArr
+				dbModel.ServerTimingExtra = stRow.ExtraArr
+				dbModel.STIPFSResolveS = stRow.IPFSResolveS
+				dbModel.STDNSLinkResolveS = stRow.DNSLinkResolveS
+				dbModel.STIPNSResolveS = stRow.IPNSResolveS
+				dbModel.STFirstConnectS = stRow.FirstConnectS
+				dbModel.STFirstBlockS = stRow.FirstBlockS
+				dbModel.STProviderCountHTTPGateway = stRow.ProviderCountHTTPGateway
+				dbModel.STProviderCountLibp2p = stRow.ProviderCountLibp2p
+				dbModel.STFastestBlockBroker = stRow.FastestBlockBroker
 			}
 
 			slog.With(
@@ -322,7 +326,8 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 				"status", dbModel.StatusCode,
 				"totalTTFBs", deref(dbModel.TotalTTFBS),
 				"finalTTFBs", deref(dbModel.FinalTTFBS),
-				"serverTimings", string(dbModel.ServerTimings),
+				"stFirstBlockS", deref(dbModel.STFirstBlockS),
+				"serverTimingCount", len(dbModel.ServerTimingName),
 				"cid", ciid.String(),
 			).Info("Inserting service worker probe into database")
 
