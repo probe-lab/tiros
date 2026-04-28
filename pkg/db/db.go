@@ -9,8 +9,6 @@ import (
 	"log/slog"
 	"os"
 	"path"
-	"reflect"
-	"strings"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -36,50 +34,17 @@ type Client interface {
 
 type ClickhouseClient struct {
 	Conn driver.Conn
+
+	biGroup         *pldb.BatchInserterGroup
+	biUploads       *pldb.BatchInserter[UploadModel]
+	biDownloads     *pldb.BatchInserter[DownloadModel]
+	biWebsiteProbes *pldb.BatchInserter[WebsiteProbeModel]
+	biProviders     *pldb.BatchInserter[ProviderModel]
+	biGatewayProbes *pldb.BatchInserter[GatewayProbeModel]
+	biSWProbes      *pldb.BatchInserter[ServiceWorkerProbeModel]
 }
 
 var _ Client = (*ClickhouseClient)(nil)
-
-// buildInsertQuery builds an INSERT query and extracts values from a struct using reflection.
-// It reads the `ch` struct tags to determine column names.
-func buildInsertQuery(tableName string, model any) (query string, values []any) {
-	val := reflect.ValueOf(model)
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-	}
-	typ := val.Type()
-
-	var columns []string
-	var placeholders []string
-	values = make([]any, 0, typ.NumField())
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		chTag := field.Tag.Get("ch")
-		if chTag == "" || chTag == "-" {
-			continue
-		}
-
-		columns = append(columns, chTag)
-		placeholders = append(placeholders, "?")
-
-		iface := val.Field(i).Interface()
-		switch tiface := iface.(type) {
-		case json.RawMessage:
-			values = append(values, string(tiface))
-		default:
-			values = append(values, iface)
-		}
-	}
-
-	query = fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
-		tableName,
-		strings.Join(columns, ", "),
-		strings.Join(placeholders, ", "),
-	)
-
-	return query, values
-}
 
 func NewClickhouseClient(
 	ctx context.Context,
@@ -92,16 +57,91 @@ func NewClickhouseClient(
 	if err != nil {
 		return nil, fmt.Errorf("connecting to clickhouse: %w", err)
 	}
-	defer pllog.Defer(conn.Close, "Failed closing clickhouse client")
 
 	if err = migrationsConfig.Apply(chConfig.Options(), migrations); err != nil {
 		return nil, fmt.Errorf("applying migrations: %w", err)
 	}
 
-	return &ClickhouseClient{Conn: conn}, nil
+	biUploads, err := newBatchInserter[UploadModel](conn, "uploads")
+	if err != nil {
+		return nil, fmt.Errorf("creating uploads batch inserter: %w", err)
+	}
+
+	biDownloads, err := newBatchInserter[DownloadModel](conn, "downloads")
+	if err != nil {
+		return nil, fmt.Errorf("creating downloads batch inserter: %w", err)
+	}
+
+	biWebsiteProbes, err := newBatchInserter[WebsiteProbeModel](conn, "website_probes")
+	if err != nil {
+		return nil, fmt.Errorf("creating website_probes batch inserter: %w", err)
+	}
+
+	biProviders, err := newBatchInserter[ProviderModel](conn, "providers")
+	if err != nil {
+		return nil, fmt.Errorf("creating providers batch inserter: %w", err)
+	}
+
+	biGatewayProbes, err := newBatchInserter[GatewayProbeModel](conn, "gateway_probes")
+	if err != nil {
+		return nil, fmt.Errorf("creating gateway_probes batch inserter: %w", err)
+	}
+
+	biSWProbes, err := newBatchInserter[ServiceWorkerProbeModel](conn, "service_worker_probes")
+	if err != nil {
+		return nil, fmt.Errorf("creating service_worker_probes batch inserter: %w", err)
+	}
+
+	biGroup := &pldb.BatchInserterGroup{}
+	biGroup.Add(biUploads)
+	biGroup.Add(biDownloads)
+	biGroup.Add(biWebsiteProbes)
+	biGroup.Add(biProviders)
+	biGroup.Add(biGatewayProbes)
+	biGroup.Add(biSWProbes)
+	biGroup.Start(context.Background())
+
+	client := &ClickhouseClient{
+		Conn: conn,
+
+		biGroup:         biGroup,
+		biUploads:       biUploads,
+		biDownloads:     biDownloads,
+		biWebsiteProbes: biWebsiteProbes,
+		biProviders:     biProviders,
+		biGatewayProbes: biGatewayProbes,
+		biSWProbes:      biSWProbes,
+	}
+
+	return client, nil
+}
+
+func newBatchInserter[T any](
+	conn driver.Conn,
+	table string,
+) (*pldb.BatchInserter[T], error) {
+	cfg := pldb.DefaultBatchInserterConfig[T]()
+	cfg.FlushInterval = 10 * time.Minute
+	cfg.OnDroppedRows = func(rows []T, err error) {
+		slog.Warn("Dropped rows in batch inserter", "table", table, "count", len(rows), "err", err)
+	}
+
+	bi, err := pldb.NewBatchInserter[T](conn, table, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("creating %s batch inserter: %w", table, err)
+	}
+
+	return bi, nil
 }
 
 func (c *ClickhouseClient) Close() error {
+	timeout := 15 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := c.biGroup.Stop(ctx); err != nil {
+		slog.Warn("Failed stopping batch inserter group in time", "err", err, "timeout", timeout)
+	}
+
 	return c.Conn.Close()
 }
 
@@ -144,57 +184,27 @@ func (c *ClickhouseClient) Gateways(ctx context.Context) ([]string, error) {
 }
 
 func (c *ClickhouseClient) InsertUpload(ctx context.Context, upload *UploadModel) error {
-	query, values := buildInsertQuery("uploads", upload)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert uploads: %w", err)
-	}
-	return nil
+	return c.biUploads.Submit(ctx, *upload)
 }
 
 func (c *ClickhouseClient) InsertDownload(ctx context.Context, download *DownloadModel) error {
-	query, values := buildInsertQuery("downloads", download)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert downloads: %w", err)
-	}
-	return nil
+	return c.biDownloads.Submit(ctx, *download)
 }
 
 func (c *ClickhouseClient) InsertWebsiteProbe(ctx context.Context, websiteProbe *WebsiteProbeModel) error {
-	query, values := buildInsertQuery("website_probes", websiteProbe)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert website_probes: %w", err)
-	}
-	return nil
+	return c.biWebsiteProbes.Submit(ctx, *websiteProbe)
 }
 
 func (c *ClickhouseClient) InsertProvider(ctx context.Context, provider *ProviderModel) error {
-	query, values := buildInsertQuery("providers", provider)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert providers: %w", err)
-	}
-	return nil
+	return c.biProviders.Submit(ctx, *provider)
 }
 
 func (c *ClickhouseClient) InsertGatewayProbe(ctx context.Context, gatewayProbe *GatewayProbeModel) error {
-	query, values := buildInsertQuery("gateway_probes", gatewayProbe)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert gateway_probes: %w", err)
-	}
-	return nil
+	return c.biGatewayProbes.Submit(ctx, *gatewayProbe)
 }
 
 func (c *ClickhouseClient) InsertServiceWorkerProbe(ctx context.Context, serviceWorkerProbe *ServiceWorkerProbeModel) error {
-	query, values := buildInsertQuery("service_worker_probes", serviceWorkerProbe)
-	err := c.Conn.AsyncInsert(ctx, query, false, values...)
-	if err != nil {
-		return fmt.Errorf("async insert service_worker_probes: %w", err)
-	}
-	return nil
+	return c.biSWProbes.Submit(ctx, *serviceWorkerProbe)
 }
 
 type NoopClient struct{}

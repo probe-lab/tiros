@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -57,30 +56,30 @@ const (
 )
 
 type WebsiteProbeModel struct {
-	RunID        string          `ch:"run_id"`
-	Region       string          `ch:"region"`
-	TirosVersion string          `ch:"tiros_version"`
-	KuboVersion  string          `ch:"kubo_version"`
-	KuboPeerID   string          `ch:"kubo_peer_id"`
-	Website      string          `ch:"website"`
-	URL          string          `ch:"url"`
-	Protocol     string          `ch:"protocol"`
-	IPFSImpl     string          `ch:"ipfs_impl"`
-	Try          int             `ch:"try"`
-	TTFB         *float64        `ch:"ttfb_s"`
-	FCP          *float64        `ch:"fcp_s"`
-	LCP          *float64        `ch:"lcp_s"`
-	TTI          *float64        `ch:"tti_s"`
-	CLS          *float64        `ch:"cls_s"`
-	TTFBRating   *string         `ch:"ttfb_rating"`
-	CLSRating    *string         `ch:"cls_rating"`
-	FCPRating    *string         `ch:"fcp_rating"`
-	LCPRating    *string         `ch:"lcp_rating"`
-	StatusCode   int             `ch:"status_code"`
-	Body         *string         `ch:"body"`
-	Metrics      json.RawMessage `ch:"metrics"`
-	Error        *string         `ch:"error"`
-	CreatedAt    time.Time       `ch:"created_at"`
+	RunID        string    `ch:"run_id"`
+	Region       string    `ch:"region"`
+	TirosVersion string    `ch:"tiros_version"`
+	KuboVersion  string    `ch:"kubo_version"`
+	KuboPeerID   string    `ch:"kubo_peer_id"`
+	Website      string    `ch:"website"`
+	URL          string    `ch:"url"`
+	Protocol     string    `ch:"protocol"`
+	IPFSImpl     string    `ch:"ipfs_impl"`
+	Try          int       `ch:"try"`
+	TTFB         *float64  `ch:"ttfb_s"`
+	FCP          *float64  `ch:"fcp_s"`
+	LCP          *float64  `ch:"lcp_s"`
+	TTI          *float64  `ch:"tti_s"`
+	CLS          *float64  `ch:"cls_s"`
+	TTFBRating   *string   `ch:"ttfb_rating"`
+	CLSRating    *string   `ch:"cls_rating"`
+	FCPRating    *string   `ch:"fcp_rating"`
+	LCPRating    *string   `ch:"lcp_rating"`
+	StatusCode   int       `ch:"status_code"`
+	Body         *string   `ch:"body"`
+	Metrics      string    `ch:"metrics"`
+	Error        *string   `ch:"error"`
+	CreatedAt    time.Time `ch:"created_at"`
 }
 
 type ProviderModel struct {
@@ -165,6 +164,9 @@ type ServiceWorkerProbeModel struct {
 	// IPFS-specific headers (from final service worker response)
 	IPFSPath  *string `ch:"ipfs_path"`  // IPFS path of the content (from "x-ipfs-path" header)
 	IPFSRoots *string `ch:"ipfs_roots"` // IPFS root CIDs involved in resolution (from "x-ipfs-roots" header)
+
+	// Deprecated: Use fields below instead.
+	ServerTimings string `ch:"server_timings"`
 
 	// Server timing data — parallel arrays bound to the Nested `server_timing_metrics` column.
 	// All slices must have the same length; absent sub-fields use "" / 0 sentinels.

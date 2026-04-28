@@ -198,9 +198,10 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 				}
 
 				metricsJSON, err := pr.MetricsJSON()
+				metricsJSONStr := string(metricsJSON)
 				if err != nil {
 					slog.With("err", err).Warn("Error marshalling metrics")
-					metricsJSON = nil
+					metricsJSONStr = "{}"
 				}
 
 				wpm := &db.WebsiteProbeModel{
@@ -225,7 +226,7 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 					LCPRating:    pr.LCPRating,
 					StatusCode:   pr.HTTPStatus,
 					Body:         pr.HTTPBody,
-					Metrics:      metricsJSON,
+					Metrics:      metricsJSONStr,
 					Error:        toPtr(errStr),
 					CreatedAt:    time.Now(),
 				}

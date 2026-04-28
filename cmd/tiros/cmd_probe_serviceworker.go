@@ -272,15 +272,16 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 			}
 
 			dbModel := &db.ServiceWorkerProbeModel{
-				RunID:        runID.String(),
-				Region:       rootConfig.AWSRegion,
-				TirosVersion: cmd.Root().Version,
-				Gateway:      gateway,
-				CID:          ciid.String(),
-				CIDSource:    cidSource,
-				URL:          navURL.String(),
-				Error:        errStr,
-				CreatedAt:    time.Now(),
+				RunID:         runID.String(),
+				Region:        rootConfig.AWSRegion,
+				TirosVersion:  cmd.Root().Version,
+				Gateway:       gateway,
+				CID:           ciid.String(),
+				CIDSource:     cidSource,
+				URL:           navURL.String(),
+				Error:         errStr,
+				CreatedAt:     time.Now(),
+				ServerTimings: "{}",
 			}
 
 			// Populate fields from result if successful
