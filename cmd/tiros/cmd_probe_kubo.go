@@ -21,7 +21,7 @@ import (
 )
 
 var probeKuboConfig = struct {
-	FileSizeMiB   int
+	FileSizesMiB  []int
 	Interval      time.Duration
 	KuboHost      string
 	KuboAPIPort   int
@@ -36,7 +36,7 @@ var probeKuboConfig = struct {
 	TracesForwardHost string
 	TracesForwardPort int
 }{
-	FileSizeMiB:       100,
+	FileSizesMiB:      []int{100},
 	Interval:          10 * time.Second, // time.Minute,
 	KuboHost:          "127.0.0.1",
 	KuboAPIPort:       5001,
@@ -52,12 +52,19 @@ var probeKuboConfig = struct {
 }
 
 var probeKuboFlags = []cli.Flag{
-	&cli.IntFlag{
-		Name:        "filesize",
-		Usage:       "File size in MiB to upload to kubo",
-		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_UPLOAD_FILE_SIZE_MIB"),
-		Value:       probeKuboConfig.FileSizeMiB,
-		Destination: &probeKuboConfig.FileSizeMiB,
+	&cli.IntSliceFlag{
+		Name:        "filesizes",
+		Usage:       "File sizes in MiB to upload to kubo",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_UPLOAD_FILE_SIZES_MIB"),
+		Value:       probeKuboConfig.FileSizesMiB,
+		Destination: &probeKuboConfig.FileSizesMiB,
+		Validator: func(fileSizes []int) error {
+			if len(fileSizes) == 0 {
+				return fmt.Errorf("no file sizes specified")
+			}
+
+			return nil
+		},
 	},
 	&cli.DurationFlag{
 		Name:        "interval",
@@ -235,10 +242,10 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	kuboCfg := &kubo.KuboConfig{
-		Host:        probeKuboConfig.KuboHost,
-		APIPort:     probeKuboConfig.KuboAPIPort,
-		Receiver:    tr,
-		FileSizeMiB: probeKuboConfig.FileSizeMiB,
+		Host:         probeKuboConfig.KuboHost,
+		APIPort:      probeKuboConfig.KuboAPIPort,
+		Receiver:     tr,
+		FileSizesMiB: probeKuboConfig.FileSizesMiB,
 	}
 	kubo, err := kubo.NewKubo(kuboCfg)
 	if err != nil {
@@ -264,6 +271,8 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 
 	// start of the respective iteration
 	iterationStart := time.Now()
+
+	fileSizeIdx := 0
 
 	maxIter := probeKuboConfig.MaxIterations
 	for i := 0; maxIter == 0 || i < maxIter; i++ {
@@ -295,7 +304,10 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 		if !probeKuboConfig.DownloadOnly {
 			slog.Info("Starting upload measurement")
 
-			ur, err := kubo.Upload(ctx)
+			//
+			fileSizeMiB := probeKuboConfig.FileSizesMiB[fileSizeIdx]
+
+			ur, err := kubo.Upload(ctx, fileSizeMiB)
 			uploadCounter.Add(ctx, 1, metric.WithAttributes(
 				attribute.Bool("success", err == nil),
 			))
@@ -311,7 +323,7 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				TirosVersion:     cmd.Root().Version,
 				KuboVersion:      kuboVersion.Version,
 				KuboPeerID:       kuboID.ID,
-				FileSizeB:        toPtr(uint32(probeKuboConfig.FileSizeMiB * 1024 * 1024)),
+				FileSizeB:        toPtr(uint32(fileSizeMiB * 1024 * 1024)),
 				CID:              toPtr(cidStr),
 				IPFSAddStart:     ur.IPFSAddStart,
 				IPFSAddDurationS: ur.IPFSAddEnd.Sub(ur.IPFSAddStart).Seconds(),
@@ -421,6 +433,9 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				kubo.Reset(ctx)
 			}
 		}
+
+		fileSizeIdx += 1
+		fileSizeIdx %= len(probeKuboConfig.FileSizesMiB)
 	}
 
 	time.Sleep(15 * time.Second)

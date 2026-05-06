@@ -45,7 +45,7 @@ type KuboConfig struct {
 	GWPort         int
 	Receiver       *TraceReceiver
 	ChromeKuboHost string
-	FileSizeMiB    int
+	FileSizesMiB   []int
 }
 
 type Kubo struct {
@@ -152,16 +152,19 @@ func (k *Kubo) Reset(ctx context.Context) {
 	}
 }
 
-func (k *Kubo) Upload(ctx context.Context) (*UploadResult, error) {
-	slog.Info(fmt.Sprintf("Uploading %dMiB to Kubo", k.cfg.FileSizeMiB))
+func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, error) {
+	slog.Info(fmt.Sprintf("Uploading %dMiB to Kubo", fileSizeMiB))
 
 	// Generate random data
-	size := k.cfg.FileSizeMiB * 1024 * 1024
+	size := fileSizeMiB * 1024 * 1024
 	data := make([]byte, size)
 	rand.Read(data)
 
 	// Determine root CID of the random data blob
-	rootCID, err := k.GetCID(ctx, files.NewBytesFile(data))
+	rndFileReader := files.NewBytesFile(data)
+	defer rndFileReader.Close()
+
+	rootCID, err := k.GetCID(ctx, rndFileReader)
 	if err != nil {
 		return nil, fmt.Errorf("determine root CID: %w", err)
 	}
@@ -219,10 +222,13 @@ func (k *Kubo) Upload(ctx context.Context) (*UploadResult, error) {
 		}
 	})
 
-	slog.With("sizeMiB", k.cfg.FileSizeMiB, "traceID", uploadSpan.SpanContext().TraceID().String()).Info("Adding file to Kubo")
+	slog.With("sizeMiB", fileSizeMiB, "traceID", uploadSpan.SpanContext().TraceID().String()).Info("Adding file to Kubo")
+
+	dataRdr := files.NewBytesFile(data)
+	defer dataRdr.Close()
 
 	uploadStart := time.Now()
-	rootCID, err = k.Add(uploadCtx, files.NewBytesFile(data))
+	rootCID, err = k.Add(uploadCtx, dataRdr)
 	uploadEnd := time.Now()
 
 	uploadSpan.RecordError(err) // noop if err is nil
