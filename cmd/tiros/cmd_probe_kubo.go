@@ -21,7 +21,7 @@ import (
 )
 
 var probeKuboConfig = struct {
-	FileSizesMiB  []int
+	FileSizesMiB  []float64
 	Interval      time.Duration
 	KuboHost      string
 	KuboAPIPort   int
@@ -36,7 +36,7 @@ var probeKuboConfig = struct {
 	TracesForwardHost string
 	TracesForwardPort int
 }{
-	FileSizesMiB:      []int{100},
+	FileSizesMiB:      []float64{100},
 	Interval:          10 * time.Second, // time.Minute,
 	KuboHost:          "127.0.0.1",
 	KuboAPIPort:       5001,
@@ -52,13 +52,13 @@ var probeKuboConfig = struct {
 }
 
 var probeKuboFlags = []cli.Flag{
-	&cli.IntSliceFlag{
+	&cli.FloatSliceFlag{
 		Name:        "filesizes",
 		Usage:       "File sizes in MiB to upload to kubo",
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_UPLOAD_FILE_SIZES_MIB"),
 		Value:       probeKuboConfig.FileSizesMiB,
 		Destination: &probeKuboConfig.FileSizesMiB,
-		Validator: func(fileSizes []int) error {
+		Validator: func(fileSizes []float64) error {
 			if len(fileSizes) == 0 {
 				return fmt.Errorf("no file sizes specified")
 			}
