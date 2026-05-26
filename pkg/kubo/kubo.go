@@ -45,7 +45,7 @@ type KuboConfig struct {
 	GWPort         int
 	Receiver       *TraceReceiver
 	ChromeKuboHost string
-	FileSizesMiB   []int
+	FileSizesMiB   []float64
 }
 
 type Kubo struct {
@@ -152,11 +152,11 @@ func (k *Kubo) Reset(ctx context.Context) {
 	}
 }
 
-func (k *Kubo) Upload(ctx context.Context, fileSizeMiB int) (*UploadResult, error) {
-	slog.Info(fmt.Sprintf("Uploading %dMiB to Kubo", fileSizeMiB))
+func (k *Kubo) Upload(ctx context.Context, fileSizeMiB float64) (*UploadResult, error) {
+	slog.Info(fmt.Sprintf("Uploading %gMiB to Kubo", fileSizeMiB))
 
 	// Generate random data
-	size := fileSizeMiB * 1024 * 1024
+	size := int(fileSizeMiB * 1024 * 1024)
 	data := make([]byte, size)
 	rand.Read(data)
 
