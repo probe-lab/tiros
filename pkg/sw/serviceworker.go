@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -463,6 +464,22 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 	<-swCtx.Done()
 }
 
+// lastDocumentResponse returns the most recent response of the most recent
+// document request that received any response, or nil if none did.
+// The caller must hold listenMu.
+func (p *swProbe) lastDocumentResponse() *network.Response {
+	for _, reqID := range slices.Backward(p.documentRequestIDs) {
+		req, ok := p.documentRequests[reqID]
+		if !ok {
+			continue
+		}
+		if resp := req.lastResponse(); resp != nil {
+			return resp
+		}
+	}
+	return nil
+}
+
 // buildProbeResult constructs the complete probe result from collected data
 // It aggregates metrics from document requests, trustless gateway fetches, and delegated router queries.
 func (p *swProbe) buildProbeResult() *swProbeResult {
@@ -570,7 +587,20 @@ func (p *swProbe) buildProbeResult() *swProbeResult {
 	}
 
 	if finalReq == nil {
-		slog.Warn("No final request found in probe")
+		// The service worker never answered. This happens when the origin
+		// itself fails the navigation (e.g., a 410 or 5xx from the host).
+		// Record the status of the last response we did see so the failure
+		// does not show up as status 0 in the database.
+		if lastResp := p.lastDocumentResponse(); lastResp != nil {
+			result.FinalStatusCode = int(lastResp.Status)
+			slog.Warn("No final request found in probe",
+				"fallbackStatus", lastResp.Status,
+				"fallbackURL", lastResp.URL,
+				"fromServiceWorker", lastResp.FromServiceWorker,
+			)
+		} else {
+			slog.Warn("No final request found in probe")
+		}
 		return result
 	}
 

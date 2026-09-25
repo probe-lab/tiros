@@ -166,6 +166,57 @@ func TestSwProbe_BuildProbeResult(t *testing.T) {
 	assert.Equal(t, 100*time.Millisecond, result.ServerTimings[0].Duration)
 }
 
+func TestSwProbe_BuildProbeResult_NoServiceWorkerResponse(t *testing.T) {
+	c, err := cid.Decode("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
+	assert.NoError(t, err)
+
+	p := NewSwProbe(c, "http://example.com")
+
+	// The origin answers the navigation itself with 410 Gone. No service
+	// worker is ever installed, so no response carries the service worker
+	// headers.
+	reqID := network.RequestID("req-1")
+	p.documentRequests[reqID] = &swRequestTrace{
+		currentURL: "http://example.com/ipfs/" + c.String(),
+		loaderID:   cdp.LoaderID("loader-1"),
+		responses: []*network.Response{
+			{
+				URL:               "http://example.com/ipfs/" + c.String(),
+				Status:            410,
+				FromServiceWorker: false,
+				Headers:           network.Headers{"content-type": "text/plain"},
+				Timing:            &network.ResourceTiming{RequestTime: 1000.0},
+			},
+		},
+	}
+	p.documentRequestIDs = append(p.documentRequestIDs, reqID)
+
+	result := p.buildProbeResult()
+
+	assert.Equal(t, 410, result.FinalStatusCode)
+	assert.Equal(t, time.Duration(0), result.TotalTTFB)
+	assert.Equal(t, time.Duration(0), result.FinalTTFB)
+	assert.Empty(t, result.ServerTimings)
+}
+
+func TestSwProbe_BuildProbeResult_NoResponses(t *testing.T) {
+	c, err := cid.Decode("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
+	assert.NoError(t, err)
+
+	p := NewSwProbe(c, "http://example.com")
+
+	reqID := network.RequestID("req-1")
+	p.documentRequests[reqID] = &swRequestTrace{
+		currentURL: "http://example.com/ipfs/" + c.String(),
+		loaderID:   cdp.LoaderID("loader-1"),
+	}
+	p.documentRequestIDs = append(p.documentRequestIDs, reqID)
+
+	result := p.buildProbeResult()
+
+	assert.Equal(t, 0, result.FinalStatusCode)
+}
+
 func TestSwProbe_DelegatedRouterStatus(t *testing.T) {
 	c, err := cid.Decode("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
 	assert.NoError(t, err)
