@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 	"log/slog"
@@ -130,6 +131,90 @@ func (p *BitswapSnifferClickhouseCIDProvider) SelectCID(ctx context.Context, ori
 		if c.Prefix().Codec != uint64(multicodec.DagPb) {
 			c = cid.NewCidV1(uint64(multicodec.Raw), c.Hash())
 		}
+	}
+
+	return c, rows.Err()
+}
+
+// ClickhouseUploadsCIDProvider selects CIDs from this experiment's own `uploads`
+// table. It is used by a retriever node to fetch content that a separate seed node
+// uploaded and keeps pinned, giving controlled-size retrieval over the network.
+type ClickhouseUploadsCIDProvider struct {
+	conn             driver.Conn
+	recent           int
+	minAge           time.Duration
+	cidSelectCounter metric.Int64Counter
+}
+
+var _ CIDProvider = (*ClickhouseUploadsCIDProvider)(nil)
+
+// NewClickhouseUploadsCIDProvider returns a provider that selects randomly from the
+// `recent` most-recent uploads that are at least `minAge` old. minAge gives DHT
+// provide records time to propagate; recent should not exceed the seed's retained
+// working set, otherwise a selected CID may already have been evicted.
+func NewClickhouseUploadsCIDProvider(dbClient db.Client, recent int, minAge time.Duration) (*ClickhouseUploadsCIDProvider, error) {
+	chClient, ok := dbClient.(*db.ClickhouseClient)
+	if !ok {
+		return nil, fmt.Errorf("expected clickhouse client, got: %T", dbClient)
+	}
+
+	if recent <= 0 {
+		recent = 20
+	}
+
+	meter := otel.GetMeterProvider().Meter("tiros")
+	cidSelectCounter, err := meter.Int64Counter("cid_select")
+	if err != nil {
+		return nil, fmt.Errorf("creating cid select counter: %w", err)
+	}
+
+	return &ClickhouseUploadsCIDProvider{
+		conn:             chClient.Conn,
+		recent:           recent,
+		minAge:           minAge,
+		cidSelectCounter: cidSelectCounter,
+	}, nil
+}
+
+func (p *ClickhouseUploadsCIDProvider) SelectCID(ctx context.Context, origin string) (cid.Cid, error) {
+	cutoff := time.Now().Add(-p.minAge)
+
+	rows, err := p.conn.Query(ctx, `
+		WITH cte AS (
+			SELECT cid
+			FROM uploads
+			WHERE cid IS NOT NULL
+			  AND cid != ''
+			  AND error IS NULL
+			  AND ipfs_add_start <= $1
+			ORDER BY ipfs_add_start DESC
+			LIMIT $2
+		) SELECT cid FROM cte ORDER BY RAND() LIMIT 1
+	`, cutoff, p.recent)
+
+	p.cidSelectCounter.Add(ctx, 1, metric.WithAttributes(
+		attribute.String("origin", origin),
+		attribute.Bool("success", err == nil && rows.Err() == nil),
+	))
+
+	var c cid.Cid
+	if err != nil {
+		return c, err
+	}
+	defer pllog.Defer(rows.Close, "Failed closing rows")
+
+	if !rows.Next() {
+		return c, sql.ErrNoRows
+	}
+
+	var cidStr string
+	if err := rows.Scan(&cidStr); err != nil {
+		return c, err
+	}
+
+	c, err = cid.Parse(cidStr)
+	if err != nil {
+		return c, err
 	}
 
 	return c, rows.Err()

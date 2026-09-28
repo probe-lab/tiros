@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ipfs/go-cid"
 	pllog "github.com/probe-lab/go-commons/log"
 	"github.com/probe-lab/tiros/pkg"
 	"github.com/probe-lab/tiros/pkg/db"
@@ -21,17 +22,21 @@ import (
 )
 
 var probeKuboConfig = struct {
-	FileSizesMiB  []float64
-	Interval      time.Duration
-	KuboHost      string
-	KuboAPIPort   int
-	TracesRecHost string
-	TracesRecPort int
-	MaxIterations int
-	TracesOut     string
-	DownloadOnly  bool
-	UploadOnly    bool
-	DownloadCIDs  []string
+	FileSizesMiB   []float64
+	Interval       time.Duration
+	KuboHost       string
+	KuboAPIPort    int
+	TracesRecHost  string
+	TracesRecPort  int
+	MaxIterations  int
+	TracesOut      string
+	DownloadOnly   bool
+	UploadOnly     bool
+	DownloadCIDs   []string
+	RetainUploads  int
+	CIDSource      string
+	RetrieveRecent int
+	RetrieveMinAge time.Duration
 
 	TracesForwardHost string
 	TracesForwardPort int
@@ -49,6 +54,10 @@ var probeKuboConfig = struct {
 	DownloadOnly:      false,
 	UploadOnly:        false,
 	DownloadCIDs:      []string{},
+	RetainUploads:     0,
+	CIDSource:         "sniffer",
+	RetrieveRecent:    20,
+	RetrieveMinAge:    2 * time.Minute,
 }
 
 var probeKuboFlags = []cli.Flag{
@@ -135,6 +144,42 @@ var probeKuboFlags = []cli.Flag{
 		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_DOWNLOAD_CIDS"),
 		Value:       probeKuboConfig.DownloadCIDs,
 		Destination: &probeKuboConfig.DownloadCIDs,
+	},
+	&cli.IntFlag{
+		Name:        "retain.uploads",
+		Usage:       "If greater than 0, keep this many most-recent uploads pinned instead of clearing them each iteration (seed mode).",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_RETAIN_UPLOADS"),
+		Value:       probeKuboConfig.RetainUploads,
+		Destination: &probeKuboConfig.RetainUploads,
+	},
+	&cli.StringFlag{
+		Name:        "cid.source",
+		Usage:       "Where the download path sources CIDs: \"sniffer\" (bitswap sniffer) or \"uploads\" (this experiment's own uploads table).",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_CID_SOURCE"),
+		Value:       probeKuboConfig.CIDSource,
+		Destination: &probeKuboConfig.CIDSource,
+		Validator: func(s string) error {
+			switch s {
+			case "sniffer", "uploads":
+				return nil
+			default:
+				return fmt.Errorf("invalid cid.source %q: must be \"sniffer\" or \"uploads\"", s)
+			}
+		},
+	},
+	&cli.IntFlag{
+		Name:        "retrieve.recent",
+		Usage:       "When cid.source=uploads, select randomly from this many most-recent uploads.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_RETRIEVE_RECENT"),
+		Value:       probeKuboConfig.RetrieveRecent,
+		Destination: &probeKuboConfig.RetrieveRecent,
+	},
+	&cli.DurationFlag{
+		Name:        "retrieve.min.age",
+		Usage:       "When cid.source=uploads, skip uploads younger than this to allow DHT provide records to propagate.",
+		Sources:     cli.EnvVars("TIROS_PROBE_KUBO_RETRIEVE_MIN_AGE"),
+		Value:       probeKuboConfig.RetrieveMinAge,
+		Destination: &probeKuboConfig.RetrieveMinAge,
 	},
 }
 
@@ -224,15 +269,20 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 
 	var cidProvider pkg.CIDProvider
 	if !probeKuboConfig.UploadOnly {
-		if len(probeKuboConfig.DownloadCIDs) > 0 {
-			// cid provider not needed for upload only
+		switch {
+		case len(probeKuboConfig.DownloadCIDs) > 0:
 			cidProvider, err = pkg.NewStaticCIDProvider(probeKuboConfig.DownloadCIDs)
 			if err != nil {
 				return fmt.Errorf("creating static cid provider: %w", err)
 			}
 			slog.Info("Using CID provider for Kubo probes: StaticCIDProvider")
-		} else {
-			// cid provider not needed for upload only
+		case probeKuboConfig.CIDSource == "uploads":
+			cidProvider, err = pkg.NewClickhouseUploadsCIDProvider(dbClient, probeKuboConfig.RetrieveRecent, probeKuboConfig.RetrieveMinAge)
+			if err != nil {
+				return fmt.Errorf("creating uploads cid provider: %w", err)
+			}
+			slog.Info("Using CID provider for Kubo probes: ClickhouseUploadsCIDProvider")
+		default:
 			cidProvider, err = pkg.NewBitswapSnifferClickhouseCIDProvider(dbClient)
 			if err != nil {
 				return fmt.Errorf("creating clickhouse cid provider: %w", err)
@@ -274,12 +324,20 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 
 	fileSizeIdx := 0
 
+	// retained holds the CIDs of the most-recent uploads that are kept pinned
+	// when RetainUploads > 0 (seed mode), so a separate retriever can fetch them.
+	var retained []cid.Cid
+
 	maxIter := probeKuboConfig.MaxIterations
 	for i := 0; maxIter == 0 || i < maxIter; i++ {
 		slog.Info(strings.Repeat("-", 80))
 
-		// remove all pins and run a repo garbage collection
-		kubo.Reset(ctx)
+		// In seed mode (RetainUploads > 0) the working set is managed after each
+		// upload, so skip the blanket unpin-and-gc that would clear it.
+		if probeKuboConfig.RetainUploads == 0 {
+			// remove all pins and run a repo garbage collection
+			kubo.Reset(ctx)
+		}
 
 		// log the time until the next iteration
 		waitTime := time.Until(iterationStart.Add(probeKuboConfig.Interval)).Truncate(time.Second)
@@ -359,6 +417,16 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 			if err := dbClient.InsertUpload(ctx, dbUpload); err != nil {
 				return fmt.Errorf("inserting upload into database: %w", err)
 			}
+
+			// In seed mode, keep the most-recent RetainUploads CIDs pinned and
+			// unpin/gc everything older so a separate retriever can fetch them.
+			if probeKuboConfig.RetainUploads > 0 && err == nil && ur.CID.Defined() {
+				retained = append(retained, ur.CID)
+				if len(retained) > probeKuboConfig.RetainUploads {
+					retained = retained[len(retained)-probeKuboConfig.RetainUploads:]
+				}
+				kubo.RetainPins(ctx, retained)
+			}
 		}
 
 		if !probeKuboConfig.UploadOnly {
@@ -381,8 +449,11 @@ func probeKuboAction(ctx context.Context, cmd *cli.Command) error {
 				))
 
 				cidSource := "bitsniffer_" + origin
-				if _, ok := cidProvider.(*pkg.StaticCIDProvider); ok {
+				switch cidProvider.(type) {
+				case *pkg.StaticCIDProvider:
 					cidSource = "static"
+				case *pkg.ClickhouseUploadsCIDProvider:
+					cidSource = "uploads"
 				}
 
 				dbDownload := &db.DownloadModel{
