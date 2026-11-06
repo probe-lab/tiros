@@ -77,7 +77,10 @@ func probeBefore(ctx context.Context, c *cli.Command) (context.Context, error) {
 	}
 
 	if probeConfig.Timeout > 0 {
-		ctx, _ = context.WithTimeout(ctx, probeConfig.Timeout) // would be cleaner to call `cancel` eventually
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, probeConfig.Timeout)
+		// Release the timer resources as soon as the context is done.
+		context.AfterFunc(ctx, cancel)
 	}
 
 	return ctx, nil
