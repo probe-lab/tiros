@@ -177,9 +177,6 @@ func (p *WebsiteProbe) mustNavigate() {
 	if errors.Is(err, context.Canceled) {
 		panic(err)
 	} else if err != nil {
-		if p.Result.Err != nil {
-			err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), p.Result.Err)
-		}
 		p.Result.Err = ErrNetworkIdleTimeout
 	}
 }

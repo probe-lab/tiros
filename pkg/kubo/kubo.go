@@ -225,7 +225,7 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB float64) (*UploadResult, 
 	defer dataRdr.Close()
 
 	uploadStart := time.Now()
-	rootCID, err = k.Add(uploadCtx, dataRdr)
+	_, err = k.Add(uploadCtx, dataRdr)
 	uploadEnd := time.Now()
 
 	uploadSpan.RecordError(err) // noop if err is nil
