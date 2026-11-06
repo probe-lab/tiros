@@ -166,7 +166,6 @@ func probeWebsitesAction(ctx context.Context, cmd *cli.Command) error {
 
 	// shuffle websites, so that we have a different order in which we request the websites.
 	// If we didn't do this a single website would always be requested with a comparatively "cold" ipfs node.
-	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(websites), func(i, j int) {
 		websites[i], websites[j] = websites[j], websites[i]
 	})
