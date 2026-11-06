@@ -1,6 +1,6 @@
-#!/usr/bin/env just --justfile
+# Task runner. `just` lists the recipes; CI runs `just ci`.
 
-# Default recipe to display available recipes
+# List the recipes
 default:
     @just --list
 
@@ -8,29 +8,43 @@ default:
 tools:
     go install -tags 'clickhouse' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.15.2
 
-# Build the Go application
+# Build the tiros binary
 build:
-    go build -o tiros .
+    go build -o tiros ./cmd/tiros
 
 # Clean up built artifacts
 clean:
     rm -f tiros
     rm -r ./e2e/tmp.* || true
 
-# Format Go code
-fmt:
-    go fmt ./...
+# Check formatting, go fix, vet, and staticcheck without changing files
+lint:
+    @test -z "$(gofumpt -l .)" || { echo "not formatted, run just format:"; gofumpt -l .; exit 1; }
+    go fix -diff ./...
+    go vet ./...
+    staticcheck ./...
+
+# Format the code and apply go fix in place
+format:
+    gofumpt -w .
+    go fix ./...
 
 # Connect to local database
 db-connect:
     docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
 
-test:
-    go test ./...
+# Run the tests
+test *args:
+    go test ./... {{ args }}
 
+# Run everything CI runs
+ci: lint build test
+
+# Run one end-to-end test: website, upload, download, serviceworker or gateway
 e2e case:
     ./e2e/test_{{case}}.sh
 
+# Fetch recent CIDs from the bitswap sniffer into testdata/cids.txt
 fetch-testcids:
     @echo "Fetching the latest 100 CIDs from the bitswap sniffer..."
     @mkdir -p testdata
