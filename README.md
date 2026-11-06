@@ -18,6 +18,7 @@ setup in detail and how the measurements can be run locally.
 <!-- TOC -->
 * [Tiros](#tiros)
   * [Table of Contents](#table-of-contents)
+  * [Quickstart](#quickstart)
   * [CID Provider Concept](#cid-provider-concept)
   * [Traditional HTTP Gateway Performance](#traditional-http-gateway-performance)
   * [Service Worker Gateway Performance](#service-worker-gateway-performance)
@@ -30,11 +31,24 @@ setup in detail and how the measurements can be run locally.
     * [Global](#global)
     * [Probe](#probe)
     * [Migrations](#migrations)
-  * [Testing](#testing)
+  * [Metrics](#metrics)
+  * [Development](#development)
+  * [Deployment](#deployment)
   * [Maintainers](#maintainers)
   * [Contributing](#contributing)
   * [License](#license)
 <!-- TOC -->
+
+## Quickstart
+
+```shell
+just build                      # builds ./tiros
+docker compose up clickhouse    # local ClickHouse; migrations apply on first use
+./tiros probe gateways --iterations.max 1 --gateways ipfs.io --controlled.share 1 --cids QmUvSqPqYsjeab2JgsNc4PjbAGnCzfn5xid6piJgYYzehH
+```
+
+Copy `.env.example` to `.env` to see every environment variable. The sections
+below describe each probe and its flags.
 
 ## CID Provider Concept
 
@@ -682,9 +696,36 @@ The migrations will automatically be applied on startup of Tiros. Always define
 migrations as if they were applied in a clustered context. Tiros will figure
 out how to apply them for a local docker-clickhouse.
 
-## Testing
+## Metrics
 
-Tiros has a few end-to-end tests that can be run with:
+Tiros exports these OpenTelemetry metrics when `--metrics.enabled` is set
+(`/metrics` on port 6060 by default). The instrument names are as defined in
+the code; the Prometheus exporter may add suffixes.
+
+| Metric | Type | Unit | Labels | Description |
+| --- | --- | --- | --- | --- |
+| `gateway_downloads` | counter | 1 | `source`, `gateway`, `success` | Gateway download attempts (`probe gateways`) |
+| `active_gateways` | gauge | 1 | none | Gateways currently probed (`probe gateways`) |
+| `probes` | counter | 1 | `gateway`, `status`, `source` | Service worker gateway probes (`probe serviceworker`) |
+| `uploads` | counter | 1 | `success` | Kubo uploads (`probe kubo`) |
+| `downloads` | counter | 1 | `origin`, `success` | Kubo downloads (`probe kubo`) |
+| `cid_select` | counter | 1 | `origin`, `success` | CID selections from the bitswap sniffer database |
+
+The measurement results themselves go to ClickHouse, not to metrics. There is
+no link to a Grafana dashboard yet.
+
+## Development
+
+```shell
+just          # list the recipes
+just build    # build ./tiros
+just test     # unit tests
+just lint     # gofumpt, go fix, go vet, staticcheck
+just format   # gofumpt and go fix in place
+just ci       # lint, build and test: what CI runs
+```
+
+Tiros has a few end-to-end tests that need Docker and can be run with:
 
 ```shell
 just e2e website
@@ -693,6 +734,14 @@ just e2e download
 just e2e serviceworker
 just e2e gateway
 ```
+
+## Deployment
+
+Tiros runs on ECS in several regions. The Terraform modules `tiros_gateways`
+and `tiros_kubo` in
+[probelab-infra](https://github.com/probe-lab/probelab-infra) (`tf/`) define
+the services. CI pushes one image per merge to ProbeLab's ECR repository as
+`tiros-sha<commit>`; a deploy sets that tag in the Terraform configuration.
 
 ## Maintainers
 
