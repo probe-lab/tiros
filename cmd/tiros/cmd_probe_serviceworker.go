@@ -272,17 +272,19 @@ func probeServiceWorkerAction(ctx context.Context, cmd *cli.Command) error {
 			}
 
 			dbModel := &db.ServiceWorkerProbeModel{
-				RunID:         runID.String(),
-				Region:        rootConfig.AWSRegion,
-				TirosVersion:  cmd.Root().Version,
-				Gateway:       gateway,
-				CID:           ciid.String(),
-				CIDSource:     cidSource,
-				URL:           navURL.String(),
-				Error:         errStr,
-				CreatedAt:     time.Now(),
-				ServerTimings: "{}",
+				RunID:        runID.String(),
+				Region:       rootConfig.AWSRegion,
+				TirosVersion: cmd.Root().Version,
+				Gateway:      gateway,
+				CID:          ciid.String(),
+				CIDSource:    cidSource,
+				URL:          navURL.String(),
+				Error:        errStr,
+				CreatedAt:    time.Now(),
 			}
+
+			//lint:ignore SA1019 the server_timings column is still part of the table; keep writing an empty value
+			dbModel.ServerTimings = "{}"
 
 			// Populate fields from result if successful
 			if result != nil {
