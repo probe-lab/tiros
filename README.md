@@ -683,13 +683,13 @@ OPTIONS:
 To create a new migration run:
 
 ```shell
-migrate create -dir migrations -ext sql -seq create_website_measurements_table
+migrate create -dir pkg/db/migrations -ext sql -seq create_website_measurements_table
 ```
 
 Apply migrations by running:
 
 ```shell
-migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path cmd/tiros/migrations up
+migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path pkg/db/migrations up
 ```
 
 The migrations will automatically be applied on startup of Tiros. Always define
