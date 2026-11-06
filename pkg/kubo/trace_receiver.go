@@ -20,6 +20,7 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -30,6 +31,21 @@ type TraceReceiverConfig struct {
 	TraceOut    string
 	ForwardHost string
 	ForwardPort int
+}
+
+// waitForReady triggers the connection and blocks until it is ready, or fails
+// when the timeout passes.
+func waitForReady(conn *grpc.ClientConn, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	conn.Connect()
+	for state := conn.GetState(); state != connectivity.Ready; state = conn.GetState() {
+		if !conn.WaitForStateChange(ctx, state) {
+			return fmt.Errorf("connection is %s after %s: %w", state, timeout, ctx.Err())
+		}
+	}
+	return nil
 }
 
 // TraceReceiver implements the OTLP gRPC service
@@ -84,13 +100,18 @@ func NewTraceReceiver(cfg *TraceReceiverConfig) (*TraceReceiver, error) {
 	coltracepb.RegisterTraceServiceServer(server, tr)
 
 	if cfg.ForwardHost != "" && cfg.ForwardPort != 0 {
-		conn, err := grpc.Dial(
+		conn, err := grpc.NewClient(
 			net.JoinHostPort(cfg.ForwardHost, fmt.Sprintf("%d", cfg.ForwardPort)),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			grpc.WithBlock(),
-			grpc.WithTimeout(5*time.Second),
 		)
 		if err != nil {
+			return nil, fmt.Errorf("failed to connect to downstream: %w", err)
+		}
+
+		// NewClient connects lazily. Wait up to five seconds for the connection
+		// to be ready, so that an unreachable downstream fails at startup.
+		if err := waitForReady(conn, 5*time.Second); err != nil {
+			_ = conn.Close()
 			return nil, fmt.Errorf("failed to connect to downstream: %w", err)
 		}
 
