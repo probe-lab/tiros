@@ -704,4 +704,4 @@ Feel free to dive in! [Open an issue](https://github.com/RichardLitt/standard-re
 
 ## License
 
-[MIT](LICENSE) © Dennis Trautwein
+[PolyForm Strict License 1.0.0](LICENSE)
