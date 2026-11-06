@@ -43,7 +43,7 @@ func TestParseServerTimings(t *testing.T) {
 			name:                         "readme_example",
 			metrics:                      readmeMetrics,
 			wantLen:                      11,
-			wantIPFSResolveS:             fptr(0),
+			wantIPFSResolveS:             new(float64(0)),
 			wantDNSLinkResolveS:          nil,
 			wantIPNSResolveS:             nil,
 			wantFirstConnectS:            new(0.206),
@@ -75,7 +75,7 @@ func TestParseServerTimings(t *testing.T) {
 			metrics:                mustParse(t, `d;dur=12,i;dur=0,n;dur=34`),
 			wantLen:                3,
 			wantDNSLinkResolveS:    new(0.012),
-			wantIPFSResolveS:       fptr(0),
+			wantIPFSResolveS:       new(float64(0)),
 			wantIPNSResolveS:       new(0.034),
 			wantFastestBlockSystem: "",
 			checks: []fieldCheck{
