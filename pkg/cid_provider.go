@@ -191,7 +191,7 @@ var _ CIDProvider = (*ControlledCIDProvider)(nil)
 
 func NewControlledCIDProvider() (*ControlledCIDProvider, error) {
 	var cids []cid.Cid
-	for _, line := range strings.Split(controlledCIDs, "\n") {
+	for line := range strings.SplitSeq(controlledCIDs, "\n") {
 		if strings.HasPrefix(line, "#") {
 			continue
 		}

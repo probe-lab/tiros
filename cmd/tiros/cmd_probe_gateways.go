@@ -406,7 +406,7 @@ func probeGatewaysAction(ctx context.Context, cmd *cli.Command) error {
 
 					for _, format := range formats {
 						// first iteration uncached, second cached
-						for j := 0; j < 2; j++ {
+						for range 2 {
 							logEntry.With("cid", ciid.String(), "gateway", gateway, "format", format).Debug("Probing gateway")
 
 							pgc := gatewayProbeConfig{

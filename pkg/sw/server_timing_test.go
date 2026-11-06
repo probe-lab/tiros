@@ -46,8 +46,8 @@ func TestParseServerTimings(t *testing.T) {
 			wantIPFSResolveS:             fptr(0),
 			wantDNSLinkResolveS:          nil,
 			wantIPNSResolveS:             nil,
-			wantFirstConnectS:            fptr(0.206),
-			wantFirstBlockS:              fptr(1.0),
+			wantFirstConnectS:            new(0.206),
+			wantFirstBlockS:              new(1.0),
 			wantProviderCountHTTPGateway: 4, // 4 'p' entries, all system=http_gateway
 			wantProviderCountLibp2p:      0,
 			wantFastestBlockSystem:       "trustless_gateway",
@@ -74,9 +74,9 @@ func TestParseServerTimings(t *testing.T) {
 			name:                   "only_resolve_metrics_no_desc",
 			metrics:                mustParse(t, `d;dur=12,i;dur=0,n;dur=34`),
 			wantLen:                3,
-			wantDNSLinkResolveS:    fptr(0.012),
+			wantDNSLinkResolveS:    new(0.012),
 			wantIPFSResolveS:       fptr(0),
-			wantIPNSResolveS:       fptr(0.034),
+			wantIPNSResolveS:       new(0.034),
 			wantFastestBlockSystem: "",
 			checks: []fieldCheck{
 				{idx: 0, name: "dnslink_resolve", durS: 0.012},
@@ -89,7 +89,7 @@ func TestParseServerTimings(t *testing.T) {
 			metrics: mustParse(t,
 				`b;dur=500;desc="t,prov1,cidX",b;dur=100;desc="b,prov2,cidY",b;dur=900;desc="t,prov3,cidZ"`),
 			wantLen:                3,
-			wantFirstBlockS:        fptr(0.1),
+			wantFirstBlockS:        new(0.1),
 			wantFastestBlockSystem: "bitswap",
 		},
 		{
@@ -113,7 +113,6 @@ func TestParseServerTimings(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -208,7 +207,8 @@ func mustParse(t *testing.T, header string) []*servertiming.Metric {
 	return h.Metrics()
 }
 
-func fptr(v float64) *float64 { return &v }
+//go:fix inline
+func fptr(v float64) *float64 { return new(v) }
 
 func assertLen[T any](t *testing.T, label string, s []T, want int) {
 	t.Helper()

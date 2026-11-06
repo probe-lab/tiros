@@ -216,7 +216,6 @@ func (p *WebsiteProbe) parseMetrics() error {
 	}
 
 	for _, v := range vitals {
-		v := v
 		switch v.Name {
 		case "LCP":
 			p.Result.LCP = &v.Value

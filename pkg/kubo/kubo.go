@@ -465,7 +465,7 @@ func (k *Kubo) FindProviders(ctx context.Context, website string, results chan<-
 	idJobs := make(chan *peer.AddrInfo, numJobs)
 	idResults := make(chan idResult, numJobs)
 
-	for w := 0; w < 10; w++ {
+	for range 10 {
 		go func() {
 			for j := range idJobs {
 				tCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -486,7 +486,7 @@ func (k *Kubo) FindProviders(ctx context.Context, website string, results chan<-
 	}
 	close(idJobs)
 
-	for i := 0; i < numJobs; i++ {
+	for range numJobs {
 		idr := <-idResults
 
 		prov := &Provider{
