@@ -253,10 +253,3 @@ func (p *WebsiteProbe) close() {
 		p.logEntry().With("err", err).Warn("Error closing browser connection")
 	}
 }
-
-func p2f(ptr *float64) float64 {
-	if ptr == nil {
-		return 0
-	}
-	return *ptr
-}

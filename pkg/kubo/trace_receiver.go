@@ -199,24 +199,3 @@ func traceIDMatcher(traceID trace.TraceID) TraceMatcher {
 		return bytes.Equal(span.TraceId, traceID[:])
 	}
 }
-
-func strAttrMatcher(k, v string) TraceMatcher {
-	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
-		for _, a := range span.Attributes {
-			return a.Key == k && a.Value.GetStringValue() == v
-		}
-		return false
-	}
-}
-
-func nameMatcher(name string) TraceMatcher {
-	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
-		return span.Name == name
-	}
-}
-
-func nameAttrMatcher(name, k, v string) TraceMatcher {
-	return func(rspan *v1.ResourceSpans, sspan *v1.ScopeSpans, span *v1.Span) bool {
-		return strAttrMatcher(k, v)(rspan, sspan, span) && nameMatcher(name)(rspan, sspan, span)
-	}
-}

@@ -207,9 +207,6 @@ func mustParse(t *testing.T, header string) []*servertiming.Metric {
 	return h.Metrics()
 }
 
-//go:fix inline
-func fptr(v float64) *float64 { return new(v) }
-
 func assertLen[T any](t *testing.T, label string, s []T, want int) {
 	t.Helper()
 	if len(s) != want {
