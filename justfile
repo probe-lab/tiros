@@ -1,5 +1,8 @@
 # Task runner. `just` lists the recipes; CI runs `just ci`.
 
+# The lint tools, pinned here so a person and CI run the same versions.
+gofumpt := "go run mvdan.cc/gofumpt@v0.12.0"
+
 # List the recipes
 default:
     @just --list
@@ -20,13 +23,13 @@ clean:
 # Check formatting, go fix, and vet without changing files
 # staticcheck is left out until its existing findings are fixed
 lint:
-    @test -z "$(gofumpt -l .)" || { echo "not formatted, run just format:"; gofumpt -l .; exit 1; }
+    @test -z "$({{ gofumpt }} -l .)" || { echo "not formatted, run just format:"; {{ gofumpt }} -l .; exit 1; }
     go fix -diff ./...
     go vet ./...
 
 # Format the code and apply go fix in place
 format:
-    gofumpt -w .
+    {{ gofumpt }} -w .
     go fix ./...
 
 # Connect to local database
