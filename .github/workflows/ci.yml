@@ -22,7 +22,7 @@ jobs:
     with:
       # Empty in a public repo, which then uses GitHub-hosted runners.
       runner: ${{ vars.RUNNER_LABEL }}
-      go-tools: mvdan.cc/gofumpt@v0.12.0
+      go-tools: mvdan.cc/gofumpt@v0.12.0 honnef.co/go/tools/cmd/staticcheck@2026.2.2
 
   image:
     needs: go

@@ -720,7 +720,7 @@ no link to a Grafana dashboard yet.
 just          # list the recipes
 just build    # build ./tiros
 just test     # unit tests
-just lint     # gofumpt, go fix, go vet
+just lint     # gofumpt, go fix, go vet, staticcheck
 just format   # gofumpt and go fix in place
 just ci       # lint, build and test: what CI runs
 ```
