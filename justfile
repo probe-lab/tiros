@@ -29,10 +29,6 @@ format:
     gofumpt -w .
     go fix ./...
 
-# Connect to local database
-db-connect:
-    docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
-
 # Run the tests
 test *args:
     go test ./... {{ args }}
