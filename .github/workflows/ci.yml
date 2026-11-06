@@ -1,0 +1,47 @@
+# CI: lints and tests every pull request, and builds the image of every merge.
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+# A new push to a pull request cancels its running checks.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    if: github.event.pull_request.draft != true
+    uses: probe-lab/.github/.github/workflows/go.yml@v1
+    with:
+      # Empty in a public repo, which then uses GitHub-hosted runners.
+      runner: ${{ vars.RUNNER_LABEL }}
+      go-tools: mvdan.cc/gofumpt@v0.12.0
+
+  image:
+    needs: go
+    permissions:
+      contents: read
+      id-token: write
+    uses: probe-lab/.github/.github/workflows/image.yml@v1
+    with:
+      runner: ${{ vars.RUNNER_LABEL }}
+      service: tiros
+      push: ${{ github.event_name == 'push' }}
+
+  # The one required check. It passes when every job passed or was skipped.
+  ci-ok:
+    name: ci-ok
+    if: always()
+    needs: [go, image]
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    steps:
+      - name: Checking that every job passed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
