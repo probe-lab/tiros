@@ -177,9 +177,6 @@ func (p *WebsiteProbe) mustNavigate() {
 	if errors.Is(err, context.Canceled) {
 		panic(err)
 	} else if err != nil {
-		if p.Result.Err != nil {
-			err = fmt.Errorf("%s: %w", ErrNetworkIdleTimeout.Error(), p.Result.Err)
-		}
 		p.Result.Err = ErrNetworkIdleTimeout
 	}
 }
@@ -252,11 +249,4 @@ func (p *WebsiteProbe) close() {
 	if err := p.Browser.Close(); err != nil && !errors.Is(err, context.Canceled) {
 		p.logEntry().With("err", err).Warn("Error closing browser connection")
 	}
-}
-
-func p2f(ptr *float64) float64 {
-	if ptr == nil {
-		return 0
-	}
-	return *ptr
 }

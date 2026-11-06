@@ -1,20 +1,17 @@
 package kubo
 
 import (
-	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
-	"math/rand"
 	"net"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/ipfs/boxo/files"
@@ -228,7 +225,7 @@ func (k *Kubo) Upload(ctx context.Context, fileSizeMiB float64) (*UploadResult, 
 	defer dataRdr.Close()
 
 	uploadStart := time.Now()
-	rootCID, err = k.Add(uploadCtx, dataRdr)
+	_, err = k.Add(uploadCtx, dataRdr)
 	uploadEnd := time.Now()
 
 	uploadSpan.RecordError(err) // noop if err is nil
@@ -610,34 +607,4 @@ func (k *Kubo) GetCID(ctx context.Context, body io.Reader) (cid.Cid, error) {
 	}
 
 	return cid.Decode(evt.Hash)
-}
-
-func looksLikeJSON(data []byte) bool {
-	if len(data) == 0 {
-		return false
-	}
-
-	if bytes.IndexByte(data, 0) >= 0 {
-		return false
-	}
-
-	if !utf8.Valid(data) {
-		return false
-	}
-
-	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF}) // UTF-8 BOM
-	s := strings.TrimSpace(string(data))
-	if s == "" {
-		return false
-	}
-
-	dec := json.NewDecoder(strings.NewReader(s))
-	dec.UseNumber()
-
-	var v any
-	if err := dec.Decode(&v); err != nil {
-		return false
-	}
-
-	return true
 }

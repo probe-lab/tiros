@@ -17,21 +17,17 @@ clean:
     rm -f tiros
     rm -r ./e2e/tmp.* || true
 
-# Check formatting, go fix, and vet without changing files
-# staticcheck is left out until its existing findings are fixed
+# Check formatting, go fix, vet, and staticcheck without changing files
 lint:
     @test -z "$(gofumpt -l .)" || { echo "not formatted, run just format:"; gofumpt -l .; exit 1; }
-    go fix -diff ./...
+    @test -z "$(go fix -diff ./... 2>/dev/null)" || { go fix -diff ./... 2>/dev/null; echo "go fix changes pending, run just format"; exit 1; }
     go vet ./...
+    staticcheck ./...
 
 # Format the code and apply go fix in place
 format:
     gofumpt -w .
     go fix ./...
-
-# Connect to local database
-db-connect:
-    docker exec -it tiros-db-1 psql -U tiros_test -d tiros_test
 
 # Run the tests
 test *args:

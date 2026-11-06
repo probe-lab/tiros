@@ -683,13 +683,13 @@ OPTIONS:
 To create a new migration run:
 
 ```shell
-migrate create -dir migrations -ext sql -seq create_website_measurements_table
+migrate create -dir pkg/db/migrations -ext sql -seq create_website_measurements_table
 ```
 
 Apply migrations by running:
 
 ```shell
-migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path cmd/tiros/migrations up
+migrate -database 'clickhouse://clickhouse_host:9440?username=tiros&password=$PASSWORD&database=tiros&secure=true' -path pkg/db/migrations up
 ```
 
 The migrations will automatically be applied on startup of Tiros. Always define
@@ -720,7 +720,7 @@ no link to a Grafana dashboard yet.
 just          # list the recipes
 just build    # build ./tiros
 just test     # unit tests
-just lint     # gofumpt, go fix, go vet
+just lint     # gofumpt, go fix, go vet, staticcheck
 just format   # gofumpt and go fix in place
 just ci       # lint, build and test: what CI runs
 ```
