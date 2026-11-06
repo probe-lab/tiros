@@ -2,7 +2,6 @@ package kubo
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"time"
 
@@ -252,23 +251,4 @@ func (r *DownloadResult) isPopulated() bool {
 	}
 
 	return true
-}
-
-func extractTimeRange(spans []*v1.Span) (time.Time, time.Time) {
-	var (
-		start int64 = math.MaxInt64
-		end   int64 = 0
-	)
-
-	for _, span := range spans {
-		if span.StartTimeUnixNano < math.MaxInt64 && int64(span.StartTimeUnixNano) < start {
-			start = int64(span.StartTimeUnixNano)
-		}
-
-		if span.EndTimeUnixNano < math.MaxInt64 && int64(span.EndTimeUnixNano) > end {
-			end = int64(span.EndTimeUnixNano)
-		}
-	}
-
-	return time.Unix(0, start), time.Unix(0, end)
 }
