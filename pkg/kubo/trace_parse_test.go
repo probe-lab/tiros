@@ -36,7 +36,7 @@ func Test_parse_upload_0_trace(t *testing.T) {
 		IPFSAddTraceID: trace.TraceID(tid),
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/upload_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
@@ -63,7 +63,7 @@ func Test_parse_upload_1_trace(t *testing.T) {
 		IPFSAddTraceID: trace.TraceID(tid),
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/upload_1/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
@@ -87,7 +87,7 @@ func Test_parse_download_bitswap_0_trace(t *testing.T) {
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
-	for i := 0; i < 1; i++ {
+	for i := range 1 {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_bitswap_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
@@ -116,7 +116,7 @@ func Test_parse_download_ipni_0_trace(t *testing.T) {
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_ipni_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}
@@ -146,7 +146,7 @@ func Test_parse_download_dht_0_trace(t *testing.T) {
 		spansByTraceID: map[trace.TraceID][]*v1.Span{},
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		trace := loadTrace(t, fmt.Sprintf("../../testdata/download_dht_0/trace-%d.proto.json", i))
 		res.parse(trace)
 	}

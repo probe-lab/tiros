@@ -342,7 +342,7 @@ func measureWebsites(ctx context.Context, k *kubo.Kubo, websites []string, resul
 func findAllProviders(ctx context.Context, k *kubo.Kubo, websites []string, results chan<- *kubo.Provider) {
 	defer close(results)
 	for _, website := range websites {
-		for retry := 0; retry < 3; retry++ {
+		for retry := range 3 {
 			err := k.FindProviders(ctx, website, results)
 			if err != nil {
 				slog.With("err", err, "retry", retry, "website", website).Warn("Couldn't find providers")

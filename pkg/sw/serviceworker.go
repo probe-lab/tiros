@@ -287,7 +287,7 @@ func (p *swProbe) Run(ctx context.Context) (*swProbeResult, error) {
 	listenCtx, listenCancel := context.WithCancel(browserCtx)
 	defer listenCancel()
 
-	chromedp.ListenTarget(listenCtx, func(ev interface{}) {
+	chromedp.ListenTarget(listenCtx, func(ev any) {
 		p.listenMu.Lock()
 		defer p.listenMu.Unlock()
 
@@ -389,7 +389,7 @@ func (p *swProbe) handleAttachedToTarget(ctx context.Context, e *target.EventAtt
 	}
 
 	// Attach the main event handler to this Service Worker context
-	chromedp.ListenTarget(swCtx, func(ev interface{}) {
+	chromedp.ListenTarget(swCtx, func(ev any) {
 		p.listenMu.Lock()
 		defer p.listenMu.Unlock()
 
