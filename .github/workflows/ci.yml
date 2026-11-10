@@ -1,11 +1,25 @@
-# CI: lints and tests every pull request, and builds the image of every merge.
+# CI for tiros: checks every pull request, and builds the image of every
+# merge (and of a pull request with the label "push-image") as
+# tiros-sha<commit>. It does not deploy: probelab-infra pins the image tag of
+# every region. A person starts this workflow by hand to check and build any
+# commit. "skip-checks" leaves out lint, build and tests.
 name: CI
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: The commit to build. Empty means the newest on main.
+        type: string
+        required: false
+      skip-checks:
+        description: Skip the Lint, Build & Test Steps
+        type: boolean
+        default: false
 
 # A new push to a pull request cancels its running checks.
 concurrency:
@@ -16,32 +30,49 @@ permissions:
   contents: read
 
 jobs:
-  go:
-    if: github.event.pull_request.draft != true
-    uses: probe-lab/.github/.github/workflows/go.yml@v1
-    with:
-      # Empty in a public repo, which then uses GitHub-hosted runners.
-      runner: ${{ vars.RUNNER_LABEL }}
-      go-tools: mvdan.cc/gofumpt@v0.12.0 honnef.co/go/tools/cmd/staticcheck@2026.2.2
+  check:
+    name: Lint, Build & Test
+    # Runs unless the pull request is a draft, the button ticked skip-checks, or
+    # the run comes from a label other than push-image.
+    if: >-
+      github.event.pull_request.draft != true && !inputs.skip-checks &&
+      (github.event.action != 'labeled' || github.event.label.name == 'push-image')
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    steps:
+      - name: Checking out the Code
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.commit || github.sha }}
+
+      - name: Setting up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: ${{ runner.environment == 'github-hosted' }}
+
+      - name: Setting up just
+        uses: extractions/setup-just@v4
+
+      - name: Linting the Code
+        run: just lint
+
+      - name: Building the Binary
+        run: just build
+
+      - name: Running the Tests
+        run: just test
 
   image:
-    needs: go
+    name: Container Image
+    needs: check
+    # Doesn't run for a draft PR. Runs when no check failed, also when the checks were skipped.
+    if: github.event.pull_request.draft != true && !failure() && !cancelled()
     permissions:
       contents: read
       id-token: write
-    uses: probe-lab/.github/.github/workflows/image.yml@v1
+      pull-requests: read
+    uses: probe-lab/.github/.github/workflows/image.yml@main
     with:
-      runner: ${{ vars.RUNNER_LABEL }}
       service: tiros
-      push: ${{ github.event_name == 'push' }}
-
-  # The one required check. It passes when every job passed or was skipped.
-  ci-ok:
-    name: ci-ok
-    if: always()
-    needs: [go, image]
-    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
-    steps:
-      - name: Checking that every job passed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: exit 1
+      commit: ${{ inputs.commit }}

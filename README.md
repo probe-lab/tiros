@@ -741,7 +741,8 @@ Tiros runs on ECS in several regions. The Terraform modules `tiros_gateways`
 and `tiros_kubo` in
 [probelab-infra](https://github.com/probe-lab/probelab-infra) (`tf/`) define
 the services. CI pushes one image per merge to ProbeLab's ECR repository as
-`tiros-sha<commit>`; a deploy sets that tag in the Terraform configuration.
+`tiros-sha<commit>`; a deploy sets that tag in the Terraform configuration. A
+pull request with the label `push-image` pushes its image too.
 
 ## Maintainers
 
