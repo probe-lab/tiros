@@ -152,6 +152,47 @@ func (k *Kubo) Reset(ctx context.Context) {
 	}
 }
 
+// RetainPins unpins every recursive or direct pin whose root CID is not in keep,
+// then runs a repo garbage collection to reclaim the unpinned blocks. Pins listed
+// in keep are left in place so the content stays available for retrieval.
+func (k *Kubo) RetainPins(ctx context.Context, keep []cid.Cid) {
+	keepSet := make(map[string]struct{}, len(keep))
+	for _, c := range keep {
+		keepSet[c.String()] = struct{}{}
+	}
+
+	pinsChan := make(chan iface.Pin)
+
+	go func() {
+		if err := k.Pin().Ls(ctx, pinsChan); err != nil {
+			slog.With("err", err).Warn("Error getting pins")
+		}
+	}()
+
+	for pin := range pinsChan {
+		if pin.Type() != "recursive" && pin.Type() != "direct" {
+			continue
+		}
+
+		if _, ok := keepSet[pin.Path().RootCid().String()]; ok {
+			continue
+		}
+
+		slog.With("pin", pin.Path()).Info("Unpinning file from Kubo")
+		if err := k.Pin().Rm(ctx, pin.Path()); err != nil {
+			slog.With("err", err, "pin", pin.Path()).Warn("Error unpinning file from Kubo")
+		}
+	}
+
+	slog.Info("Running repo garbage collection")
+	res, err := k.Request("repo/gc").Send(ctx)
+	if err != nil {
+		slog.With("err", err).Warn("Error running ipfs gc")
+	} else {
+		defer pllog.Defer(res.Close, "Failed closing repo garbage collection")
+	}
+}
+
 func (k *Kubo) Upload(ctx context.Context, fileSizeMiB float64) (*UploadResult, error) {
 	slog.Info(fmt.Sprintf("Uploading %gMiB to Kubo", fileSizeMiB))
 
